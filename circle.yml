@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - mv /home/ubuntu/alpine/docker-build /home/ubuntu/bin/docker-build
+    - mv /home/ubuntu/zz/docker-build /home/ubuntu/bin/docker-build
     - chmod +x /home/ubuntu/bin/docker-build
   override:
     - docker-build pull || true
