@@ -16,9 +16,7 @@ services:
        - MYSQL_PASSWORD=1
      
   wordpress-itshellws1:
-     build:
-        context: .
-        dockerfile: Dockerfile.web
+     image: nightmareze1/zz:latest
      container_name: wordpress-itshellws1 
      links:
        - mysql-test11:itshelldb
