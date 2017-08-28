@@ -1,0 +1,35 @@
+mysql-test11:
+   image: mysql:5.6
+   container_name: mysql-itshellws1
+   hostname: mysql-itshellws1
+   volumes:
+     - ./mysql:/var/lib/mysql/
+   ports:
+     - 3306:3306
+   environment:
+     - MYSQL_ROOT_PASSWORD=1
+     - MYSQL_DATABASE=itshelldb
+     - MYSQL_USER=root
+     - MYSQL_PASSWORD=1
+     
+wordpress-itshellws1:
+   image: wordpress
+   container_name: wordpress-itshellws1 
+   volumes:
+     - ./html:/var/www/html
+   links:
+     - mysql-test11:itshelldb
+   environment:
+     - VIRTUAL_HOST=www.itshellws.org,www.itshellweb.org
+
+nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy1
+    volumes:
+     - /var/run/docker.sock:/tmp/docker.sock
+     - ./certs:/etc/nginx/certs
+    ports:
+     - "443:443"
+     - "80:80"
+    security_opt:
+     - label:type:docker_t
