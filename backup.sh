@@ -2,6 +2,9 @@
 
 #login path
 cd /home/ec2-user/github/
+rm -rf mysql-backup.tar
+tar -cvf mysql-backup.tar mysql/
+mv mysql-backup.tar ../
 
 git add . 
 # Git: add and commit changes
