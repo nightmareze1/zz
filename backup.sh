@@ -1,10 +1,13 @@
 #!/bin/bash
 
+$fecha=`date`
+
 #login path
 cd /home/ec2-user/github/
 rm -rf mysql-backup.tar
-tar -cvf mysql-backup.tar mysql/
-mv mysql-backup.tar ../
+tar -cvf mysql-backup$fecha.tar mysql/
+mv mysql-backup*.tar ../
+aws s3 cp mysql-backup*.tar s3://itshellws/
 
 git add . 
 # Git: add and commit changes

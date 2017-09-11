@@ -1,4 +1,4 @@
-var javascript_version = "2.1.14";
+var javascript_version = "2.2.2";
 var ignore_key = true;
 var start = 1;
 var end = 16;
@@ -38,9 +38,15 @@ var AI_ALIGNMENT_STICKY_RIGHT   = 9;
 var AI_ALIGNMENT_STICKY_TOP     = 10;
 var AI_ALIGNMENT_STICKY_BOTTOM  = 11;
 
-var AI_ACTION_NONE              = 0;
-var AI_ACTION_WARNING_MESSAGE   = 1;
-var AI_ACTION_REDIRECTION       = 2;
+var AI_ADB_ACTION_NONE              = 0;
+var AI_ADB_ACTION_MESSAGE           = 1;
+var AI_ADB_ACTION_REDIRECTION       = 2;
+
+var AI_ADB_BLOCK_ACTION_DO_NOTHING  = 0;
+var AI_ADB_BLOCK_ACTION_REPLACE     = 1;
+var AI_ADB_BLOCK_ACTION_SHOW        = 2;
+var AI_ADB_BLOCK_ACTION_HIDE        = 3;
+
 
 var shSettings = {
   "tab_size":"4",
@@ -53,6 +59,8 @@ var shSettings = {
 
 function SyntaxHighlight (id, block, settings) {
   var textarea, editor, form, session, editDiv;
+
+  settings ['tab_size'] = 2;
 
   this.textarea = textarea = jQuery(id);
   this.settings = settings || {};
@@ -89,7 +97,7 @@ function SyntaxHighlight (id, block, settings) {
     jQuery("#ai-active-tab").attr ("value", '[' + active_tab + ',' + active_tab_0 + ']');
   });
 
-  session.setMode ("ace/mode/html");
+  session.setMode ("ace/mode/ai-html");
 
   this.applySettings();
 }
@@ -144,6 +152,27 @@ function set_editor_text (block, text) {
   } else textarea.val (text);
 }
 
+function window_open_post (url, windowoption, name, params) {
+   var form = document.createElement("form");
+   form.setAttribute("method", "post");
+   form.setAttribute("action", url);
+   form.setAttribute("target", name);
+   for (var i in params) {
+     if (params.hasOwnProperty(i)) {
+       var input = document.createElement('input');
+       input.type = 'hidden';
+       input.name = i;
+       input.value = encodeURI (params[i]);
+       form.appendChild(input);
+     }
+   }
+   document.body.appendChild(form);
+   //note I am using a post.htm page since I did not want to make double request to the page
+   //it might have some Page_Load call which might screw things up.
+   window.open("post.htm", name, windowoption);
+   form.submit();
+   document.body.removeChild(form);
+}
 
 jQuery(document).ready(function($) {
 
@@ -389,10 +418,6 @@ jQuery(document).ready(function($) {
          }
         }, {
          plotProps : {
-          fill : "gray"
-         }
-        }, {
-         plotProps : {
           fill : "#ec6400"
          }
         }, {
@@ -457,7 +482,7 @@ jQuery(document).ready(function($) {
   syntax_highlighting = typeof shSettings ['theme'] != 'undefined' && shSettings ['theme'] != 'disabled';
 
   var header_id = 'name';
-  var preview_top = (screen.height / 2) - (820 / 2);
+//  var preview_top = (screen.height / 2) - (820 / 2);
 
   function remove_default_values (block) {
     $("#tab-" + block + " input:checkbox").each (function() {
@@ -558,8 +583,8 @@ jQuery(document).ready(function($) {
     var editor = ace.edit ("editor-" + block);
 
     if ($("input#process-php-"+block).is(":checked")) {
-      editor.getSession ().setMode ("ace/mode/php");
-    } else editor.getSession ().setMode ("ace/mode/html");
+      editor.getSession ().setMode ("ace/mode/ai-php");
+    } else editor.getSession ().setMode ("ace/mode/ai-html");
   }
 
   function disable_auto_refresh_statistics () {
@@ -752,9 +777,7 @@ jQuery(document).ready(function($) {
     $("#scheduling-delay-"+block).hide();
     $("#scheduling-between-dates-"+block).hide();
     $("#scheduling-delay-warning-"+block).hide();
-
     var scheduling = $("select#scheduling-"+block).val();
-
     if (scheduling == "1") {
       if (content_settings) {
         $("#scheduling-delay-"+block).show();
@@ -765,6 +788,13 @@ jQuery(document).ready(function($) {
     if (scheduling == "2") {
       $("#scheduling-between-dates-"+block).show();
       process_scheduling_dates (block);
+    }
+
+
+    $("#adb-block-replacement-"+block).hide();
+    var adb_block_action = $("select#adb-block-action-"+block).val();
+    if (adb_block_action == AI_ADB_BLOCK_ACTION_REPLACE) {
+      $("#adb-block-replacement-"+block).show();
     }
 
     if (syntax_highlighting) configure_editor_language (block);
@@ -818,10 +848,10 @@ jQuery(document).ready(function($) {
 
     var adb_action = $("select#adb-action option:selected").attr('value');
 
-    if (adb_action == AI_ACTION_WARNING_MESSAGE) {
+    if (adb_action == AI_ADB_ACTION_MESSAGE) {
       $("#adb-message").show();
     } else
-    if (adb_action == AI_ACTION_REDIRECTION) {
+    if (adb_action == AI_ADB_ACTION_REDIRECTION) {
       $("#adb-page-redirection").show();
     }
   }
@@ -848,8 +878,9 @@ jQuery(document).ready(function($) {
 
       if ($("#export-container-0").is(':visible') && !$(this).hasClass ("loaded")) {
         var nonce = $(this).attr ('nonce');
-        var site_url = $(this).attr ('site-url');
-        $("#export_settings_0").load (site_url+"/wp-admin/admin-ajax.php?action=ai_data&export=0&ai_check=" + nonce, function() {
+//        var site_url = $(this).attr ('site-url');
+//        $("#export_settings_0").load (site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&export=0&ai_check=" + nonce, function() {
+        $("#export_settings_0").load (ajaxurl+"?action=ai_ajax_backend&export=0&ai_check=" + nonce, function() {
           $("#export_settings_0").attr ("name", "export_settings_0");
           $("#export-switch-0").addClass ("loaded");
         });
@@ -904,12 +935,16 @@ jQuery(document).ready(function($) {
 
       var window_width = 820;
       var window_height = 870;
-      var nonce = $(this).attr ('nonce');
-      var site_url = $(this).attr ('site-url');
-      var page = site_url+"/wp-admin/admin-ajax.php?action=ai_data&preview=adb&ai_check=" + nonce;
       var window_left  = 120;
       var window_top   = (screen.height / 2) - (870 / 2);
-      var preview_window = window.open (page, 'preview','width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+      var nonce = $(this).attr ('nonce');
+//      var site_url = $(this).attr ('site-url');
+//      var page = site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&preview=adb&ai_check=" + nonce;
+//      var page = ajaxurl+"?action=ai_ajax_backend&preview=adb&ai_check=" + nonce;
+//      var preview_window = window.open (page, 'preview','width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+
+      var param = {'action': 'ai_ajax_backend', 'preview': 'adb', 'ai_check': nonce};
+      window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
     });
   }
 
@@ -959,6 +994,11 @@ jQuery(document).ready(function($) {
       var block = $(this).attr('id').replace ("scheduling-", "");
       process_display_elements (block);
     });
+    $("select#adb-block-action-"+tab).change (function() {
+      var block = $(this).attr('id').replace ("adb-block-action-", "");
+      process_display_elements (block);
+    });
+
 
     $("#display-homepage-"+tab).change (function() {
       var block = $(this).attr('id').replace ("display-homepage-", "");
@@ -1167,8 +1207,9 @@ jQuery(document).ready(function($) {
 
       if ($("#export-container-" + block).is(':visible') && !$(this).hasClass ("loaded")) {
         var nonce = $(this).attr ('nonce');
-        var site_url = $(this).attr ('site-url');
-        $("#export_settings_" + block).load (site_url+"/wp-admin/admin-ajax.php?action=ai_data&export=" + block + "&ai_check=" + nonce, function() {
+//        var site_url = $(this).attr ('site-url');
+//        $("#export_settings_" + block).load (site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&export=" + block + "&ai_check=" + nonce, function() {
+        $("#export_settings_" + block).load (ajaxurl+"?action=ai_ajax_backend&export=" + block + "&ai_check=" + nonce, function() {
           $("#export_settings_" + block).attr ("name", "export_settings_" + block);
           $("#export-switch-"+block).addClass ("loaded");
         });
@@ -1205,7 +1246,7 @@ jQuery(document).ready(function($) {
       label.addClass ('on');
 
       var nonce = $(this).attr ('nonce');
-      var site_url = $(this).attr ('site-url');
+//      var site_url = $(this).attr ('site-url');
       var start_date = $("input#chart-start-date-" + block).attr('value');
       var end_date = $("input#chart-end-date-" + block).attr('value');
       var container = $("div#statistics-elements-" + block);
@@ -1218,7 +1259,8 @@ jQuery(document).ready(function($) {
         delete_range = '&delete=1';
       }
 
-      container.load (site_url+"/wp-admin/admin-ajax.php?action=ai_data&statistics=" + block + "&start-date=" + start_date + "&end-date=" + end_date + delete_range + "&ai_check=" + nonce, function (response, status, xhr) {
+//      container.load (site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&statistics=" + block + "&start-date=" + start_date + "&end-date=" + end_date + delete_range + "&ai_check=" + nonce, function (response, status, xhr) {
+      container.load (ajaxurl+"?action=ai_ajax_backend&statistics=" + block + "&start-date=" + start_date + "&end-date=" + end_date + delete_range + "&ai_check=" + nonce, function (response, status, xhr) {
         label.removeClass ('on');
         if ( status == "error" ) {
           var message = "Error downloading data: " + xhr.status + " " + xhr.statusText ;
@@ -1371,53 +1413,58 @@ jQuery(document).ready(function($) {
       $(this).blur ();
 
 
-      var alignment = $("select#block-alignment-"+block+" option:selected").attr('value');
+      var alignment  = $("select#block-alignment-"+block+" option:selected").attr('value');
+      var custom_css = $("#custom-css-"+block).val ();
 
-      var css = "";
+      var alignment_css = "";
       if (alignment == AI_ALIGNMENT_DEFAULT) {
-        css = $("#css-none-"+block).text ();
+        alignment_css = $("#css-none-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_CUSTOM_CSS) {
-        css = $("#custom-css-"+block).val();
+        alignment_css = $("#custom-css-"+block).val();
       } else
       if (alignment == AI_ALIGNMENT_LEFT) {
-        css = $("#css-left-"+block).text ();
+        alignment_css = $("#css-left-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_RIGHT) {
-        css = $("#css-right-"+block).text ();
+        alignment_css = $("#css-right-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_CENTER) {
-        css = $("#css-center-"+block).text ();
+        alignment_css = $("#css-center-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_FLOAT_LEFT) {
-        css = $("#css-float-left-"+block).text ();
+        alignment_css = $("#css-float-left-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_FLOAT_RIGHT) {
-        css = $("#css-float-right-"+block).text ();
+        alignment_css = $("#css-float-right-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_STICKY_LEFT) {
-        css = $("#css-sticky-left-"+block).text ();
+        alignment_css = $("#css-sticky-left-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_STICKY_RIGHT) {
-        css = $("#css-sticky-right-"+block).text ();
+        alignment_css = $("#css-sticky-right-"+block).text ();
       }
       if (alignment == AI_ALIGNMENT_STICKY_TOP) {
-        css = $("#css-sticky-top-"+block).text ();
+        alignment_css = $("#css-sticky-top-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_STICKY_BOTTOM) {
-        css = $("#css-sticky-bottom-"+block).text ();
+        alignment_css = $("#css-sticky-bottom-"+block).text ();
       }
 
       var name = $("#name-label-"+block).text ();
 
       var window_width = 820;
       var window_height = 820;
-      var nonce = $(this).attr ('nonce');
-      var site_url = $(this).attr ('site-url');
-      var page = site_url+"/wp-admin/admin-ajax.php?action=ai_data&preview=" + block + "&ai_check=" + nonce + "&alignment=" + alignment + "&css=" + encodeURI (css) + "&name=" + encodeURI (name);
       var window_left  = 120;
       var window_top   = (screen.height / 2) - (820 / 2);
-      var preview_window = window.open (page, 'preview','width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+      var nonce = $(this).attr ('nonce');
+//      var site_url = $(this).attr ('site-url');
+//      var page = site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&preview=" + block + "&ai_check=" + nonce + "&alignment=" + alignment + "&css=" + encodeURI (alignment_css) + "&name=" + encodeURI (name);
+//      var page = ajaxurl+"?action=ai_ajax_backend&preview=" + block + "&ai_check=" + nonce + "&alignment=" + alignment + "&css=" + encodeURI (alignment_css) + "&name=" + encodeURI (name);
+//      var preview_window = window.open (page, 'preview','width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
+
+      var param = {'action': 'ai_ajax_backend', 'preview': block, 'ai_check': nonce, 'name': name, 'alignment': alignment, 'alignment_css': alignment_css, 'custom_css': custom_css};
+      window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
     });
 
     generate_country_list ('country', tab);
@@ -1425,6 +1472,10 @@ jQuery(document).ready(function($) {
     $('#tracking-' + tab).checkboxButton ();
     $('#simple-editor-' + tab).checkboxButton ();
     $('#process-php-' + tab).checkboxButton ();
+
+    $('#ai-misc-container-' + tab).tabs();
+    $('#ai-misc-tabs-' + tab).show();
+
   }
 
   function generate_country_list (element_name_prefix, index) {
@@ -1591,8 +1642,9 @@ jQuery(document).ready(function($) {
   function update_rating (parameter = '') {
     var rating_bar = $('#ai-rating-bar');
     var nonce = rating_bar.attr ('nonce');
-    var site_url = rating_bar.attr ('site-url');
-    $("#rating-value span").load (site_url+"/wp-admin/admin-ajax.php?action=ai_data&rating=" + parameter + "&ai_check=" + nonce, function() {
+//    var site_url = rating_bar.attr ('site-url');
+//    $("#rating-value span").load (site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&rating=" + parameter + "&ai_check=" + nonce, function() {
+    $("#rating-value span").load (ajaxurl+"?action=ai_ajax_backend&rating=" + parameter + "&ai_check=" + nonce, function() {
       var rating = $("#rating-value span").text ()
       var rating_value = 0;
       if (rating != '') var rating_value = parseFloat (rating);
@@ -1649,7 +1701,7 @@ jQuery(document).ready(function($) {
 
   setTimeout (configure_hidden_tab, 700);
 
-  var plugin_version = $('#ai-data').attr ('version');
+  var plugin_version = $('#ai-data').attr ('version').split ('-') [0];
   if (javascript_version != plugin_version) {
 
     // Check page HTML
@@ -1763,7 +1815,7 @@ jQuery(document).ready(function($) {
   });
 
   $('#plugin_name').dblclick (function () {
-    $("#system-debugging").toggle();
+    $(".system-debugging").toggle();
   });
 
   $('#ai-stars').click (function () {

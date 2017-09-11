@@ -126,6 +126,7 @@ function generate_code_preview_adb () {
   }
 
   function update_message_preview (editor, e) {
+    if (e.type == 'keyup' && e.key == 'Escape') window.close();
     jQuery('#message').html (editor.getContent());
   }
 
@@ -243,6 +244,10 @@ input[type="button"] {
   width: initial;
 }
 
+input[type="text"] {
+    margin: 0;
+}
+
 .button {
   font-size: 14px!important;
 }
@@ -306,9 +311,9 @@ input[type="button"] {
   $error_reporting = error_reporting ();
   error_reporting ($error_reporting & ~E_NOTICE);
 
-//  \_WP_Editors::enqueue_scripts();
-//  print_footer_scripts ();
-//  \_WP_Editors::editor_js();
+  _WP_Editors::enqueue_scripts();
+  print_footer_scripts ();
+  _WP_Editors::editor_js();
 
   error_reporting ($error_reporting);
 

@@ -2,13 +2,14 @@
 
 Contributors: spacetime
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4
-Tags: ads, adsense, ad management, advertising manager, advanced contextual ads, ad rotation, adverts, widgets, amazon, banners, automatic insertion, amp, geo targeting, multisite, shortcodes, PHP, Javascript, HTML, header, footer, tracking, sticky, taxonomy, term, custom post
+Tags: ads, adsense, ad management, advertising manager, advanced contextual ads, ad rotation, ad injection, adverts, sticky widgets, amazon, banners, automatic insertion, amp, geo targeting, multisite, shortcodes, PHP, Javascript, HTML, header, footer, tracking
 Requires at least: 4.0
 Tested up to: 4.8
-Stable tag: 2.1.13
+Requires PHP: 5.2
+Stable tag: 2.2.1
 License: GPLv3
 
-Ad management plugin: AdSense, Amazon ads, banners, ad rotation, sticky widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
+Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
 
 == Description ==
 
@@ -85,7 +86,7 @@ Ad Inserter Wordpress plugin is and advanced advertising manager - it has many f
 
 Ad Inserter is not just another plugin for WordPress ads. Do you enjoy finding the right plugin to solve a particular problem on your site? For example:
 
-*   ad management
+*   ad management and ad injection
 *   to insert ads between paragraphs
 *   to insert ads between posts
 *   to insert ads between comments
@@ -97,6 +98,7 @@ Ad Inserter is not just another plugin for WordPress ads. Do you enjoy finding t
 *   for sticky (fixed) widgets
 *   for widget logic
 *   to restrict widgets
+*   to detect ad blocking
 *   to insert PHP or HTML code into posts
 *   to insert header, footer or tracking code
 *   to insert PHP, HTML, CSS, shortcodes
@@ -114,7 +116,7 @@ Few very important things you need to know in order to <a href="http://adinserte
 *   Code block is any code (for example Google AdSense ad) that has to be inserted (and displayed) at some position. Each code block can be configured to insert code at almost any position supported by Wordpress
 *   **Enable and use at least one insertion option** (Automatic insertion, Widget, Shortcode, PHP function call)
 *   **Enable insertion on at least one <a href="https://adinserter.pro/page-types">Wordpress page type</a>** (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages)
-*   For Posts and static pages **select default value On all Posts / On all Static pages** unless you really know what are you doing
+*   For Posts and Static pages **leave default BLANK selection value** after the checkbox unless you really know what are you doing (using individual exceptions)
 *   If you don't see inserted code block turn on **debugging functions**: Label inserted blocks, Show available positions for automatic insertion (Ad Inserter menu item in the Wordpress toolbar on the top of every post/page)
 *   If you are using AdSense you may get blank (empty) ad blocks.  This might be because there is some error in the code (wrong IDs), your Google AdSense account is not fully approved yet, your website was not accepted or your Google AdSense account is banned. Try <a href="http://bit.ly/2oF81Oh" target="_blank">Media net ads</a> - they seem to be a good alternative for contextual ads.
 
@@ -274,7 +276,7 @@ Caching on the frontend side (what visitors see) in some cases does speed up pag
 When you are using caching and visitor visits some page, Wordpress creates that page, Ad Inseter is called to do the job, the created page is sent to the visitor and it is also saved for quicker serving later.
 The next time the page is visited **the visitor gets cached (saved) page**. Because of this some Ad Inserter functions can not work because Ad Inserter is not called when the page is cached:
 
-*   Server-side block rotation with |rotate|
+*   Server-side block rotation with [ADINSERTER ROTATE] (or old separator |rotate|)
 *   User check
 *   Server-side device detection
 *   Referer check
@@ -286,7 +288,7 @@ When you need the functions listed above you have to switch off caching (if poss
 
 However, Ad Inserter also supports some of the functions above even when caching is enabled:
 
-*   Client-side ad rotation with |rotate|
+*   Client-side ad rotation with [ADINSERTER ROTATE] (or old separator |rotate|)
 *   Client-side device detection
 *   Client-side GEO targeting (country detection, Pro only)
 *   Client-side IP address detection (Pro only)
@@ -324,12 +326,12 @@ Please note also the following:
 
 To use client-side rotation you have to enable it first. Go to Ad Inserter plugin settings tab * / tab General and set Dynamic blocks to Client-side.
 
-Configure blocks normally and separate different versions with |rotate| tag. When the page will be created and Ad Inserter called, it will generate hidden code for all block versions. When the page will be loaded in the browser, one randomly chosen version of the code will be displayed. For example, to rotate 3 images:
+Configure blocks normally and separate different versions with [ADINSERTER ROTATE] shortcode. When the page will be created and Ad Inserter called, it will generate hidden code for all block versions. When the page will be loaded in the browser, one randomly chosen version of the code will be displayed. For example, to rotate 3 images:
 
 `<img style='height: 400px;' src="http://malsup.github.io/images/p1.jpg">
-|rotate|
+[ADINSERTER ROTATE]
 <img style='height: 400px;' src="http://malsup.github.io/images/p2.jpg">
-|rotate|
+[ADINSERTER ROTATE]
 <img style='height: 400px;' src="http://malsup.github.io/images/p3.jpg">`
 
 Please note the following:
@@ -405,7 +407,7 @@ You can also try <a href="http://bit.ly/2oF81Oh" target="_blank">Media net ads</
 *   Go to Appearance / Widgets, drag Ad Inserter widget to the sidebar or any other widget position, select code block and click on Save
 *   Optionally you can enable Sticky widget - this means that this widget (and widgets below) will stay fixed in the sidebar when the page is scrolled, but please note that this may not work with all themes
 *   You can also make other widgets sticky even if you don't use Ad Inserter widgets - drag Ad Inserter widget to the sidebar ABOVE the top widget that needs to be sticky, select Dummy Widget for Block, check Sticky and save widget
-*   In general plugin settings (tab *) you can also define Sticky Widget Top Margin to precisely define top position where first sticky widget will stop
+*   In general plugin settings (tab *) you can also define Sticky Widget Top Margin to precisely define top position where the first sticky widget will stop
 
 Additional note regarding *sticky widgets*:
 
@@ -581,7 +583,7 @@ Use Before paragraph automatic insertion and put `2, 0.5` as paragraph number. Y
 
 = I'd like to rotate my ad codes based on percentage, for example show one ad 75% of the time and another one 25% of the time. Is that possible? =
 
-Yes, simply create block with 4 ads separated with |rotate|: 3 times ad1 and 1 time ad2.
+Yes, simply create block with 4 ads separated with [ADINSERTER ROTATE]: 3 times ad1 and 1 time ad2.
 
 
 = How can I show different ads to different visitors according to a url query parameter? =
@@ -628,27 +630,22 @@ For all options check <a href="http://adinserter.pro/documentation#code-block-op
 
 = How can I rotate few versions of the same ad? =
 
-Enter them into the ad box and separate them with |rotate| (vertical bars around text rotate). Ad Inserter will insert them randomly.
+Enter them into the ad box and separate them with `[ADINSERTER ROTATE]`. Ad Inserter will insert them randomly.
 Example:
 
 `ad_code_1
-|rotate|
+[ADINSERTER ROTATE]
 ad_code_2
-|rotate|
+[ADINSERTER ROTATE]
 ad_code_3`
 
 
 = What settings should I use for ads on AMP pages? =
 
-Asumming AMP urls end with `/amp/` use the following settings:
+Normally the code will not be inserted on AMP pages. There are two settings that can be used to insert code on AMP pages:
 
-*   Automatic Insertion: set as needed
-*   Select **No wrapping** style
-*   Whitelist url `*/amp/`
-*   Put AMP head script in the Header code block (tab * / tab Header) and enable it
-*   For all other ads on standard (non AMP) pages blacklist url `*/amp/`
-
-If you have different url structure you'll have to adjust url pattern accordingly.
+1. **AMP pages** checkbox in **Misc / Insertion** section - If checked it enables insertion also on AMP pages. Use this approach only if you need to insert the same code on normal and AMP pages. To insert different codes on AMP pages use **[ADINSERTER AMP]** separator as described below.
+2. Separate the codes with **[ADINSERTER AMP]** separator - the code above the separator will be inserted on normal pages, the code below the separator will be inserted on AMP pages. This separator can be used also for **Header** and **Footer** code.
 
 For details check <a href="https://adinserter.pro/settings#amp" target="_blank">settings for ads on AMP pages</a>.
 
@@ -684,13 +681,13 @@ Try to use the following custom CSS:
 
 = How can I rotate between different alignments so I can test an ad aligned to the right against an ad aligned to the left? =
 
-Set Block Alignment and Style to "No Wrapping" and create manual wrapping around both ads separated with |rotate|:
+Set Block Alignment and Style to "No Wrapping" and create manual wrapping around both ads separated with [ADINSERTER ROTATE]:
 
 `<div style="float: left; margin: 0 8px 8px 0;">
 AD CODE LEFT
 </div>
 
-|rotate|
+[ADINSERTER ROTATE]
 
 <div style="float: right; margin: 0 0 8px 8px;">
 AD CODE RIGHT
@@ -719,6 +716,25 @@ AD CODE RIGHT
 
 
 == Changelog ==
+
+= 2.2.2 =
+- Fix for mobile admin layout
+- Few other minor bug fixes
+
+= 2.2.1 =
+- Fix for header/footer scripts on AMP pages
+
+= 2.2.0 =
+- Added support for ad blocking detection (experimental)
+- Added support for [ADINSERTER AMP] shortcode to separate code for AMP pages
+- Added support for [ADINSERTER ROTATE] and [ADINSERTER COUNT] shortcodes
+- Added syntax highlighting for shortcodes and separators
+- Added option to define minimum number of words in paragraphs above
+- Added support for %N filter item to filter every N-th insertion
+- Added filter support when inserting for all paragraphs
+- Added style `clear: both;` to Default, Left, Right and Center alignments
+- Bug fix for errors when loading tracking charts (Pro only)
+- Many minor bug fixes, cosmetic changes and code improvements
 
 = 2.1.14 =
 - Fix for error when using older PHP versions (prior to 5.5)
@@ -797,176 +813,24 @@ AD CODE RIGHT
 - Bug fix for minimum user role not taken into account for exceptions list
 - Bug fix for IP database update cron event (Pro only)
 
-= 2.0.14 =
-- Fixed issue for responsive ads not displayed when using Left, Center or Right alignment
-
-= 2.0.13 =
-- Added icons for Automatic insertion and alignment
-- Automatic insertion None changed to Disabled
-- Alignment None changed to Default
-- Changed database option data for Automatic insertion and Alignment settings
-- Improved CSS 3 code for Left, Center and Right alignment
-- Click on CSS code starts editing
-- Page/Post exceptions listed in debug output
-- Different plugin slug for Pro version
-- Few minor bug fixes and cosmetic changes
-
-= 2.0.12 =
-- Bug fix for page/post exceptions list
-
-= 2.0.11 =
-- Bug fix for settings page not loading
-
-= 2.0.10 =
-- Added option to insert ads between posts on blog pages
-- Added option to check and manage post/page exceptions for each block
-- Added option to check and manage all post/page exceptions (Pro only)
-- Added option for multisite installations to disable PHP processing on sub-sites (Pro only)
-- Added license status notifications (Pro only)
-
-= 2.0.9 =
-- Added support for uppercase {country_ISO2} and lowercase {country_iso2} tag (Pro only)
-- Removed inclusion of dummy css and js file
-- Bug fix: Client-side dynamic blocks were not enabled if not using W3 Total Cache
-
-= 2.0.8 =
-- Added support for client-side rotation (works with caching)
-- Added support for server-side rotation with W3 Total Cache
-- Added support for client-side country detection (works with caching, Pro only)
-- Added support for server-side country detection with W3 Total Cache (Pro only)
-- Added debugging functions to measure plugin processing time
-- Added option to black/white-list IP addresses (Pro only)
-- Added option for fallback code when scheduling between dates expires (Pro only)
-- On multisite installations Ad Inserter debug menu item on sites is available only if settings page is enabled
-- Added option for multisite installations to use Ad Inserter settings of main site for all blogs
-- Added flags to country list (Pro only)
-- Bug fix: Code preview did not work if Wordpress was installed in a folder
-- Few minor bug fixes and cosmetic changes
-
-= 2.0.7 =
-- Delayed display moved to Misc group
-- Added option for scheduling to insert code only between specified dates (Pro only)
-- Added option for Geo targeting (Pro only)
-- Few minor bug fixes and cosmetic changes
-
-= 2.0.6 =
-- Added support to filter subpages created by the `<!--nextpage-->` tag
-- Added option to import block name (Pro only)
-- Cookie deleted only when it exists and debugging is disabled
-- Few minor bug fixes
-
-= 2.0.5 =
-- Cookie created only when debugging is enabled
-- Few minor bug fixes
-
-= 2.0.4 =
-- Bug fix: Cursor position always at the end of block name
-- State of debugging functions saved to cookie
-- Few minor bug fixes
-
-= 2.0.3 =
-- Debugging functions in admin toolbar available only for administrators
-- Added option to hide debugging functions in admin toolbar
-- Added shortcode for debugger
-- Few minor bug fixes
-
-= 2.0.2 =
-- Changed javascript version check to get plugin version from the HTML page
-- Added warning if old cached version of CSS file is loaded on the settings page
-- Added warning if version query parameter for js/css files is removed due to inappropriate caching
-
-= 2.0.1 =
-- Bug fix: Shortcodes called by name were not displayed
-
-= 2.0.0 =
-- Redesigned user interface
-- Added many debugging tools for easier troubleshooting
-- New feature: Code preview tool with visual CSS editor
-- New feature: Label inserted blocks
-- New feature: Show available positions for automatic insertion
-- New feature: Show HTML tags in posts/static pages
-- New feature: Log Ad Inserter processing
-- Improved loading speed of the settings page
-- Improved block insertion processing speed
-- Added support to avoid inserion near images, headers and other elements
-- Added option to avoid insertion in feeds
-- Added option to display code blocks only to administrators
-- Added option for publishig date check for display positions Before/After Content
-- Added option for server-side device check for header and footer code
-- Added option for maximum page/post words
-- Added option for maximum paragraph words
-- Added option to black/white-list post IDs
-- Added option to black/white-list url query parameters
-- Added warning if the settings page is blocked by ad blocker
-- Added warning if old cached version of javascript is loaded on the settings page
-- Added support for multisite installations to disable settings, widgets and exceptions on network sites (Pro only)
-- Block names can be edited by clicking on the name
-- Filters now work also on posts and single pages
-- CSS code for client-side detection moved to inline CSS
-- Bug fix: Minimum user roles for exception editing was not calculated properly
-- Bug fix: Server-side detection checkbox was not saved properly
-- Many other minor bug fixes, code improvements and cosmetic changes
-
-= 1.7.0 =
-- Bug fix: Shortcodes did not ignore post/static page exceptions
-- Slightly redesigned user interface
-- Excerpt/Post number(s) renamed to Filter as it now works on all display positions
-- Widget setting removed from Automatic display to Manual display section
-- Added support to disable widgets (standalone checkbox in Manual display)
-- Added call counter/filter for widgets
-- Added support to edit CSS for predefined styles
-- Few other minor bug fixes, code improvements and cosmetic changes
-
-= 1.6.7 =
-- Bug fix: Block code textarea was not escaped
-- Added checks for page types for shortcodes
-- Added support for Before/After Post position call counter/filter
-- Few minor cosmetic changes
-
-= 1.6.6 =
-- Bug fix: Display on Homepage and other blog pages might get disabled - important if you were using PHP function call or shortcode (import of settings from 1.6.4)
-- Few minor cosmetic changes
-- Requirements changed to WordPress 4.0 or newer
-- Added initial support for Pro version
-
-= 1.6.5 =
-- Fixed bug: Wrong counting of max insertions
-- Change: display position Before Title was renamed to Before Post
-- Added support for display position After Post
-- Added support for posts with no `<p>` tags (paragraphs separated with \r\n\r\n characters)
-- Added support for paragraph processing on homepage, category, archive and search pages
-- Added support for custom viewports
-- Added support for PHP function call counter
-- Added support to disable code block on error 404 pages
-- Added support to debug paragraph tags
-
-= 1.6.4 =
-- Fixed bug: For shortcodes in posts the url was not checked
-- Optimizations for device detection
-
-= 1.6.3 =
-- Removed deprecated code (fixes PHP 7 deprecated warnings)
-- Added support for paragraphs with div and other HTML tags (h1, h2, h3,...)
-
-= 1.6.2 =
-- Removed deprecated code (fixes PHP Fatal error Call to a member function get_display_type)
-- Added support to change plugin processing priority
-
-= 1.6.1 =
-* Fixed bug: For shortcodes in posts the date was not checked
-* Fixed error with some templates "Call to undefined method is_main_query()"
-* Added support for minumum number of page/post words for Before/After content display option
-* Added support for {author} and {author_name} tags
-
-= 1.6.0 =
-* Added support for client-side device detection
-* Many code improvements
-* Improved plugin processing speed
-* Removed support for deprecated tags for manual insertion {adinserter n}
-* Few minor bug fixes
-
-
 == Upgrade Notice ==
+
+= 2.2.2 =
+Fix for mobile admin layout;
+Few other minor bug fixes
+
+= 2.2.1 =
+Fix for header/footer scripts on AMP pages
+
+= 2.2.0 =
+Added support for ad blocking detection (experimental);
+Added support for [ADINSERTER AMP] shortcode to separate code for AMP pages;
+Added syntax highlighting for shortcodes and separators
+Added option to define minimum number of words in paragraphs above;
+Added support for %N filter item to filter every N-th insertion;
+Added style `clear: both;` to Default, Left, Right and Center alignments;
+Added filter support when inserting for all paragraphs;
+Bug fix for errors when loading tracking charts (Pro only);
 
 = 2.1.14 =
 Fix for error when using older PHP versions (prior to 5.5)
@@ -1032,56 +896,3 @@ Few bug fixes and cosmetic changes
 = 2.1.0 =
 Support for ads in Ajax requests (e.g. in infinite scroll); Added sticky positions (Pro only);
 Bug fix for minimum user role for exceptions list; Bug fix for IP database update cron event (Pro only)
-
-= 2.0.14 =
-Fixed issue for responsive ads not displayed when using Left, Center or Right alignment
-
-= 2.0.13 =
-Added icons for Automatic insertion and alignment; Changed database option data for Automatic insertion and Alignment settings;
-Improved CSS 3 code for Left, Center and Right alignment; Few minor bug fixes and cosmetic changes;
-
-= 2.0.12 =
-Bug fix for page/post exceptions list
-
-= 2.0.11 =
-Bug fix for settings page not loading
-
-= 2.0.10 =
-Option to insert ads between posts on blog pages;
-Option to check and manage post/page exceptions for each block;
-
-= 2.0.9 =
-Bug fix: Client-side dynamic blocks were not enabled if not using W3 Total Cache;
-Added support for uppercase and lowercase {country_iso2} tag (Pro only); Removed inclusion of dummy css and js file
-
-= 2.0.8 =
-Added support for client-side rotation (works with caching), added support for W3 Total Cache, client-side country detection (works with caching, Pro only),
-bug fixed: Code preview did not work if Wordpress was installed in a folder, added flags to country list (Pro only)
-
-= 2.0.7 =
-Delayed display moved to Misc group, added option for scheduling to insert code only between specified dates (Pro only),
-added option for Geo targeting (Pro only), few minor bug fixes and cosmetic changes
-
-= 2.0.6 =
-Added support to filter subpages created by the `<!--nextpage-->` tag, added option to import block name (Pro only),
-cookie deleted only when it exists and debugging is disabled, few minor bug fixes
-
-= 2.0.5 =
-cookie created only when debugging is enabled, few minor bug fixes
-
-= 2.0.4 =
-Bug fix: Cursor position always at the end of block name, state of debugging functions saved to cookie, few minor bug fixes
-
-= 2.0.3 =
-Debugging functions in admin toolbar available only for administrators, added option to hide debugging functions in admin toolbar,
-Added shortcode for debugger, few minor bug fixes
-
-= 2.0.2 =
-Changed javascript version check to get plugin version from the HTML page, added warning if old cached version of CSS file is loaded on the settings page,
-added warning if version query parameter for js/css files is removed due to inappropriate caching,
-
-= 2.0.1 =
-Bug fix: Shortcodes called by name were not displayed
-
-= 2.0.0 =
-Redesigned user interface, added code preview and many debugging tools for easier troubleshooting and many new features

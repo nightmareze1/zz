@@ -9,8 +9,11 @@ abstract class ai_BaseCodeBlock {
   var $w3tc_code;
   var $needs_class;
   var $code_version;
+  var $debug_code;
 
   function __construct () {
+
+    $this->number = 0;
 
     $this->wp_options = array ();
     $this->fallback = 0;
@@ -18,10 +21,12 @@ abstract class ai_BaseCodeBlock {
     $this->w3tc_code = '';
     $this->needs_class = false;
     $this->code_version = 0;
+    $this->color = '#e00';
 
     $this->wp_options [AI_OPTION_CODE]                = AD_EMPTY_DATA;
     $this->wp_options [AI_OPTION_PROCESS_PHP]         = AI_DISABLED;
     $this->wp_options [AI_OPTION_ENABLE_MANUAL]       = AI_DISABLED;
+    $this->wp_options [AI_OPTION_ENABLE_AMP]          = AI_DISABLED;
     $this->wp_options [AI_OPTION_ENABLE_404]          = AI_DISABLED;
     $this->wp_options [AI_OPTION_DETECT_SERVER_SIDE]  = AI_DISABLED;
     $this->wp_options [AI_OPTION_DISPLAY_FOR_DEVICES] = AD_DISPLAY_DESKTOP_DEVICES;
@@ -240,25 +245,49 @@ abstract class ai_BaseCodeBlock {
     unset ($this->wp_options ['']);
   }
 
+  public function get_ad_name(){
+     $name = isset ($this->wp_options [AI_OPTION_BLOCK_NAME]) ? $this->wp_options [AI_OPTION_BLOCK_NAME] : "";
+     return $name;
+  }
+
   public function get_ad_data(){
     $ad_data = isset ($this->wp_options [AI_OPTION_CODE]) ? $this->wp_options [AI_OPTION_CODE] : '';
     return $ad_data;
   }
 
   public function get_enable_manual (){
-    $enable_manual = isset ($this->wp_options [AI_OPTION_ENABLE_MANUAL]) ? $this->wp_options [AI_OPTION_ENABLE_MANUAL] : '';
+    $enable_manual = isset ($this->wp_options [AI_OPTION_ENABLE_MANUAL]) ? $this->wp_options [AI_OPTION_ENABLE_MANUAL] : AI_DISABLED;
     if ($enable_manual == '') $enable_manual = AI_DISABLED;
     return $enable_manual;
   }
 
+  public function get_enable_amp ($return_saved_value = false){
+    $enable_amp = isset ($this->wp_options [AI_OPTION_ENABLE_AMP]) ? $this->wp_options [AI_OPTION_ENABLE_AMP] : AI_DISABLED;
+
+    if ($return_saved_value) return $enable_amp;
+
+    // Fix for AMP code blocks with url white-list */amp
+    $urls = $this->get_ad_url_list();
+    $url_type = $this->get_ad_url_list_type();
+    if ($url_type == AD_WHITE_LIST && strpos ($urls, '/amp') !== false) {
+      $enable_amp = true;
+    }
+    // Fix for code blocks using PHP function is_amp_endpoint
+    elseif ($this->get_process_php() && strpos ($this->get_ad_data (), 'is_amp_endpoint') !== false) {
+      $enable_amp = true;
+    }
+
+    return $enable_amp;
+  }
+
   public function get_process_php (){
-    $process_php = isset ($this->wp_options [AI_OPTION_PROCESS_PHP]) ? $this->wp_options [AI_OPTION_PROCESS_PHP] : '';
+    $process_php = isset ($this->wp_options [AI_OPTION_PROCESS_PHP]) ? $this->wp_options [AI_OPTION_PROCESS_PHP] : AI_DISABLED;
     if ($process_php == '') $process_php = AI_DISABLED;
     return $process_php;
   }
 
   public function get_enable_404 (){
-    $enable_404 = isset ($this->wp_options [AI_OPTION_ENABLE_404]) ? $this->wp_options [AI_OPTION_ENABLE_404] : '';
+    $enable_404 = isset ($this->wp_options [AI_OPTION_ENABLE_404]) ? $this->wp_options [AI_OPTION_ENABLE_404] : AI_DISABLED;
     if ($enable_404 == '') $enable_404 = AI_DISABLED;
     return $enable_404;
   }
@@ -310,7 +339,7 @@ abstract class ai_BaseCodeBlock {
   }
 
   public function ai_getCode (){
-    global $block_object, $ai_total_php_time;
+    global $block_object, $ai_total_php_time, $ai_wp_data;
 
     $obj = $this;
     if ($this->fallback != 0) {
@@ -320,10 +349,11 @@ abstract class ai_BaseCodeBlock {
     $code = $obj->get_ad_data();
 
     if ($obj->get_process_php () && (!is_multisite() || is_main_site () || multisite_php_processing ())) {
-      $start_time = microtime (true);
 
       $global_name = 'GENERATED_CODE';
       if (isset ($obj->wp_options [$global_name])) return $obj->wp_options [$global_name];
+
+      $start_time = microtime (true);
 
       $php_error = "";
       ob_start ();
@@ -331,16 +361,18 @@ abstract class ai_BaseCodeBlock {
       try {
         eval ("?>". $code . "<?php ");
       } catch (Exception $e) {
-          $php_error = "PHP error in " . AD_INSERTER_NAME . " code block ".$obj->number . " - " . $obj->get_ad_name() . "<br />\n" .  $e->getMessage();
+          $php_error = "PHP error in " . AD_INSERTER_NAME . " code block ". ($obj->number == 0 ? '' : $obj->number . " - ") . $obj->get_ad_name() . "<br />\n" .  $e->getMessage();
       }
 
       $processed_code = ob_get_clean ();
 
       if (strpos ($processed_code, __FILE__) || $php_error != "") {
-        if (preg_match ("%(.+) in ".__FILE__."%", $processed_code, $error_message))
-          $code = "PHP error in " . AD_INSERTER_NAME . " code block ".$obj->number . " - " . $obj->get_ad_name() . "<br />\n" . $error_message [1];
+
+        if (preg_match ("%(.+) in ".__FILE__."%", strip_tags($processed_code), $error_message))
+          $code = "PHP error in " . AD_INSERTER_NAME . " code block ". ($obj->number == 0 ? '' : $obj->number . " - ") . $obj->get_ad_name() . "<br />\n" . $error_message [1];
         elseif (preg_match ("%(.+) in ".__FILE__."%", $php_error, $error_message))
-          $code = "PHP error in " . AD_INSERTER_NAME . " code block ".$obj->number . " - " . $obj->get_ad_name() . "<br />\n" . $error_message [1];
+          $code = "PHP error in " . AD_INSERTER_NAME . " code block ". ($obj->number == 0 ? '' : $obj->number . " - ") . $obj->get_ad_name() . "<br />\n" . $error_message [1];
+
         else $code = $processed_code;
       } else $code = $processed_code;
 
@@ -359,8 +391,6 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
   var $number;
 
   function __construct () {
-
-    $this->number = 0;
 
     parent::__construct();
 
@@ -394,6 +424,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     $this->wp_options [AI_OPTION_START_DATE]                 = AD_EMPTY_DATA;
     $this->wp_options [AI_OPTION_END_DATE]                   = AD_EMPTY_DATA;
     $this->wp_options [AI_OPTION_FALLBACK]                   = AD_EMPTY_DATA;
+    $this->wp_options [AI_OPTION_ADB_BLOCK_ACTION]           = DEFAULT_ADB_BLOCK_ACTION;
+    $this->wp_options [AI_OPTION_ADB_BLOCK_REPLACEMENT]      = AD_EMPTY_DATA;
     $this->wp_options [AI_OPTION_MAXIMUM_INSERTIONS]         = AD_EMPTY_DATA;
     $this->wp_options [AI_OPTION_ID_LIST]                    = AD_EMPTY_DATA;
     $this->wp_options [AI_OPTION_ID_LIST_TYPE]               = AD_BLACK_LIST;
@@ -421,8 +453,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     $this->wp_options [AI_OPTION_DISPLAY_ON_ARCHIVE_PAGES]   = AI_DISABLED;
     $this->wp_options [AI_OPTION_ENABLE_AJAX]                = AI_ENABLED;
     $this->wp_options [AI_OPTION_ENABLE_FEED]                = AI_DISABLED;
-    $this->wp_options [AI_OPTION_ENABLED_ON_WHICH_PAGES]     = AD_ENABLED_ON_ALL;
-    $this->wp_options [AI_OPTION_ENABLED_ON_WHICH_POSTS]     = AD_ENABLED_ON_ALL;
+    $this->wp_options [AI_OPTION_ENABLED_ON_WHICH_PAGES]     = AI_NO_INDIVIDUAL_EXCEPTIONS;
+    $this->wp_options [AI_OPTION_ENABLED_ON_WHICH_POSTS]     = AI_NO_INDIVIDUAL_EXCEPTIONS;
     $this->wp_options [AI_OPTION_ENABLE_PHP_CALL]            = AI_DISABLED;
     $this->wp_options [AI_OPTION_ENABLE_WIDGET]              = AI_ENABLED;
     $this->wp_options [AI_OPTION_PARAGRAPH_TEXT]             = AD_EMPTY_DATA;
@@ -638,6 +670,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
   public function get_paragraph_number_minimum(){
     $option = isset ($this->wp_options [AI_OPTION_MIN_PARAGRAPHS]) ? $this->wp_options [AI_OPTION_MIN_PARAGRAPHS] : "";
+    if ($option == '0') $option = '';
     return $option;
    }
 
@@ -648,6 +681,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
   public function get_minimum_words(){
     $option = isset ($this->wp_options [AI_OPTION_MIN_WORDS]) ? $this->wp_options [AI_OPTION_MIN_WORDS] : "";
+    if ($option == '0') $option = '';
     return $option;
    }
 
@@ -663,6 +697,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
   public function get_minimum_paragraph_words(){
     $option = isset ($this->wp_options [AI_OPTION_MIN_PARAGRAPH_WORDS]) ? $this->wp_options [AI_OPTION_MIN_PARAGRAPH_WORDS] : "";
+    if ($option == '0') $option = '';
     return $option;
    }
 
@@ -717,6 +752,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
   public function get_call_filter(){
     $option = isset ($this->wp_options [AI_OPTION_EXCERPT_NUMBER]) ? $this->wp_options [AI_OPTION_EXCERPT_NUMBER] : "";
+    if ($option == '0') $option = '';
     return $option;
   }
 
@@ -900,11 +936,12 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     return $enable_ajax;
   }
 
+   // Used for shortcodes
    public function get_enable_manual (){
-     $option = isset ($this->wp_options [AI_OPTION_ENABLE_MANUAL]) ? $this->wp_options [AI_OPTION_ENABLE_MANUAL] : "";
-     if ($option == '') {
-       $option = AI_DISABLED;
-     }
+     $option = isset ($this->wp_options [AI_OPTION_ENABLE_MANUAL]) ? $this->wp_options [AI_OPTION_ENABLE_MANUAL] : AI_DISABLED;
+
+     if ($option == '') $option = AI_DISABLED;
+
      return $option;
    }
 
@@ -1073,6 +1110,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
     $code = $this->ai_getCode ();
 
+    $processed_code = do_shortcode ($this->replace_ai_tags ($code));
+
     if (strpos ($code, AD_COUNT_SEPARATOR) !== false) {
       $ads = explode (AD_COUNT_SEPARATOR, $code);
 
@@ -1085,8 +1124,6 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       } else $code = $ads [rand (0, count ($ads) - 1)];
     }
 
-    $processed_code = do_shortcode ($this->replace_ai_tags ($code));
-
     $dynamic_blocks = get_dynamic_blocks ();
     if ($force_server_side_code || ($dynamic_blocks == AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC && defined ('AI_NO_W3TC'))) $dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
 
@@ -1096,7 +1133,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       switch ($dynamic_blocks) {
         case AI_DYNAMIC_BLOCKS_SERVER_SIDE:
           $this->code_version = mt_rand (1, count ($ads));
-          $processed_code = $ads [$this->code_version - 1];
+          $processed_code = trim ($ads [$this->code_version - 1]);
           break;
         case AI_DYNAMIC_BLOCKS_CLIENT_SIDE:
           $this->code_version = '""';
@@ -1121,6 +1158,23 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
           break;
       }
     }
+
+    $this->color = '#e00';
+
+    if (strpos ($processed_code, AD_AMP_SEPARATOR) !== false) {
+      $codes = explode (AD_AMP_SEPARATOR, $processed_code);
+      $code_index = $ai_wp_data [AI_WP_AMP_PAGE] ? 1 : 0;
+      $this->color = $code_index ? '#0c0' : '#e00';
+      $processed_code = trim ($codes [$code_index]);
+    } else {
+        // AMP page but No AMP separator - don't insert code unless enabled
+        if ($ai_wp_data [AI_WP_AMP_PAGE]) {
+          if (!$this->get_enable_amp ()) {
+            $processed_code = '';
+            $this->color = '#222';
+          } else $this->color = '#0c0';
+        }
+      }
 
     if ($dynamic_blocks != AI_DYNAMIC_BLOCKS_SERVER_SIDE) {
       $countries = trim (str_replace (' ', '', strtoupper ($this->get_ad_country_list (true))));
@@ -1170,63 +1224,13 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     }
 
 
-    if (defined ('AI_ADBLOCKING_DETECTION') && AI_ADBLOCKING_DETECTION) {
 
-      $adb_action = 2;
-      switch ($adb_action) {
-        case 1: // Replacement ad
-
-            $globals_name = AI_ADB_FALLBACK_DEPTH_NAME;
-            if (!isset ($ad_inserter_globals [$globals_name])) {
-              $ad_inserter_globals [$globals_name] = 0;
-            }
-
-            $fallback_block = 4;
-            if ($fallback_block != 0 && $fallback_block <= AD_INSERTER_BLOCKS && $fallback_block != $this->number && $ad_inserter_globals [$globals_name] < 2) {
-              $ad_inserter_globals [$globals_name] ++;
-
-              $fallback_obj = $block_object [$fallback_block];
-
-              $processed_code =  "<div>\n" . $processed_code ."</div>\n";
-
-              $fallback_code = $fallback_obj->ai_getProcessedCode (true);
-
-              if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 && !$hide_label) {
-
-                $color = '#e0e';
-
-                $title = '';
-                $counters = $fallback_obj->ai_get_counters ($title);
-
-                if (function_exists ('ai_settings_url_parameters')) $url_parameters = ai_settings_url_parameters ($fallback_obj->number); else $url_parameters = "";
-                $url = admin_url ('options-general.php?page=ad-inserter.php') . $url_parameters . '&tab=' . $fallback_obj->number;
-
-                $fallback_code = '<section style="border: 1px solid '.$color.';"><section style="padding: 1px 0 1px 5px; background: '.$color.'; color: white; font-size: 12px; text-align: left;"><a style="text-decoration: none; color: white;" title="Click to go to block settings" href="'
-                . $url . '"><kbd style="display: none">[AI]</kbd>' . $fallback_obj->number . ' &nbsp; ' . $fallback_obj->get_ad_name () .'</a> &nbsp;&#8678;&nbsp; AD BLOCKING<a style="float: right; text-decoration: none; color: white; padding: 0px 10px 0 0;"><kbd title="'.$title.'">'.$counters.'</kbd><kbd style="display: none">[/AI]</kbd></a></section>' . $fallback_code . '</section>';
-              }
-
-              $processed_code .= "<div class='ai-adb-show' style='visibility: hidden; display: none;' data='$this->number <= $fallback_obj->number'>\n" . $fallback_code ."</div>\n";
-
-              $ad_inserter_globals [$globals_name] --;
-            }
-
-          break;
-        case 2: // Show
-            $processed_code = "<div class='ai-adb-show' style='visibility: hidden; display: none;' data='$this->number'>\n" . $processed_code ."</div>\n";
-          break;
-        case 3: // Hide
-            $processed_code = "<div class='ai-adb-hide' data='$this->number'>\n" . $processed_code ."</div>\n";
-          break;
-      }
-
-    }
-
+    if (function_exists ('ai_adb_block_actions')) $url_parameters = ai_adb_block_actions ($this, $processed_code);
 
     $title = '';
     $fallback_code = '';
-    $color = '#e00';
     if ($this->fallback != 0) {
-      $color = '#e0e';
+      $this->color = '#a0f';
       $fallback_block = $block_object [$this->fallback];
       if (function_exists ('ai_settings_url_parameters')) $url_parameters = ai_settings_url_parameters ($fallback_block->number); else $url_parameters = "";
       $url = admin_url ('options-general.php?page=ad-inserter.php') . $url_parameters . '&tab=' . $fallback_block->number;
@@ -1239,11 +1243,85 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       if (function_exists ('ai_settings_url_parameters')) $url_parameters = ai_settings_url_parameters ($this->number); else $url_parameters = "";
       $url = admin_url ('options-general.php?page=ad-inserter.php') . $url_parameters . '&tab=' . $this->number;
 
-      $processed_code = '<section style="border: 1px solid '.$color.';"><section style="padding: 1px 0 1px 5px; background: '.$color.'; color: white; font-size: 12px; text-align: left;"><a style="text-decoration: none; color: white;" title="Click to go to block settings" href="'
-      . $url . '"><kbd style="display: none">[AI]</kbd>' . $this->number . ' &nbsp; ' . $this->get_ad_name () .'</a>'.$fallback_code.'<a style="float: right; text-decoration: none; color: white; padding: 0px 10px 0 0;"><kbd title="'.$title.'">'.$counters.'</kbd><kbd style="display: none">[/AI]</kbd></a></section>' . $processed_code . '</section>';
+      $processed_code = '<section style="border: 1px solid '.$this->color.';"><section style="padding: 1px 0 1px 5px; background: '.$this->color.'; color: white; font-size: 12px; text-align: left;"><a style="text-decoration: none; color: white;" title="Click to go to block settings" href="'
+      . $url . '"><kbd style="display: none">[AI]</kbd>' . $this->number . ' &nbsp; ' . $this->get_ad_name () .'</a>&nbsp;'.$fallback_code.'<a style="float: right; text-decoration: none; color: white; padding: 0px 10px 0 0;"><kbd title="'.$title.'">'.$counters.'</kbd><kbd style="display: none">[/AI]</kbd></a></section>' . $processed_code . '</section>';
     }
 
     return $processed_code;
+  }
+
+  public function get_code_for_insertion ($include_viewport_classes = true, $hidden_widgets = false) {
+    global $ai_wp_data;
+
+    if ($this->get_alignment_type() == AI_ALIGNMENT_NO_WRAPPING) return $this->ai_getProcessedCode ();
+
+    $hidden_viewports = '';
+    if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 && $this->get_detection_client_side()) {
+
+      $processed_code = $this->ai_getProcessedCode (true);
+      $title = '';
+      $counters = $this->ai_get_counters ($title);
+
+      if (function_exists ('ai_settings_url_parameters')) $url_parameters = ai_settings_url_parameters ($this->number); else $url_parameters = "";
+      $url = admin_url ('options-general.php?page=ad-inserter.php') . $url_parameters . '&tab=' . $this->number;
+
+      $hidden_block_text = '<section style="text-align: center; font-weight: bold;">&nbsp;'.($hidden_widgets ? 'WIDGET':'BLOCK').' INSERTED BUT NOT VISIBLE&nbsp;</section>';
+
+      $visible_viewports = '';
+      for ($viewport = 1; $viewport <= AD_INSERTER_VIEWPORTS; $viewport ++) {
+        $viewport_name = get_viewport_name ($viewport);
+        if ($viewport_name != '') {
+          if ($this->get_detection_viewport ($viewport))
+            $visible_viewports .= '<section class="ai-viewport-' . $viewport .'" style=""><section style="padding: 1px 0 1px 5px; text-align: center; background: '.$this->color.'; color: white; font-size: 12px;"><a style="float: left; text-decoration: none; color: white;" title="Click to go to block settings" href="' . $url . '"><kbd style="display: none">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () .'</a><a style="text-decoration: none; color: white;">&nbsp;'.$viewport_name.'&nbsp;</a><a style="float: right; text-decoration: none; color: white; padding-right: 5px;" title="'.$title.'">'.$counters.'<kbd style="display: none">[/AI]</kbd></a></section></section>'; else
+              $hidden_viewports .= '<section class="ai-viewport-' . $viewport .'" style="' . $this->get_alignment_style() . '; border: 1px solid blue;"><section style="padding: 1px 0 1px 5px; text-align: center; background: blue; color: white; font-size: 12px;"><a style="float: left; text-decoration: none; color: white;" title="Click to go to block settings" href="' . $url . '"><kbd style="display: none">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () .'</a><a style="text-decoration: none; color: white;">&nbsp;'.$viewport_name.'&nbsp;</a><a style="float: right; text-decoration: none; color: white; padding-right: 5px;" title="'.$title.'">'.$counters.'<kbd style="display: none">[/AI]</kbd></a></section>' . $hidden_block_text . '</section>';
+        }
+      }
+
+      $code = "<div style='border: 1px solid " . $this->color . ";'>".$visible_viewports . $processed_code.'</div>';
+    } else $code = $this->ai_getProcessedCode ();
+
+    // Prevent empty wrapping div on AMP pages
+    if ($ai_wp_data [AI_WP_AMP_PAGE] && $code == '') return '';
+
+    $block_class_name = get_block_class_name ();
+    if ($block_class_name == '' && $this->needs_class) $block_class_name = DEFAULT_BLOCK_CLASS_NAME;
+    $viewport_classes = $include_viewport_classes ? $this->get_viewport_classes () : "";
+    if ($block_class_name != '' || $viewport_classes != '') {
+      if ($block_class_name == '') $viewport_classes = trim ($viewport_classes);
+      $class = " class='" . ($block_class_name != '' ? $block_class_name . " " . $block_class_name . "-" . $this->number : '') . $viewport_classes ."'";
+    } else $class = '';
+
+    if ($hidden_widgets) return $hidden_viewports; else {
+      if ($this->client_side_ip_address_detection) $additional_block_style = 'visibility: hidden; position: absolute; width: 100%; height: 100%; z-index: -9999; '; else $additional_block_style = '';
+
+      $tracking_code_pre  = '';
+      $tracking_code_data = '';
+      $tracking_code_post = '';
+      $tracking_code      = '';
+      if ($this->get_tracking ()) {
+        $tracking_code_pre = " data-ai='";
+        $tracking_code_data = "[{$this->number},{$this->code_version}]";
+        $tracking_code_post = "'";
+
+        $tracking_code = $tracking_code_pre . base64_encode ($tracking_code_data) . $tracking_code_post;
+      }
+
+      $wrapper_before = $hidden_viewports . "<div" . $class . $tracking_code . " style='" . $additional_block_style . $this->get_alignment_style() . "'>\n";
+
+      $wrapper_after  = "</div>\n";
+
+      if ($this->w3tc_code != '' && get_dynamic_blocks () == AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC && !defined ('AI_NO_W3TC')) {
+
+        if ($this->get_tracking ()) $tracking_code_data = '[#AI_DATA#]';
+
+        $wrapper_before = $hidden_viewports . "<div" . $class . $tracking_code_pre . $tracking_code_data . $tracking_code_post . " style='" . $additional_block_style . $this->get_alignment_style() . "'>\n";
+
+        $code = '<!-- mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
+        $code .= $this->w3tc_code.' if ($ai_enabled) echo str_replace (\'[#AI_DATA#]\', base64_encode ("[' . $this->number . ',$ai_index]"), unserialize (base64_decode (\''.base64_encode (serialize ($wrapper_before)).'\'))), $ai_code, unserialize (base64_decode (\''.base64_encode (serialize ($wrapper_after)).'\'));';
+        $code .= '<!-- /mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
+        return $code;
+      } else return $wrapper_before . $code . $wrapper_after;
+    }
   }
 
    public function get_ad_general_tag(){
@@ -1251,6 +1329,16 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
      if ($option == '') $option = AD_GENERAL_TAG;
      return $option;
    }
+
+  public function get_adb_block_action (){
+     $option = isset ($this->wp_options [AI_OPTION_ADB_BLOCK_ACTION]) ? $this->wp_options [AI_OPTION_ADB_BLOCK_ACTION] : DEFAULT_ADB_BLOCK_ACTION;
+     return $option;
+  }
+
+  public function get_adb_block_replacement (){
+     $option = isset ($this->wp_options [AI_OPTION_ADB_BLOCK_REPLACEMENT]) ? $this->wp_options [AI_OPTION_ADB_BLOCK_REPLACEMENT] : AD_EMPTY_DATA;
+     return $option;
+  }
 
   public function get_scheduling(){
      $option = isset ($this->wp_options [AI_OPTION_SCHEDULING]) ? $this->wp_options [AI_OPTION_SCHEDULING] : "";
@@ -1266,6 +1354,9 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
   public function get_ad_after_day(){
      $option = isset ($this->wp_options [AI_OPTION_AFTER_DAYS]) ? $this->wp_options [AI_OPTION_AFTER_DAYS] : "";
 //     if ($option == '') $option = AD_ZERO;
+
+     if ($option == '0') $option = '';
+
      return $option;
   }
 
@@ -1286,6 +1377,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
   public function get_maximum_insertions (){
      $option = isset ($this->wp_options [AI_OPTION_MAXIMUM_INSERTIONS]) ? $this->wp_options [AI_OPTION_MAXIMUM_INSERTIONS] : "";
+     if ($option == '0') $option = '';
      return $option;
   }
 
@@ -1356,7 +1448,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
      return $option;
   }
 
-	public function get_ad_name(){
+  public function get_ad_name(){
      $option = isset ($this->wp_options [AI_OPTION_BLOCK_NAME]) ? $this->wp_options [AI_OPTION_BLOCK_NAME] : "";
      if ($option == '') $option = AD_NAME. " " . $this->number;
      return $option;
@@ -1403,15 +1495,63 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
    }
 
   public function get_ad_enabled_on_which_pages (){
-    $option = isset ($this->wp_options [AI_OPTION_ENABLED_ON_WHICH_PAGES]) ? $this->wp_options [AI_OPTION_ENABLED_ON_WHICH_PAGES] : "";
-    if ($option == '') $option = AD_ENABLED_ON_ALL;
+    $option = isset ($this->wp_options [AI_OPTION_ENABLED_ON_WHICH_PAGES]) ? $this->wp_options [AI_OPTION_ENABLED_ON_WHICH_PAGES] : AI_NO_INDIVIDUAL_EXCEPTIONS;
+
+    if ($option == '') $option = AI_NO_INDIVIDUAL_EXCEPTIONS;
+
+    elseif ($option == AD_ENABLED_ON_ALL)                       $option = AI_NO_INDIVIDUAL_EXCEPTIONS;
+    elseif ($option == AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED)    $option = AI_INDIVIDUALLY_DISABLED;
+    elseif ($option == AD_ENABLED_ONLY_ON_SELECTED)             $option = AI_INDIVIDUALLY_ENABLED;
+
+//    return AI_INDIVIDUALLY_DISABLED;
     return $option;
   }
 
+  public function get_ad_enabled_on_which_pages_text (){
+    switch ($this->get_ad_enabled_on_which_pages ()) {
+      case AI_NO_INDIVIDUAL_EXCEPTIONS:
+        return AI_TEXT_NO_INDIVIDUAL_EXCEPTIONS;
+        break;
+      case AI_INDIVIDUALLY_DISABLED:
+        return AI_TEXT_INDIVIDUALLY_DISABLED;
+        break;
+      case AI_INDIVIDUALLY_ENABLED:
+        return AI_TEXT_INDIVIDUALLY_ENABLED;
+        break;
+      default:
+        return '';
+        break;
+    }
+  }
+
   public function get_ad_enabled_on_which_posts (){
-    $option = isset ($this->wp_options [AI_OPTION_ENABLED_ON_WHICH_POSTS]) ? $this->wp_options [AI_OPTION_ENABLED_ON_WHICH_POSTS] : "";
-    if ($option == '') $option = AD_ENABLED_ON_ALL;
+    $option = isset ($this->wp_options [AI_OPTION_ENABLED_ON_WHICH_POSTS]) ? $this->wp_options [AI_OPTION_ENABLED_ON_WHICH_POSTS] : AI_NO_INDIVIDUAL_EXCEPTIONS;
+
+    if ($option == '') $option = AI_NO_INDIVIDUAL_EXCEPTIONS;
+
+    elseif ($option == AD_ENABLED_ON_ALL)                       $option = AI_NO_INDIVIDUAL_EXCEPTIONS;
+    elseif ($option == AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED)    $option = AI_INDIVIDUALLY_DISABLED;
+    elseif ($option == AD_ENABLED_ONLY_ON_SELECTED)             $option = AI_INDIVIDUALLY_ENABLED;
+
+//    return AI_INDIVIDUALLY_DISABLED;
     return $option;
+  }
+
+  public function get_ad_enabled_on_which_posts_text (){
+    switch ($this->get_ad_enabled_on_which_posts ()) {
+      case AI_NO_INDIVIDUAL_EXCEPTIONS:
+        return AI_TEXT_NO_INDIVIDUAL_EXCEPTIONS;
+        break;
+      case AI_INDIVIDUALLY_DISABLED:
+        return AI_TEXT_INDIVIDUALLY_DISABLED;
+        break;
+      case AI_INDIVIDUALLY_ENABLED:
+        return AI_TEXT_INDIVIDUALLY_ENABLED;
+        break;
+      default:
+        return '';
+        break;
+    }
   }
 
   public function get_viewport_classes (){
@@ -1429,77 +1569,6 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     }
     return ($viewport_classes);
   }
-
-  public function get_code_for_insertion ($include_viewport_classes = true, $hidden_widgets = false) {
-    global $ai_wp_data;
-
-    if ($this->get_alignment_type() == AI_ALIGNMENT_NO_WRAPPING) return $this->ai_getProcessedCode ();
-
-    $hidden_blocks = '';
-    if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 && $this->get_detection_client_side()) {
-
-      $title = '';
-      $counters = $this->ai_get_counters ($title);
-
-      if (function_exists ('ai_settings_url_parameters')) $url_parameters = ai_settings_url_parameters ($this->number); else $url_parameters = "";
-      $url = admin_url ('options-general.php?page=ad-inserter.php') . $url_parameters . '&tab=' . $this->number;
-
-      $hidden_block_text = '<section style="text-align: center; font-weight: bold;">'.($hidden_widgets ? 'WIDGET':'BLOCK').' INSERTED BUT NOT VISIBLE</section>';
-
-      $visible_blocks = '';
-      for ($viewport = 1; $viewport <= AD_INSERTER_VIEWPORTS; $viewport ++) {
-        $viewport_name = get_viewport_name ($viewport);
-        if ($viewport_name != '') {
-          if ($this->get_detection_viewport ($viewport))
-            $visible_blocks .= '<section class="ai-viewport-' . $viewport .'" style=""><section style="padding: 1px 0 1px 5px; text-align: center; background: red; color: white; font-size: 12px;"><a style="float: left; text-decoration: none; color: white;" title="Click to go to block settings" href="' . $url . '"><kbd style="display: none">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () .'</a><a style="text-decoration: none; color: white;">'.$viewport_name.'</a><a style="float: right; text-decoration: none; color: white; padding-right: 5px;" title="'.$title.'">'.$counters.'<kbd style="display: none">[/AI]</kbd></a></section><section>'; else
-              $hidden_blocks .= '<section class="ai-viewport-' . $viewport .'" style="' . $this->get_alignment_style() . '; border: 1px solid blue;"><section style="padding: 1px 0 1px 5px; text-align: center; background: blue; color: white; font-size: 12px;"><a style="float: left; text-decoration: none; color: white;" title="Click to go to block settings" href="' . $url . '"><kbd style="display: none">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () .'</a><a style="text-decoration: none; color: white;">'.$viewport_name.'</a><a style="float: right; text-decoration: none; color: white; padding-right: 5px;" title="'.$title.'">'.$counters.'<kbd style="display: none">[/AI]</kbd></a></section>' . $hidden_block_text . '</section>';
-        }
-      }
-
-      $code = "<div style='border: 1px solid red;'>".$visible_blocks.$this->ai_getProcessedCode (true).'</div>';
-    } else $code = $this->ai_getProcessedCode ();
-
-    $block_class_name = get_block_class_name ();
-    if ($block_class_name == '' && $this->needs_class) $block_class_name = DEFAULT_BLOCK_CLASS_NAME;
-    $viewport_classes = $include_viewport_classes ? $this->get_viewport_classes () : "";
-    if ($block_class_name != '' || $viewport_classes != '') {
-      if ($block_class_name == '') $viewport_classes = trim ($viewport_classes);
-      $class = " class='" . ($block_class_name != '' ? $block_class_name . " " . $block_class_name . "-" . $this->number : '') . $viewport_classes ."'";
-    } else $class = '';
-
-    if ($hidden_widgets) return $hidden_blocks; else {
-      if ($this->client_side_ip_address_detection) $additional_block_style = 'visibility: hidden; position: absolute; width: 100%; height: 100%; z-index: -9999; '; else $additional_block_style = '';
-
-      $tracking_code_pre  = '';
-      $tracking_code_data = '';
-      $tracking_code_post = '';
-      $tracking_code      = '';
-      if ($this->get_tracking ()) {
-        $tracking_code_pre = " data-ai='";
-        $tracking_code_data = "[{$this->number},{$this->code_version}]";
-        $tracking_code_post = "'";
-
-        $tracking_code = $tracking_code_pre . base64_encode ($tracking_code_data) . $tracking_code_post;
-      }
-
-      $wrapper_before = $hidden_blocks . "<div" . $class . $tracking_code . " style='" . $additional_block_style . $this->get_alignment_style() . "'>\n";
-
-      $wrapper_after  = "</div>\n";
-
-      if ($this->w3tc_code != '' && get_dynamic_blocks () == AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC && !defined ('AI_NO_W3TC')) {
-
-        if ($this->get_tracking ()) $tracking_code_data = '[#AI_DATA#]';
-
-        $wrapper_before = $hidden_blocks . "<div" . $class . $tracking_code_pre . $tracking_code_data . $tracking_code_post . " style='" . $additional_block_style . $this->get_alignment_style() . "'>\n";
-
-        $code = '<!-- mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
-        $code .= $this->w3tc_code.' if ($ai_enabled) echo str_replace (\'[#AI_DATA#]\', base64_encode ("[' . $this->number . ',$ai_index]"), unserialize (base64_decode (\''.base64_encode (serialize ($wrapper_before)).'\'))), $ai_code, unserialize (base64_decode (\''.base64_encode (serialize ($wrapper_after)).'\'));';
-        $code .= '<!-- /mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
-        return $code;
-      } else return $wrapper_before . $code . $wrapper_after;
-    }
-  }
-
 
   public function before_paragraph ($content, $position_preview = false) {
     global $ai_wp_data, $ai_last_check, $special_element_tags;
@@ -2477,9 +2546,12 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
   }
 
   function check_category () {
+    global $ai_wp_data;
 
     $categories = trim (strtolower ($this->get_ad_block_cat()));
     $cat_type = $this->get_ad_block_cat_type();
+
+    $wp_categories = get_the_category ();
 
     if ($cat_type == AD_BLACK_LIST) {
 
@@ -2487,16 +2559,16 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
       $cats_listed = explode (",", $categories);
 
-      foreach (get_the_category() as $post_category) {
+      foreach ($wp_categories as $wp_category) {
 
         foreach ($cats_listed as $cat_disabled){
 
           $cat_disabled = trim ($cat_disabled);
 
-          $post_category_name = strtolower ($post_category->cat_name);
-          $post_category_slug = strtolower ($post_category->slug);
+          $wp_category_name = strtolower ($wp_category->cat_name);
+          $wp_category_slug = strtolower ($wp_category->slug);
 
-          if ($post_category_name == $cat_disabled || $post_category_slug == $cat_disabled) {
+          if ($wp_category_name == $cat_disabled || $wp_category_slug == $cat_disabled) {
             return false;
           } else {
             }
@@ -2510,16 +2582,16 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
         $cats_listed = explode (",", $categories);
 
-        foreach (get_the_category() as $post_category) {
+        foreach ($wp_categories as $wp_category) {
 
           foreach ($cats_listed as $cat_enabled) {
 
             $cat_enabled = trim ($cat_enabled);
 
-            $post_category_name = strtolower ($post_category->cat_name);
-            $post_category_slug = strtolower ($post_category->slug);
+            $wp_category_name = strtolower ($wp_category->cat_name);
+            $wp_category_slug = strtolower ($wp_category->slug);
 
-            if ($post_category_name == $cat_enabled || $post_category_slug == $cat_enabled) {
+            if ($wp_category_name == $cat_enabled || $wp_category_slug == $cat_enabled) {
               return true;
             } else {
               }
@@ -2760,7 +2832,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       case AI_SCHEDULING_DELAY:
         $after_days = trim ($this->get_ad_after_day());
         if ($after_days == '') return true;
-        if (intval ($after_days) == AD_ZERO) return true;
+        $after_days = intval ($after_days);
+        if ($after_days == AD_ZERO) return true;
 
         $post_date = get_the_date ('U');
         if ($post_date === false) return true;
@@ -2937,26 +3010,26 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 //      $meta_value = get_post_meta (get_the_ID (), '_adinserter_block_exceptions', true);
 //      $selected_blocks = explode (",", $meta_value);
 
-      $enabled_on_text = $this->get_ad_enabled_on_which_posts ();
-      if ($enabled_on_text == AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED) {
-        $ai_last_check = AI_CHECK_ENABLED_ON_ALL_EXCEPT_ON_SELECTED;
+      $enabled_on = $this->get_ad_enabled_on_which_posts ();
+      if ($enabled_on == AI_INDIVIDUALLY_DISABLED) {
+        $ai_last_check = AI_CHECK_INDIVIDUALLY_DISABLED;
         if (in_array ($this->number, $selected_blocks)) return false;
       }
-      elseif ($enabled_on_text == AD_ENABLED_ONLY_ON_SELECTED) {
-        $ai_last_check = AI_CHECK_ENABLED_ONLY_ON_SELECTED;
+      elseif ($enabled_on == AI_INDIVIDUALLY_ENABLED) {
+        $ai_last_check = AI_CHECK_INDIVIDUALLY_ENABLED;
         if (!in_array ($this->number, $selected_blocks)) return false;
       }
     } elseif ($ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_STATIC) {
 //      $meta_value = get_post_meta (get_the_ID (), '_adinserter_block_exceptions', true);
 //      $selected_blocks = explode (",", $meta_value);
 
-      $enabled_on_text = $this->get_ad_enabled_on_which_pages ();
-      if ($enabled_on_text == AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED) {
-        $ai_last_check = AI_CHECK_ENABLED_ON_ALL_EXCEPT_ON_SELECTED;
+      $enabled_on = $this->get_ad_enabled_on_which_pages ();
+      if ($enabled_on == AI_INDIVIDUALLY_DISABLED) {
+        $ai_last_check = AI_CHECK_INDIVIDUALLY_DISABLED;
         if (in_array ($this->number, $selected_blocks)) return false;
       }
-      elseif ($enabled_on_text == AD_ENABLED_ONLY_ON_SELECTED) {
-        $ai_last_check = AI_CHECK_ENABLED_ONLY_ON_SELECTED;
+      elseif ($enabled_on == AI_INDIVIDUALLY_ENABLED) {
+        $ai_last_check = AI_CHECK_INDIVIDUALLY_ENABLED;
         if (!in_array ($this->number, $selected_blocks)) return false;
       }
     }
@@ -3259,6 +3332,8 @@ class ai_AdH extends ai_BaseCodeBlock {
 
   public function __construct () {
     parent::__construct();
+
+    $this->wp_options [AI_OPTION_BLOCK_NAME] = 'HEADER';
   }
 }
 
@@ -3266,6 +3341,8 @@ class ai_AdF extends ai_BaseCodeBlock {
 
   public function __construct () {
     parent::__construct();
+
+    $this->wp_options [AI_OPTION_BLOCK_NAME] = 'FOOTER';
   }
 }
 
@@ -3274,6 +3351,7 @@ class ai_AdA extends ai_BaseCodeBlock {
   public function __construct () {
     parent::__construct();
 
+    $this->wp_options [AI_OPTION_BLOCK_NAME] = 'AD BLOCKING MESSAGE';
     $this->wp_options [AI_OPTION_CODE] = AI_DEFAULT_ADB_MESSAGE;
   }
 }

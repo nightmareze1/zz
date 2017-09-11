@@ -1,5 +1,5 @@
 #ai-data {
-  font-family: "2.1.14"; /* Used for version number of the file */
+  font-family: "2.2.2"; /* Used for version number of the file */
 }
 
 #blocked-warning {
@@ -268,28 +268,6 @@ textarea.simple-editor.small {
   height: 192px;
 }
 
-@media (min-width: 783px) and (max-width: 828px) {
-  .auto-fold #wpcontent, .auto-fold #wpfooter {
-    margin-left: 20px;
-  }
-}
-@media (max-width: 782px) {
-  .auto-fold #wpcontent {
-      padding-left: 8px;
-  }
-}
-
-@media screen and (max-width: 782px){
-  #wpbody .small-select select {
-    height: 32px;
-    font-size: 14px;
-  }
-
-  #wpbody span.small-input-tags {
-    width: 22%;
-  }
-}
-
 .ms-container {
   width: 100%;
   font-size: 12px;
@@ -314,6 +292,14 @@ textarea.simple-editor.small {
 
 .ms-container div.ms-selection {
   margin-top: 24px;
+}
+
+div.custom-range-controls {
+  width: 696px;
+}
+
+div.custom-range-controls input.chart-date {
+  width: 85px;
 }
 
 .country-flags .ms-container .ms-selectable li.ms-elem-selectable, .country-flags .ms-container .ms-selection li.ms-elem-selection {
@@ -490,6 +476,37 @@ div.automatic-insertion img {
   margin-top: 6px;
 }
 
+#ai-sidebar .notice-dismiss {
+  position: absolute;
+  top: 0;
+  right: 1px;
+  border: none;
+  margin: 0;
+  padding: 9px;
+  background: 0 0;
+  color: #72777c;
+  cursor: pointer;
+}
+
+#ai-sidebar .notice-dismiss:focus {
+    outline: 0;
+     -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+#ai-sidebar .notice-dismiss.ui-state-active, #ai-sidebar .notice-dismiss.ui-widget-content .ui-state-active, #ai-sidebar .notice-dismiss.ui-widget-header .ui-state-active {
+  background: 0 0!important;
+}
+
+@media (max-width: 782px) {
+  .auto-fold #wpcontent {
+      padding-left: 4px;
+  }
+  #wpwrap {
+    width: 762px;
+  }
+}
+
 @media(max-width: 768px) {
    .text .checkbox-button {
      padding: 2px 5px 2px 4px;
@@ -504,6 +521,13 @@ div.automatic-insertion img {
       font-family: sans-serif,Arial,Verdana;
       font-size: 16px;
    }
+   div.custom-range-controls {
+     width: 715px;
+   }
+   div.custom-range-controls input.chart-date {
+     width: 90px;
+     padding: 3px 3px;
+   }
 }
 
 @media(min-width: 769px) {
@@ -512,5 +536,23 @@ div.automatic-insertion img {
      height: 22px;
    }
 }
+
+@media (min-width: 783px) and (max-width: 828px) {
+  .auto-fold #wpcontent, .auto-fold #wpfooter {
+    margin-left: 20px;
+  }
+}
+
+@media screen and (max-width: 782px){
+  #wpbody .small-select select {
+    height: 32px;
+    font-size: 14px;
+  }
+
+  #wpbody span.small-input-tags {
+    width: 22%;
+  }
+}
+
 
 

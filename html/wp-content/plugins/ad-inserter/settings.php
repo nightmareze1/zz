@@ -3,7 +3,8 @@
 require_once AD_INSERTER_PLUGIN_DIR.'constants.php';
 
 function generate_settings_form (){
-  global $ai_db_options, $block_object;
+  global $ai_db_options, $block_object, $ai_wp_data, $ai_db_options_extract;
+  global $rating_value, $rating_string, $rating_css;
 
   $save_url = $_SERVER ['REQUEST_URI'];
   if (isset ($_GET ['tab'])) {
@@ -99,7 +100,7 @@ function generate_settings_form (){
 
 ?>
 
-<div id="ai-data" style="display: none;" version="<?php echo AD_INSERTER_VERSION; ?>" theme="<?php echo $syntax_highlighter_theme; ?>" javascript_debugging="<?php echo get_javascript_debugging () ? '1' : '0'; ?>" ></div>
+<div id="ai-data" style="display: none;" version="<?php echo AD_INSERTER_VERSION; ?>" theme="<?php echo $syntax_highlighter_theme; ?>" javascript_debugging="<?php echo $ai_wp_data [AI_JS_DEBUGGING] ? '1' : '0'; ?>" ></div>
 <?php
   if (function_exists ('ai_data_2')) ai_data_2 ();
 ?>
@@ -121,8 +122,8 @@ function generate_settings_form (){
       <a style="text-decoration: none;" href="http://adinserter.pro/documentation" target="_blank"><button type="button" style="display: none; margin: 0 10px 0 0; width: 62px;" title="<?php echo AD_INSERTER_NAME; ?> Documentation">Doc</button></a>
       <a style="text-decoration: none;" href="https://wordpress.org/support/plugin/ad-inserter" target="_blank"><button type="button" style="display: none; margin: 0 10px 0 0; width: 68px;" title="<?php echo AD_INSERTER_NAME; ?> support forum">Support</button></a>
       <a style="text-decoration: none;" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4" target="_blank"><button type="button" style="display: none; margin: 0 10px 0 0; width: 62px;" title="Support Free Ad Inserter development. If you are making money with Ad Inserter consider donating some small amount. Even 1 dollar counts. Thank you!">Donate</button></a>
-      <a style="text-decoration: none;" href="https://wordpress.org/support/plugin/ad-inserter/reviews/" target="_blank"><button type="button" title="If you like Ad Inserter please write a nice review" style="display: none; margin: 0 10px 0 0; width: 62px;">Review</button></a>
-      <a style="text-decoration: none;" href="http://adinserter.pro/" target="_blank"><button type="button" title="Upgrade to Ad Inserter Pro" style="display: none; margin: 0 10px 0 0; width: 62px;">Go&nbsp;Pro</button></a>
+      <a style="text-decoration: none;" href="https://wordpress.org/support/plugin/ad-inserter/reviews/" target="_blank"><button type="button" title="If you like Ad Inserter and have a moment, please help me spread the word by reviewing the plugin on WordPres" style="display: none; margin: 0 10px 0 0; width: 62px;">Review</button></a>
+      <a style="text-decoration: none;" href="http://adinserter.pro/" target="_blank"><button type="button" title="Need more code blocks, GEO targeting, impression and click tracking? Upgrade to Ad Inserter Pro" style="display: none; margin: 0 10px 0 0; width: 62px;">Go&nbsp;Pro</button></a>
     </div>
 
     <div style="clear: both;"></div>
@@ -134,7 +135,7 @@ function generate_settings_form (){
   <div id="javascript-warning" class="ai-form rounded" style="display: none;">
     <h2 id="javascript-version" style="float: left; color: red;" title="Loaded plugin javascript version">&nbsp;</h2>
     <div style="float: right; text-align: right; margin: 8px 5px 0px 0;">
-        <span id="javascript-version-parameter" style="display: none;">Wrong version parameter for the javscript file, probably due to inappropriate caching.<br /></span>
+        <span id="javascript-version-parameter" style="display: none;">Wrong or <a href="https://adinserter.pro/documentation#missing-version-parameter" class="simple-link" target="_blank">missing version parameter</a> for the javscript file, probably due to inappropriate caching.<br /></span>
         <span id="javascript-version-parameter-missing" style="display: none;">Missing version parameter for the javscript file, probably due to inappropriate caching.<br /></span>
         Incompatible (old) javscript file loaded, probably due to inappropriate caching.<br />
         Please delete browser's cache and all other caches used and then reload this page.
@@ -155,9 +156,9 @@ function generate_settings_form (){
 
   <div id="blocked-warning" class="ai-form warning-enabled rounded">
     <h2 class="blocked-warning-text" style="float: left; color: red;" title="Error loading page">PAGE BLOCKED</h2>
-    <div style="float: right; text-align: right; margin: 8px 5px 0px 0;">
-       This page was not loaded properly. Please check browser and plugins that may block CSS/javascript<br />
-       files or images for this page. For <strong>Ad Blocker</strong> select "Disable on this page" or "Don't run on this page".
+    <div style="float: right; text-align: right; width: 600px; margin: 8px 5px 0px 0;">
+       This page was <a href="https://adinserter.pro/documentation#page-blocked" class="simple-link" target="_blank">not loaded properly</a>. Make sure your theme doesn't add async or defer tags to javascript files.
+       Check also browser and ad blocking plugins that may block CSS/js files or images for this page.
     </div>
     <div style="clear: both;"></div>
   </div>
@@ -213,50 +214,54 @@ function generate_settings_form (){
   for ($ad_number = $start; $ad_number <= $end; $ad_number ++){
     $obj = $block_object [$ad_number];
 
+    $automatic = $obj->get_automatic_insertion() != AI_AUTOMATIC_INSERTION_DISABLED;
+
     $manual_widget        [$ad_number] = $obj->get_enable_widget()    == AI_ENABLED;
     $manual_shortcode     [$ad_number] = $obj->get_enable_manual()    == AI_ENABLED;
     $manual_php_function  [$ad_number] = $obj->get_enable_php_call()  == AI_ENABLED;
     $manual               [$ad_number] = ($manual_widget [$ad_number] && !empty ($sidebars_with_widget [$ad_number])) || $manual_shortcode [$ad_number] || $manual_php_function [$ad_number];
 
-    $ad_name = $obj->get_ad_name();
-    $automatic = $obj->get_automatic_insertion() != AI_AUTOMATIC_INSERTION_DISABLED;
-
-    $ad_name_functions = false;
-    if ($automatic) {
-      $ad_name .= ": ".$obj->get_automatic_insertion_text ();
-      $ad_name_functions = true;
-    }
-
     $style = "";
-
+    $ad_name = "";
+    $sidebars [$ad_number] = "";
     if ($automatic && $manual [$ad_number]) $style = "font-weight: bold; color: #c4f;";
-    elseif ($automatic) $style = "font-weight: bold; color: #e44;";
-    elseif ($manual [$ad_number]) $style = "font-weight: bold; color: #66f;";
+      elseif ($automatic) $style = "font-weight: bold; color: #e44;";
+        elseif ($manual [$ad_number]) $style = "font-weight: bold; color: #66f;";
 
-    if (!empty ($sidebars_with_widget [$ad_number])) $sidebars [$ad_number] = implode (", ", $sidebars_with_widget [$ad_number]); else $sidebars [$ad_number] = "";
-    if ($manual_widget [$ad_number]) {
-      if ($sidebars [$ad_number] != "") {
-        $ad_name .= $ad_name_functions ? ", " : ": ";
-        $ad_name .= "Widget used in: [".$sidebars [$ad_number]."]";
+    if (!wp_is_mobile ()) {
+      $ad_name = $obj->get_ad_name();
+
+      $ad_name_functions = false;
+      if ($automatic) {
+        $ad_name .= ": ".$obj->get_automatic_insertion_text ();
         $ad_name_functions = true;
       }
-    } else {
-        if (!empty ($sidebars_with_widget [$ad_number])) {
+
+      if (!empty ($sidebars_with_widget [$ad_number])) $sidebars [$ad_number] = implode (", ", $sidebars_with_widget [$ad_number]);
+      if ($manual_widget [$ad_number]) {
+        if ($sidebars [$ad_number] != "") {
           $ad_name .= $ad_name_functions ? ", " : ": ";
-          $ad_name .= "Widget DISABLED but used in: [".$sidebars [$ad_number]."]";
+          $ad_name .= "Widget used in: [".$sidebars [$ad_number]."]";
           $ad_name_functions = true;
         }
-      }
+      } else {
+          if (!empty ($sidebars_with_widget [$ad_number])) {
+            $ad_name .= $ad_name_functions ? ", " : ": ";
+            $ad_name .= "Widget DISABLED but used in: [".$sidebars [$ad_number]."]";
+            $ad_name_functions = true;
+          }
+        }
 
-    if ($manual_shortcode     [$ad_number]) {
-      $ad_name .= $ad_name_functions ? ", " : ": ";
-      $ad_name .= "Shortcode";
-      $ad_name_functions = true;
-    }
-    if ($manual_php_function  [$ad_number]) {
-      $ad_name .= $ad_name_functions ? ", " : ": ";
-      $ad_name .= "PHP function";
-      $ad_name_functions = true;
+      if ($manual_shortcode     [$ad_number]) {
+        $ad_name .= $ad_name_functions ? ", " : ": ";
+        $ad_name .= "Shortcode";
+        $ad_name_functions = true;
+      }
+      if ($manual_php_function  [$ad_number]) {
+        $ad_name .= $ad_name_functions ? ", " : ": ";
+        $ad_name .= "PHP function";
+        $ad_name_functions = true;
+      }
     }
 
     echo "
@@ -264,22 +269,22 @@ function generate_settings_form (){
 
   }
 
-  $title_hf = "";
-  if ($adH->get_enable_manual () && $adH->get_ad_data() != "") $title_hf .= ", Header code";
-  if ($adF->get_enable_manual () && $adF->get_ad_data() != "") $title_hf .= ", Footer code";
+  $title_hfa = "";
+  if ($adH->get_enable_manual () && $adH->get_ad_data() != "") $title_hfa .= ", Header code";
+  if ($adF->get_enable_manual () && $adF->get_ad_data() != "") $title_hfa .= ", Footer code";
 
   $enabled_h = $adH->get_enable_manual () && $adH->get_ad_data() != "";
   $enabled_f = $adF->get_enable_manual () && $adF->get_ad_data() != "";
-  if ($enabled_h || $enabled_f) $class_hf = " on"; else $class_hf = "";
+  if ($enabled_h || $enabled_f) $class_hfa = " on"; else $class_hfa = "";
 
   if (defined ('AI_ADBLOCKING_DETECTION') && AI_ADBLOCKING_DETECTION) {
-    $enabled_a = $adA->get_enable_manual ();
-    if ($enabled_a) $title_hf .= ", Ad blocking detection code";
-    if ($enabled_a) $class_hf = " on";
+    $enabled_a = $ai_wp_data [AI_ADB_DETECTION];
+    if ($enabled_a) $title_hfa .= ", Ad blocking detection code";
+    if ($enabled_a) $class_hfa = " on";
   }
 
 ?>
-      <li id="ai-tab0" class="ai-tab" title="<?php echo AD_INSERTER_NAME ?> General Settings<?php echo $title_hf ?>" style=" margin: 1px 0 0 0;"><a href="#tab-0" style="padding: 5px 14px 6px 12px;"><div class="ai-icon-gear<?php echo $class_hf ?>"></div></a></li>
+      <li id="ai-tab0" class="ai-tab" title="<?php echo AD_INSERTER_NAME ?> General Settings<?php echo $title_hfa ?>" style=" margin: 1px 0 0 0;"><a href="#tab-0" style="padding: 5px 14px 6px 12px;"><div class="ai-icon-gear<?php echo $class_hfa ?>"></div></a></li>
   </ul>
 
 <?php
@@ -309,15 +314,44 @@ function generate_settings_form (){
     $show_manual = $manual [$ad_number];
     if ($show_manual) $manual_style = "font-weight: bold; color: " . ($manual_widget [$ad_number] || empty ($sidebars_with_widget [$ad_number]) ? "#66f;" : "#e44;"); else $manual_style = "";
 
+    $insertion_options =
+      $obj->get_maximum_insertions () ||
+      $obj->get_display_for_users() != AD_DISPLAY_ALL_USERS ||
+      $obj->get_enable_amp () == AI_ENABLED ||
+      $obj->get_enable_ajax () != AI_ENABLED ||
+      $obj->get_enable_404 () == AI_ENABLED ||
+      $obj->get_enable_feed () == AI_ENABLED;
+
     $scheduling_active = $obj->get_scheduling() != AI_SCHEDULING_OFF;
 
-    $show_misc = $scheduling_active || !$obj->get_maximum_insertions () || !$obj->get_call_filter() || $obj->get_inverted_filter() || $obj->get_display_for_users() != AD_DISPLAY_ALL_USERS || $obj->get_enable_404 () == AI_ENABLED || $obj->get_enable_feed () == AI_ENABLED;
+    $filter_active = $obj->get_call_filter() || $obj->get_inverted_filter() != 0;
+
+    $adb_block_action_active = $obj->get_adb_block_action () != AI_ADB_BLOCK_ACTION_DO_NOTHING;
+
+    $show_misc =
+      $insertion_options ||
+      $scheduling_active ||
+      $filter_active ||
+      $adb_block_action_active;
+
     if ($show_misc) $misc_style = "font-weight: bold; color: #66f;"; else $misc_style = "";
+
+    if ($insertion_options)       $insertion_style  = "font-weight: bold; color: #66f;"; else $insertion_style = "";
+    if ($scheduling_active)       $scheduling_style = "font-weight: bold; color: #66f;"; else $scheduling_style = "";
+    if ($filter_active)           $filter_style     = "font-weight: bold; color: #66f;"; else $filter_style = "";
+    if ($adb_block_action_active) $adb_style        = "font-weight: bold; color: #66f;"; else $adb_style = "";
 
     $automatic_insertion = $obj->get_automatic_insertion();
 
-    $paragraph_settings = $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_PARAGRAPH || $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_PARAGRAPH;
-    $content_settings   = $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_PARAGRAPH || $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_PARAGRAPH || $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_CONTENT || $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_CONTENT;
+    $paragraph_settings =
+      $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_PARAGRAPH ||
+      $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_PARAGRAPH;
+
+    $content_settings   =
+      $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_PARAGRAPH ||
+      $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_PARAGRAPH ||
+      $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_CONTENT ||
+      $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_CONTENT;
 
     $paragraph_counting =
       $obj->get_direction_type()            != $default->get_direction_type() ||
@@ -368,10 +402,10 @@ function generate_settings_form (){
 
   <div style="padding: 0; min-height: 28px;">
     <div style="float: left;">
-      <button id="misc-button-<?php echo $ad_number; ?>" type="button" style="display: none; margin-right: 4px;" title="Limit / Filter / Delay insertions, general tag, check for users, insert on error 404 page or in feeds"><span style="<?php echo $misc_style; ?>">Misc</span></button>
-      <button id="device-detection-button-<?php echo $ad_number; ?>" type="button" style="display: none; margin-right: 4px;" title="Client/Server-side Device Detection (Desktop, Tablet, Phone,...)"><span style="<?php echo $devices_style; ?>">Devices</span></button>
       <button id="lists-button-<?php echo $ad_number; ?>" type="button" style="display: none; margin-right: 4px;" title="White/Black-list Category, Tag, Url, Referer (domain) or Country"><span style="<?php echo $lists_style; ?>">Lists</span></button>
       <button id="manual-button-<?php echo $ad_number; ?>" type="button" style="display: none; margin-right: 4px;" title="Widget, Shortcode and PHP function call"><span style="<?php echo $manual_style; ?>">Manual</span></button>
+      <button id="device-detection-button-<?php echo $ad_number; ?>" type="button" style="display: none; margin-right: 4px;" title="Client/Server-side Device Detection (Desktop, Tablet, Phone,...)"><span style="<?php echo $devices_style; ?>">Devices</span></button>
+      <button id="misc-button-<?php echo $ad_number; ?>" type="button" style="display: none; margin-right: 4px;" title="Check for user status, Limit insertions, [error 404 page, Ajax requests, RSS feeds], Filter, Scheduling, General tag"><span style="<?php echo $misc_style; ?>">Misc</span></button>
       <button id="preview-button-<?php echo $ad_number; ?>" type="button" style="display: none; margin-right: 4px;" title="Preview saved code above" nonce="<?php echo wp_create_nonce ("adinserter_data"); ?>" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">Preview</button>
     </div>
     <div style="float: right;">
@@ -444,14 +478,14 @@ function generate_settings_form (){
   <div class="responsive-table small-button rounded">
     <table>
       <tr>
-        <td style="width: 70%">
+        <td style="width: 70%; padding-bottom: 5px;">
           <input type="hidden" name="<?php echo AI_OPTION_DISPLAY_ON_POSTS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
           <input type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_POSTS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_display_settings_post(); ?>" id="display-posts-<?php echo $ad_number; ?>" title="Enable or disable insertion on posts" <?php if ($obj->get_display_settings_post()==AI_ENABLED) echo 'checked '; ?> />
 
-          <select style="margin: 0 0 3px 10px;" title="Default insertion for posts - exceptions can be configured on individual post editor pages" id="enabled-on-which-posts-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_ENABLED_ON_WHICH_POSTS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_ad_enabled_on_which_posts(); ?>" style="width:160px">
-             <option value="<?php echo AD_ENABLED_ON_ALL; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AD_ENABLED_ON_ALL) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_ENABLED_ON_ALL; ?></option>
-             <option value="<?php echo AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED; ?></option>
-             <option value="<?php echo AD_ENABLED_ONLY_ON_SELECTED; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AD_ENABLED_ONLY_ON_SELECTED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_ENABLED_ONLY_ON_SELECTED; ?></option>
+          <select style="margin: 0 0 0 10px;" title="Individual post exceptions (if enabled here) can be configured in post editor. Leave blank for no individual post exceptions." id="enabled-on-which-posts-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_ENABLED_ON_WHICH_POSTS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_ad_enabled_on_which_posts(); ?>" style="width:160px">
+             <option value="<?php echo AI_NO_INDIVIDUAL_EXCEPTIONS; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AI_NO_INDIVIDUAL_EXCEPTIONS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NO_INDIVIDUAL_EXCEPTIONS; ?></option>
+             <option value="<?php echo AI_INDIVIDUALLY_DISABLED; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AI_INDIVIDUALLY_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_INDIVIDUALLY_DISABLED; ?></option>
+             <option value="<?php echo AI_INDIVIDUALLY_ENABLED; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AI_INDIVIDUALLY_ENABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_INDIVIDUALLY_ENABLED; ?></option>
           </select>
           &nbsp;
           <label for="display-posts-<?php echo $ad_number; ?>">Posts</label>
@@ -459,7 +493,7 @@ function generate_settings_form (){
 <?php
   if (!empty ($block_exceptions [$ad_number])) {
 ?>
-          <button id="exceptions-button-<?php echo $ad_number; ?>" type="button" style="display: none; width: 15px; height: 15px; margin-left: 20px;" title="Toggle Exceptions"></button>
+          <button id="exceptions-button-<?php echo $ad_number; ?>" type="button" style="display: none; width: 15px; height: 15px; margin-left: 20px;" title="Toggle list of individual exceptions"></button>
 <?php
   }
 ?>
@@ -469,12 +503,12 @@ function generate_settings_form (){
         </td>
         <td style="padding-left: 8px;">
           <input type="hidden" name="<?php echo AI_OPTION_DISPLAY_ON_HOMEPAGE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-          <input id= "display-homepage-<?php echo $ad_number; ?>" style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_HOMEPAGE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_display_settings_home(); ?>" <?php if ($obj->get_display_settings_home()==AI_ENABLED) echo 'checked '; ?> />
+          <input id= "display-homepage-<?php echo $ad_number; ?>" style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_HOMEPAGE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" title="Enable or disable insertion on homepage: latest posts (including sub-pages), static page or theme homepage" value="1" default="<?php echo $default->get_display_settings_home(); ?>" <?php if ($obj->get_display_settings_home()==AI_ENABLED) echo 'checked '; ?> />
           <label for="display-homepage-<?php echo $ad_number; ?>" title="Enable or disable insertion on homepage: latest posts (including sub-pages), static page or theme homepage">Homepage</label>
         </td>
         <td style="padding-left: 8px;">
           <input type="hidden" name="<?php echo AI_OPTION_DISPLAY_ON_CATEGORY_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-          <input id= "display-category-<?php echo $ad_number; ?>" style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_CATEGORY_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_display_settings_category(); ?>" <?php if ($obj->get_display_settings_category()==AI_ENABLED) echo 'checked '; ?> />
+          <input id= "display-category-<?php echo $ad_number; ?>" style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_CATEGORY_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" title="Enable or disable insertion on category blog pages (including sub-pages)" value="1" default="<?php echo $default->get_display_settings_category(); ?>" <?php if ($obj->get_display_settings_category()==AI_ENABLED) echo 'checked '; ?> />
           <label for="display-category-<?php echo $ad_number; ?>" title="Enable or disable insertion on category blog pages (including sub-pages)">Category pages</label>
         </td>
       </tr>
@@ -484,10 +518,10 @@ function generate_settings_form (){
           <input type="hidden" name="<?php echo AI_OPTION_DISPLAY_ON_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
           <input type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_display_settings_page(); ?>" id="display-pages-<?php echo $ad_number; ?>" title="Enable or disable insertion on static pages" <?php if ($obj->get_display_settings_page()==AI_ENABLED) echo 'checked '; ?> />
 
-          <select style="margin: 0 0 3px 10px;" title="Default insertion for pages - exceptions can be configured on individual page editor pages" id="enabled-on-which-pages-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_ENABLED_ON_WHICH_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_ad_enabled_on_which_pages(); ?>" style="width:160px">
-             <option value="<?php echo AD_ENABLED_ON_ALL; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AD_ENABLED_ON_ALL) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_ENABLED_ON_ALL; ?></option>
-             <option value="<?php echo AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED; ?></option>
-             <option value="<?php echo AD_ENABLED_ONLY_ON_SELECTED; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AD_ENABLED_ONLY_ON_SELECTED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_ENABLED_ONLY_ON_SELECTED; ?></option>
+          <select style="margin: 0 0 0 10px;" title="Individual static page exceptions (if enabled here) can be configured in page editor. Leave blank for no individual page exceptions." id="enabled-on-which-pages-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_ENABLED_ON_WHICH_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_ad_enabled_on_which_pages(); ?>" style="width:160px">
+             <option value="<?php echo AI_NO_INDIVIDUAL_EXCEPTIONS; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AI_NO_INDIVIDUAL_EXCEPTIONS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NO_INDIVIDUAL_EXCEPTIONS; ?></option>
+             <option value="<?php echo AI_INDIVIDUALLY_DISABLED; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AI_INDIVIDUALLY_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_INDIVIDUALLY_DISABLED; ?></option>
+             <option value="<?php echo AI_INDIVIDUALLY_ENABLED; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AI_INDIVIDUALLY_ENABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_INDIVIDUALLY_ENABLED; ?></option>
           </select>
           &nbsp;
           <label for="display-pages-<?php echo $ad_number; ?>">Static pages</label>
@@ -496,12 +530,12 @@ function generate_settings_form (){
         </td>
         <td style="padding-left: 8px;">
           <input type="hidden" name="<?php echo AI_OPTION_DISPLAY_ON_SEARCH_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-          <input id= "display-search-<?php echo $ad_number; ?>" style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_SEARCH_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_display_settings_search(); ?>" <?php if ($obj->get_display_settings_search()==AI_ENABLED) echo 'checked '; ?> />
+          <input id= "display-search-<?php echo $ad_number; ?>" style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_SEARCH_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" title="Enable or disable insertion on search blog pages" value="1" default="<?php echo $default->get_display_settings_search(); ?>" <?php if ($obj->get_display_settings_search()==AI_ENABLED) echo 'checked '; ?> />
           <label for="display-search-<?php echo $ad_number; ?>" title="Enable or disable insertion on search blog pages">Search pages</label>
         </td>
         <td style="padding-left: 8px;">
           <input type="hidden" name="<?php echo AI_OPTION_DISPLAY_ON_ARCHIVE_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-          <input id= "display-archive-<?php echo $ad_number; ?>" style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_ARCHIVE_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_display_settings_archive(); ?>" <?php if ($obj->get_display_settings_archive()==AI_ENABLED) echo 'checked '; ?> />
+          <input id= "display-archive-<?php echo $ad_number; ?>" style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_ARCHIVE_PAGES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" title="Enable or disable insertion on tag or archive blog pages" value="1" default="<?php echo $default->get_display_settings_archive(); ?>" <?php if ($obj->get_display_settings_archive()==AI_ENABLED) echo 'checked '; ?> />
           <label for="display-archive-<?php echo $ad_number; ?>" title="Enable or disable insertion on tag or archive blog pages">Tag / Archive pages</label>
         </td>
       </tr>
@@ -546,7 +580,7 @@ function generate_settings_form (){
   </div>
 
   <div id="paragraph-settings-<?php echo $ad_number; ?>" class="rounded" style="<?php echo $paragraph_settings ? "" : " display: none;" ?>">
-    <div style="height: 26px;">
+<!--    <div>-->
       <div style="float: left; margin-top: 1px;">
         Paragraph number(s)
         <input
@@ -563,7 +597,9 @@ function generate_settings_form (){
         <button id="counting-button-<?php echo $ad_number; ?>" type="button" style="min-width: 85px; margin-right: 8px; display: none;">Counting</button>
         <button id="clearance-button-<?php echo $ad_number; ?>" type="button" style="min-width: 85px; margin-right: 0px; display: none;">Clearance</button>
       </div>
-    </div>
+
+      <div style="clear: both;"></div>
+<!--    </div>-->
   </div>
 
   <div id="paragraph-counting-<?php echo $ad_number; ?>" class="rounded" style="<?php echo $paragraph_counting ? "" : "display: none;" ?>">
@@ -884,7 +920,7 @@ function generate_settings_form (){
           </label>
         </td>
         <td>
-          <pre style= "margin: 0; display: inline; color: blue;" title="Sidebars (or widget positions) where this widged is used"><?php echo $sidebars [$ad_number], !empty ($sidebars [$ad_number]) ? " &nbsp;" : ""; ?></pre>
+          <pre style= "margin: 0; display: inline; color: blue; white-space: pre-wrap; word-wrap: break-word;" title="Sidebars (or widget positions) where this widged is used"><?php echo $sidebars [$ad_number], !empty ($sidebars [$ad_number]) ? " &nbsp;" : ""; ?></pre>
           <button id="widgets-button-<?php echo $ad_number; ?>" type="button" style="display: none; width: 15px; height: 15px;" title="Manage Widgets"></button>
         </td>
       </tr>
@@ -897,8 +933,8 @@ function generate_settings_form (){
           </label>
         </td>
         <td>
-          <pre class="select" style="margin: 0; display: inline; color: blue; font-size: 11px;">[adinserter block="<?php echo $ad_number; ?>"]</pre>
-          or <pre class="select" style="margin: 0; display: inline; color: blue;">[adinserter name="<?php echo $obj->get_ad_name(); ?>"]</pre>
+          <pre class="select" style="margin: 0; display: inline; color: blue; font-size: 11px; white-space: pre-wrap; word-wrap: break-word;">[adinserter block="<?php echo $ad_number; ?>"]</pre>
+          or <pre class="select" style="margin: 0; display: inline; color: blue; white-space: pre-wrap; word-wrap: break-word;">[adinserter name="<?php echo $obj->get_ad_name(); ?>"]</pre>
         </td>
       </tr>
       <tr>
@@ -910,101 +946,10 @@ function generate_settings_form (){
           </label>
         </td>
         <td class="select">
-          <pre style="margin: 0; display: inline; color: blue; font-size: 11px;">&lt;?php if (function_exists ('adinserter')) echo adinserter (<?php echo $ad_number; ?>); ?&gt;</pre>
+          <pre style="margin: 0; display: inline; color: blue; font-size: 11px; white-space: pre-wrap; word-wrap: break-word;">&lt;?php if (function_exists ('adinserter')) echo adinserter (<?php echo $ad_number; ?>); ?&gt;</pre>
         </td>
       </tr>
     </table>
-  </div>
-
-  <div id="misc-settings-<?php echo $ad_number; ?>" class="rounded" style="<?php if (!$show_misc) echo 'display: none;'; ?>">
-    <div class="max-input" style="margin: 0 0 8px 0;">
-      <span style="display: table-cell; width: 1px; white-space: nowrap;">
-        Insert for
-        <select style="margin-bottom: 3px;" id="display-for-users-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_DISPLAY_FOR_USERS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_display_for_users(); ?>" style="width:160px">
-           <option value="<?php echo AD_DISPLAY_ALL_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_ALL_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_ALL_USERS; ?></option>
-           <option value="<?php echo AD_DISPLAY_LOGGED_IN_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_LOGGED_IN_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_LOGGED_IN_USERS; ?></option>
-           <option value="<?php echo AD_DISPLAY_NOT_LOGGED_IN_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_NOT_LOGGED_IN_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_NOT_LOGGED_IN_USERS; ?></option>
-           <option value="<?php echo AD_DISPLAY_ADMINISTRATORS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_ADMINISTRATORS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_ADMINISTRATORS; ?></option>
-        </select>
-      </span>
-      <span style="display: table-cell; width: 1px; white-space: nowrap;">
-        &nbsp;&nbsp;
-        Max <input type="text" style="width: 32px;" name="<?php echo AI_OPTION_MAXIMUM_INSERTIONS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_maximum_insertions (); ?>" value="<?php echo $obj->get_maximum_insertions (); ?>" size="1" maxlength="3" title="Empty or 0 means no limit" /> insertions
-      </span>
-      <span style="display: table-cell; width: 1px; white-space: nowrap;">
-        <input type="hidden" name="<?php echo AI_OPTION_ENABLE_AJAX, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-        <input style="margin-left: 20px;" id="enable-ajax-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_AJAX, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_enable_ajax(); ?>" <?php if ($obj->get_enable_ajax () == AI_ENABLED) echo 'checked '; ?> />
-        <label for="enable-ajax-<?php echo $ad_number; ?>" style="vertical-align: top;" title="Enable or disable insertion in Ajax requests">Ajax</label>
-      </span>
-      <span style="display: table-cell; width: 1px; white-space: nowrap;">
-        <input type="hidden" name="<?php echo AI_OPTION_ENABLE_FEED, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-        <input style="margin-left: 10px;" id="enable-feed-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_FEED, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_enable_feed(); ?>" <?php if ($obj->get_enable_feed () == AI_ENABLED) echo 'checked '; ?> />
-        <label for="enable-feed-<?php echo $ad_number; ?>" style="vertical-align: top;" title="Enable or disable insertion in feeds">Feed</label>
-      </span>
-      <span style="display: table-cell; width: 1px; white-space: nowrap;">
-        <input type="hidden" name="<?php echo AI_OPTION_ENABLE_404, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-        <input style="margin-left: 10px;" id="enable-404-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_404, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_enable_404(); ?>" <?php if ($obj->get_enable_404 () == AI_ENABLED) echo 'checked '; ?> />
-        <label for="enable-404-<?php echo $ad_number; ?>" style="vertical-align: top;" title="Enable or disable insertion on page for Error 404: Page not found">404</label>
-      </span>
-      <span style="display: table-cell; width: 1px; white-space: nowrap;">
-        &nbsp;&nbsp;
-        General tag
-        &nbsp;
-      </span>
-      <span style="display: table-cell;">
-        <input style="width: 100%;" type="text" name="<?php echo AI_OPTION_GENERAL_TAG, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_ad_general_tag(); ?>" value="<?php echo $obj->get_ad_general_tag(); ?>" size="8" maxlength="40" title="Used for {tags} when no page data is found" />
-      </span>
-    </div>
-
-    <div style="margin: 8px 0;">
-      <div class="max-input" style="margin: 8px 0;">
-        <span style="display: table-cell;">
-          Filter insertions
-        </span>
-        <span style="display: table-cell;">
-          <input style="width: 100%; padding-right: 10px;" type="text" name="<?php echo AI_OPTION_EXCERPT_NUMBER, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_call_filter(); ?>" value="<?php echo $obj->get_call_filter(); ?>" title= "Filter insertions by specifying wanted calls for this block - single number or comma separated numbers, empty means all / no limits. Set Counter for filter to Auto if you are using only one insertion type." size="12" maxlength="24" />
-        </span>
-        <span style="display: table-cell;">
-          &nbsp;&nbsp;&nbsp;using
-          <select style="margin-bottom: 3px;" id="filter-type-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_FILTER_TYPE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_filter_type(); ?>" style="width:160px">
-             <option value="<?php echo AI_FILTER_AUTO; ?>" <?php echo ($filter_type == AI_FILTER_AUTO) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_AUTO; ?></option>
-             <option value="<?php echo AI_FILTER_PHP_FUNCTION_CALLS; ?>" <?php echo ($filter_type == AI_FILTER_PHP_FUNCTION_CALLS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_PHP_FUNCTION_CALLS; ?></option>
-             <option value="<?php echo AI_FILTER_CONTENT_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_CONTENT_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CONTENT_PROCESSING; ?></option>
-             <option value="<?php echo AI_FILTER_EXCERPT_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_EXCERPT_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_EXCERPT_PROCESSING; ?></option>
-             <option value="<?php echo AI_FILTER_BEFORE_POST_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_BEFORE_POST_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_BEFORE_POST_PROCESSING; ?></option>
-             <option value="<?php echo AI_FILTER_AFTER_POST_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_AFTER_POST_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_AFTER_POST_PROCESSING; ?></option>
-             <option value="<?php echo AI_FILTER_WIDGET_DRAWING; ?>" <?php echo ($filter_type == AI_FILTER_WIDGET_DRAWING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_WIDGET_DRAWING; ?></option>
-             <option value="<?php echo AI_FILTER_SUBPAGES; ?>" <?php echo ($filter_type == AI_FILTER_SUBPAGES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_SUBPAGES; ?></option>
-             <option value="<?php echo AI_FILTER_POSTS; ?>" <?php echo ($filter_type == AI_FILTER_POSTS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_POSTS; ?></option>
-             <option value="<?php echo AI_FILTER_PARAGRAPHS; ?>" <?php echo ($filter_type == AI_FILTER_PARAGRAPHS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_PARAGRAPHS; ?></option>
-             <option value="<?php echo AI_FILTER_COMMENTS; ?>" <?php echo ($filter_type == AI_FILTER_COMMENTS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_COMMENTS; ?></option>
-          </select>
-          counter
-        </span>
-        <span style="display: table-cell;">
-          <input type="hidden" name="<?php echo AI_OPTION_INVERTED_FILTER, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-          <input style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_INVERTED_FILTER, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_inverted_filter(); ?>" <?php if ($obj->get_inverted_filter () == AI_ENABLED) echo 'checked '; ?> />
-          <label for="enable-ajax-<?php echo $ad_number; ?>" style="vertical-align: top;" title="If checked specified calls are unwanted">Invert filter</label>
-        </span>
-      </div>
-    </div>
-
-    <div style="margin: 8px 0 0 0;">
-      <select style="margin-bottom: 0px;" id="scheduling-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_SCHEDULING, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_scheduling(); ?>">
-        <option value="<?php echo AI_SCHEDULING_OFF; ?>" <?php echo ($obj->get_scheduling() == AI_SCHEDULING_OFF) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_OFF; ?></option>
-        <option value="<?php echo AI_SCHEDULING_DELAY; ?>" <?php echo ($obj->get_scheduling() == AI_SCHEDULING_DELAY) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DELAY_INSERTION; ?></option>
-<?php if (function_exists ('ai_scheduling_options')) ai_scheduling_options ($obj); ?>
-      </select>
-
-      <span id="scheduling-delay-<?php echo $ad_number; ?>">
-        for <input type="text" name="<?php echo AI_OPTION_AFTER_DAYS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_ad_after_day(); ?>" value="<?php echo $obj->get_ad_after_day(); ?>" size="2" maxlength="3" /> days after publishing
-      </span>
-      <span id="scheduling-delay-warning-<?php echo $ad_number; ?>" style="color: #d00; display: none;">&nbsp;&nbsp; Not available</span>
-
-<?php if (function_exists ('ai_scheduling_data')) ai_scheduling_data ($ad_number, $obj, $default); ?>
-    </div>
-
-<?php if (function_exists ('ai_adb_action')) ai_adb_action ($ad_number, $obj, $default); ?>
   </div>
 
   <div id="device-detection-settings-<?php echo $ad_number; ?>" class="rounded" style="<?php if (!$show_devices) echo 'display: none;'; ?>">
@@ -1055,6 +1000,121 @@ function generate_settings_form (){
     </table>
   </div>
 
+  <div id="misc-settings-<?php echo $ad_number; ?>" style="<?php if (!$show_misc) echo 'display: none;'; ?>">
+    <div id="ai-misc-container-<?php echo $ad_number; ?>" style="padding: 0; margin 8px 0 0 0; border: 0;">
+      <ul id="ai-misc-tabs-<?php echo $ad_number; ?>" style="display: none;">
+        <li id="ai-misc-insertion-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-insertion-<?php echo $ad_number; ?>"><span style="<?php echo $insertion_style; ?>">Insertion</span></a></li>
+        <li id="ai-misc-filter-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-filter-<?php echo $ad_number; ?>"><span style="<?php echo $filter_style; ?>">Filter</span></a></li>
+        <li id="ai-misc-scheduling-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-scheduling-<?php echo $ad_number; ?>"><span style="<?php echo $scheduling_style; ?>">Scheduling</span></a></li>
+        <?php if (function_exists ('ai_adb_action_0')) ai_adb_action_0 ($ad_number, $adb_style); ?>
+        <li id="ai-misc-general-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-general-<?php echo $ad_number; ?>">General</a></li>
+      </ul>
+
+      <div id="tab-insertion-<?php echo $ad_number; ?>" class="rounded">
+        <div class="max-input">
+          <span style="display: table-cell; width: 1px; white-space: nowrap;">
+            Insert for
+            <select id="display-for-users-<?php echo $ad_number; ?>" style="margin: 0 1px;" name="<?php echo AI_OPTION_DISPLAY_FOR_USERS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_display_for_users(); ?>" style="width:160px">
+               <option value="<?php echo AD_DISPLAY_ALL_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_ALL_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_ALL_USERS; ?></option>
+               <option value="<?php echo AD_DISPLAY_LOGGED_IN_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_LOGGED_IN_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_LOGGED_IN_USERS; ?></option>
+               <option value="<?php echo AD_DISPLAY_NOT_LOGGED_IN_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_NOT_LOGGED_IN_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_NOT_LOGGED_IN_USERS; ?></option>
+               <option value="<?php echo AD_DISPLAY_ADMINISTRATORS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_ADMINISTRATORS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_ADMINISTRATORS; ?></option>
+            </select>
+          </span>
+          <span style="display: table-cell; width: 1px; white-space: nowrap;">
+            &nbsp;&nbsp;
+            Max <input type="text" style="width: 32px;" name="<?php echo AI_OPTION_MAXIMUM_INSERTIONS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_maximum_insertions (); ?>" value="<?php echo $obj->get_maximum_insertions (); ?>" size="1" maxlength="3" title="Empty or 0 means no limit" /> insertions
+          </span>
+          <span style="display: table-cell; width: 1px; white-space: nowrap;">
+            <input type="hidden" name="<?php echo AI_OPTION_ENABLE_AMP, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
+            <input style="margin-left: 10px;" id="enable-amp-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_AMP, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_enable_amp(true); ?>" <?php if ($obj->get_enable_amp (true) == AI_ENABLED) echo 'checked '; ?> />
+            <label for="enable-amp-<?php echo $ad_number; ?>" style="vertical-align: top;<?php if (!$obj->get_enable_amp (true) && $obj->get_enable_amp ()) echo ' color: red;' ?>" title="<?php if (!$obj->get_enable_amp (true) && $obj->get_enable_amp ()) echo "Old settings for AMP pages detected. " ?>To insert different codes on normal and AMP pages separate them with [ADINSERTER AMP] separator. Here you can enable insertion on AMP pages only when you need to insert THE SAME CODE also on AMP pages (no AMP separator).">AMP pages</label>
+          </span>
+          <span style="display: table-cell; width: 1px; white-space: nowrap;">
+            <input type="hidden" name="<?php echo AI_OPTION_ENABLE_AJAX, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
+            <input style="margin-left: 10px;" id="enable-ajax-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_AJAX, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_enable_ajax(); ?>" <?php if ($obj->get_enable_ajax () == AI_ENABLED) echo 'checked '; ?> />
+            <label for="enable-ajax-<?php echo $ad_number; ?>" style="vertical-align: top;" title="Enable or disable insertion for Ajax requests">Ajax</label>
+          </span>
+          <span style="display: table-cell; width: 1px; white-space: nowrap;">
+            <input type="hidden" name="<?php echo AI_OPTION_ENABLE_FEED, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
+            <input style="margin-left: 10px;" id="enable-feed-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_FEED, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_enable_feed(); ?>" <?php if ($obj->get_enable_feed () == AI_ENABLED) echo 'checked '; ?> />
+            <label for="enable-feed-<?php echo $ad_number; ?>" style="vertical-align: top;" title="Enable or disable insertion in RSS feeds">RSS Feed</label>
+          </span>
+          <span style="display: table-cell; width: 1px; white-space: nowrap;">
+            <input type="hidden" name="<?php echo AI_OPTION_ENABLE_404, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
+            <input style="margin-left: 10px;" id="enable-404-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_404, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_enable_404(); ?>" <?php if ($obj->get_enable_404 () == AI_ENABLED) echo 'checked '; ?> />
+            <label for="enable-404-<?php echo $ad_number; ?>" style="vertical-align: top;" title="Enable or disable insertion on page for Error 404: Page not found">Error page</label>
+          </span>
+        </div>
+      </div>
+
+      <div id="tab-filter-<?php echo $ad_number; ?>" class="rounded">
+        <div class="max-input">
+          <span style="display: table-cell;">
+            Filter insertions
+          </span>
+          <span style="display: table-cell;">
+            <input style="width: 100%; padding-right: 10px;" type="text" name="<?php echo AI_OPTION_EXCERPT_NUMBER, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_call_filter(); ?>" value="<?php echo $obj->get_call_filter(); ?>" title= "Filter insertions by specifying wanted calls for this block - single number or comma separated numbers, empty means all / no limits. Set Counter for filter to Auto if you are using only one insertion type." size="12" maxlength="24" />
+          </span>
+          <span style="display: table-cell;">
+            &nbsp;&nbsp;&nbsp;using
+            <select id="filter-type-<?php echo $ad_number; ?>" style="margin: 0 1px;" name="<?php echo AI_OPTION_FILTER_TYPE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_filter_type(); ?>" style="width:160px">
+               <option value="<?php echo AI_FILTER_AUTO; ?>" <?php echo ($filter_type == AI_FILTER_AUTO) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_AUTO; ?></option>
+               <option value="<?php echo AI_FILTER_PHP_FUNCTION_CALLS; ?>" <?php echo ($filter_type == AI_FILTER_PHP_FUNCTION_CALLS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_PHP_FUNCTION_CALLS; ?></option>
+               <option value="<?php echo AI_FILTER_CONTENT_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_CONTENT_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CONTENT_PROCESSING; ?></option>
+               <option value="<?php echo AI_FILTER_EXCERPT_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_EXCERPT_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_EXCERPT_PROCESSING; ?></option>
+               <option value="<?php echo AI_FILTER_BEFORE_POST_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_BEFORE_POST_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_BEFORE_POST_PROCESSING; ?></option>
+               <option value="<?php echo AI_FILTER_AFTER_POST_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_AFTER_POST_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_AFTER_POST_PROCESSING; ?></option>
+               <option value="<?php echo AI_FILTER_WIDGET_DRAWING; ?>" <?php echo ($filter_type == AI_FILTER_WIDGET_DRAWING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_WIDGET_DRAWING; ?></option>
+               <option value="<?php echo AI_FILTER_SUBPAGES; ?>" <?php echo ($filter_type == AI_FILTER_SUBPAGES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_SUBPAGES; ?></option>
+               <option value="<?php echo AI_FILTER_POSTS; ?>" <?php echo ($filter_type == AI_FILTER_POSTS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_POSTS; ?></option>
+               <option value="<?php echo AI_FILTER_PARAGRAPHS; ?>" <?php echo ($filter_type == AI_FILTER_PARAGRAPHS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_PARAGRAPHS; ?></option>
+               <option value="<?php echo AI_FILTER_COMMENTS; ?>" <?php echo ($filter_type == AI_FILTER_COMMENTS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_COMMENTS; ?></option>
+            </select>
+            counter
+          </span>
+          <span style="display: table-cell;">
+            <input type="hidden" name="<?php echo AI_OPTION_INVERTED_FILTER, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
+            <input style="margin-left: 10px;" type="checkbox" name="<?php echo AI_OPTION_INVERTED_FILTER, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_inverted_filter(); ?>" <?php if ($obj->get_inverted_filter () == AI_ENABLED) echo 'checked '; ?> />
+            <label for="enable-ajax-<?php echo $ad_number; ?>" style="vertical-align: top;" title="If checked specified calls are unwanted">Invert filter</label>
+          </span>
+        </div>
+      </div>
+
+      <div id="tab-scheduling-<?php echo $ad_number; ?>" class="rounded" style="min-height: 24px;">
+        <select id="scheduling-<?php echo $ad_number; ?>" style="margin: 0 1px;" name="<?php echo AI_OPTION_SCHEDULING, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_scheduling(); ?>">
+          <option value="<?php echo AI_SCHEDULING_OFF; ?>" <?php echo ($obj->get_scheduling() == AI_SCHEDULING_OFF) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_OFF; ?></option>
+          <option value="<?php echo AI_SCHEDULING_DELAY; ?>" <?php echo ($obj->get_scheduling() == AI_SCHEDULING_DELAY) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DELAY_INSERTION; ?></option>
+<?php if (function_exists ('ai_scheduling_options')) ai_scheduling_options ($obj); ?>
+        </select>
+
+        <span id="scheduling-delay-<?php echo $ad_number; ?>">
+          for <input type="text" name="<?php echo AI_OPTION_AFTER_DAYS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_ad_after_day(); ?>" value="<?php echo $obj->get_ad_after_day(); ?>" size="2" maxlength="3" /> days after publishing
+        </span>
+        <span id="scheduling-delay-warning-<?php echo $ad_number; ?>" style="color: #d00; display: none;">&nbsp;&nbsp; Not available</span>
+
+<?php if (function_exists ('ai_scheduling_data')) ai_scheduling_data ($ad_number, $obj, $default); ?>
+      </div>
+
+<?php if (function_exists ('ai_adb_action')) ai_adb_action ($ad_number, $obj, $default); ?>
+
+      <div id="tab-general-<?php echo $ad_number; ?>" class="rounded">
+        <div class="max-input">
+          <span style="display: table-cell; width: 1px; white-space: nowrap;">
+            General tag
+            &nbsp;
+          </span>
+          <span style="display: table-cell;">
+            <input style="width: 100%;" type="text" name="<?php echo AI_OPTION_GENERAL_TAG, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_ad_general_tag(); ?>" value="<?php echo $obj->get_ad_general_tag(); ?>" size="8" maxlength="40" title="Used for {tags} when no page data is found" />
+          </span>
+          <span style="display: table-cell; width: 400px; white-space: nowrap;">
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <div id="no-wrapping-warning-<?php echo $ad_number; ?>" class="rounded" style="display: none;">
      <span id="" style="margin-top: 5px;"><strong><span style="color: red;">WARNING:</span> No Wrapping</strong> style has no HTML code for client-side device detection!</span>
   </div>
@@ -1093,7 +1153,7 @@ function generate_settings_form (){
   if ($enabled_f) $style_f = "font-weight: bold; color: #66f;"; else $style_f = "";
   if (defined ('AI_ADBLOCKING_DETECTION') && AI_ADBLOCKING_DETECTION) {
     $adb_action = get_adb_action();
-    if ($enabled_a) $style_a = "font-weight: bold; color: " . ($adb_action == AI_ACTION_NONE ? "#66f;" : "#f00;"); else $style_a = "";
+    if ($enabled_a) $style_a = "font-weight: bold; color: " . ($adb_action == AI_ADB_ACTION_NONE ? "#66f;" : "#f00;"); else $style_a = "";
   }
   if (false) $style_d = "font-weight: bold; color: #e44;"; else $style_d = "";
 ?>
@@ -1116,7 +1176,7 @@ function generate_settings_form (){
       <table class="ai-settings-table" style="width: 100%;">
 <?php if (function_exists ('ai_general_settings')) ai_general_settings (); ?>
       <tr>
-        <td style="width: 36%;">
+        <td style="width: 34%;">
           Syntax Highlighter Theme
         </td>
         <td>
@@ -1177,7 +1237,7 @@ function generate_settings_form (){
       </tr>
       <tr>
         <td>
-          Minimum User Role for Exceptions Editing
+          Min. User Role for Ind. Exceptions Editing
         </td>
         <td>
           <select style="margin-bottom: 3px;" id="minimum-user-role" name="minimum-user-role" selected-value="1" data="<?php echo get_minimum_user_role (); ?>" default="<?php echo DEFAULT_MINIMUM_USER_ROLE; ?>" style="width:300px">
@@ -1393,9 +1453,9 @@ function generate_settings_form (){
             </td>
             <td>
               <select id="adb-action" name="<?php echo AI_OPTION_ADB_ACTION; ?>" title="Global action when ad blocking is detected" default="<?php echo AI_DEFAULT_ADB_ACTION; ?>" >
-                <option value="<?php echo AI_ACTION_NONE; ?>" <?php echo ($adb_action == AI_ACTION_NONE) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NONE; ?></option>
-                <option value="<?php echo AI_ACTION_WARNING_MESSAGE; ?>" <?php echo ($adb_action == AI_ACTION_WARNING_MESSAGE) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_WARNING_MESSAGE; ?></option>
-                <option value="<?php echo AI_ACTION_REDIRECTION; ?>" <?php echo ($adb_action == AI_ACTION_REDIRECTION) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_REDIRECTION; ?></option>
+                <option value="<?php echo AI_ADB_ACTION_NONE; ?>" <?php echo ($adb_action == AI_ADB_ACTION_NONE) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NONE; ?></option>
+                <option value="<?php echo AI_ADB_ACTION_MESSAGE; ?>" <?php echo ($adb_action == AI_ADB_ACTION_MESSAGE) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_POPUP_MESSAGE; ?></option>
+                <option value="<?php echo AI_ADB_ACTION_REDIRECTION; ?>" <?php echo ($adb_action == AI_ADB_ACTION_REDIRECTION) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_REDIRECTION; ?></option>
               </select>
             </td>
           </tr>
@@ -1504,7 +1564,7 @@ function generate_settings_form (){
               Overlay CSS
               </td>
               <td>
-                <input id="overlay-css" style="width: 100%;" type="text" name="<?php echo AI_OPTION_ADB_OVERLAY_CSS; ?>" value="<?php echo get_overlay_css (); ?>"  default="<?php echo AI_ADB_DEFAULT_OVERLAY_CSS; ?>" size="50" maxlength="200" />
+                <input id="overlay-css" style="width: 100%;" type="text" name="<?php echo AI_OPTION_ADB_OVERLAY_CSS; ?>" value="<?php echo get_overlay_css (); ?>"  default="<?php echo AI_DEFAULT_ADB_OVERLAY_CSS; ?>" size="50" maxlength="200" />
               </td>
             </tr>
             <tr>
@@ -1513,7 +1573,7 @@ function generate_settings_form (){
               </td>
               <td>
                 <input type="hidden" name="<?php echo AI_OPTION_ADB_UNDISMISSIBLE_MESSAGE; ?>" value="0" />
-                <input style="margin-left: 1px;" type="checkbox" name="<?php echo AI_OPTION_ADB_UNDISMISSIBLE_MESSAGE; ?>" id="undismissible-message" value="1" default="<?php echo AI_DEFAULT_ADB_UNDISMISSIBLE_MESSAGE; ?>" <?php if (get_undismissible_message () == AI_ENABLED) echo 'checked '; ?> />
+                <input type="checkbox" name="<?php echo AI_OPTION_ADB_UNDISMISSIBLE_MESSAGE; ?>" id="undismissible-message" value="1" default="<?php echo AI_DEFAULT_ADB_UNDISMISSIBLE_MESSAGE; ?>" <?php if (get_undismissible_message () == AI_ENABLED) echo 'checked '; ?> />
               </td>
             </tr>
           </table>
@@ -1524,27 +1584,66 @@ function generate_settings_form (){
 <?php } ?>
 
     <div id="tab-debugging" class="rounded">
-      <div style="margin:  0 0 8px 0;">
-        <input type="hidden" name="admin_toolbar_debugging" value="0" />
-        <input type="checkbox" name="admin_toolbar_debugging" id="admin-toolbar-debugging" value="1" default="<?php echo DEFAULT_ADMIN_TOOLBAR_DEBUGGING; ?>" <?php if (get_admin_toolbar_debugging ()==AI_ENABLED) echo 'checked '; ?> />
-        <label for="admin-toolbar-debugging" title="Enable or disable debugging functions in admin toolbar">Debugging functions in admin toolbar</label>
-      </div>
-
-      <div style="margin: 8px 0 0 0;">
-        <input type="hidden" name="remote_debugging" value="0" />
-        <input type="checkbox" name="remote_debugging" id="remote-debugging" value="1" default="<?php echo DEFAULT_REMOTE_DEBUGGING; ?>" <?php if (get_remote_debugging ()==AI_ENABLED) echo 'checked '; ?> />
-        <label for="remote-debugging" title="Enable Debugger widget and code insertion debugging (blocks, positions, tags, processing) by url parameters for non-logged in users. Enable this option to allow other people to see Debugger widget, labeled blocks and positions in order to help you to diagnose problems. For logged in administrators debugging is always enabled.">Remote debugging</label>
-      </div>
-
-      <div id="system-debugging" style="display: none;">
-        <div style="margin: 8px 0 0 0;">
-          <input type="hidden" name="javascript_debugging" value="0" />
-          <input type="checkbox" name="javascript_debugging"id="javascript-debugging" value="1" default="<?php echo DEFAULT_JAVASCRIPT_DEBUGGING; ?>" <?php if (get_javascript_debugging ()==AI_ENABLED) echo 'checked '; ?> />
-          <label for="javascript-debugging" title="Enable Javascript console output">Javascript debugging</label>
-        </div>
-
+      <table class="ai-settings-table" style="width: 100%;">
+        <tr>
+          <td style="width: 30%;">
+            <label for="admin-toolbar-debugging" title="Enable or disable debugging functions in admin toolbar">Debugging functions in admin toolbar</label>
+          </td>
+          <td>
+            <input type="hidden" name="admin_toolbar_debugging" value="0" />
+            <input type="checkbox" name="admin_toolbar_debugging" id="admin-toolbar-debugging" value="1" default="<?php echo DEFAULT_ADMIN_TOOLBAR_DEBUGGING; ?>" <?php if (get_admin_toolbar_debugging ()==AI_ENABLED) echo 'checked '; ?> />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="remote-debugging" title="Enable Debugger widget and code insertion debugging (blocks, positions, tags, processing) by url parameters for non-logged in users. Enable this option to allow other people to see Debugger widget, labeled blocks and positions in order to help you to diagnose problems. For logged in administrators debugging is always enabled.">Remote debugging</label>
+          </td>
+          <td>
+            <input type="hidden" name="remote_debugging" value="0" />
+            <input type="checkbox" name="remote_debugging" id="remote-debugging" value="1" default="<?php echo DEFAULT_REMOTE_DEBUGGING; ?>" <?php if (get_remote_debugging ()==AI_ENABLED) echo 'checked '; ?> />
+          </td>
+        </tr>
+        <tr class="system-debugging" style="display: none;">
+          <td>
+            <label for="javascript-debugging" title="Enable Javascript console output">Javascript debugging</label>
+          </td>
+          <td>
+            <input type="hidden" name="javascript_debugging" value="0" />
+            <input type="checkbox" name="javascript_debugging"id="javascript-debugging" value="1" default="<?php echo DEFAULT_JAVASCRIPT_DEBUGGING; ?>" <?php if (get_javascript_debugging ()==AI_ENABLED) echo 'checked '; ?> />
+          </td>
+        </tr>
+        <tr class="system-debugging" style="display: none;">
+          <td>
+            Installation
+          </td>
+          <td>
+            <?php echo ($install_timestamp = get_option (AI_INSTALL_NAME)) !== false ? date ("Y-m-d H:i:s", $install_timestamp + get_option ('gmt_offset') * 3600) : ""; ?>
+          </td>
+        </tr>
+        <tr class="system-debugging" style="display: none;">
+          <td>
+            Age
+          </td>
+          <td>
+           <?php if (isset ($ai_wp_data [AI_INSTALL_TIME_DIFFERENCE])) printf ('%04d-%02d-%02d %02d:%02d:%02d',
+                                                                                      $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->y,
+                                                                                      $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->m,
+                                                                                      $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->d,
+                                                                                      $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->h,
+                                                                                      $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->i,
+                                                                                      $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->s); ?>
+          </td>
+        </tr>
+        <tr class="system-debugging" style="display: none;">
+          <td>
+            Used blocks
+          </td>
+          <td>
+            <?php if (isset ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS])) echo $ai_db_options_extract [AI_EXTRACT_USED_BLOCKS]; ?>
+          </td>
+        </tr>
 <?php if (function_exists ('ai_system_debugging')) ai_system_debugging (); ?>
-      </div>
+      </table>
     </div>
 
   </div>
@@ -1552,27 +1651,44 @@ function generate_settings_form (){
 
 </div>
 
-<?php if (!function_exists ('ai_settings_side'))  { ?>
+<?php
 
-<div class="ai-form header rounded">
-  <div style="float: left;">
-    <h2 style="display: inline-block; margin: 5px 0;">Blank Ad Blocks? Looking for AdSense alternative?</h2>
-  </div>
-  <div style="clear: both;"></div>
-</div>
+  $sidebar = 0;
+  if (isset ($ai_wp_data [AI_DAYS_SINCE_INSTAL])) {
+    if (                                                         $ai_wp_data [AI_DAYS_SINCE_INSTAL] >  5) $sidebar = 1;
 
-<div class="ai-form rounded" style="height: 90px; padding: 8px 4px 8px 12px;">
-  <a href='http://bit.ly/2oF81Oh' class="clear-link" title="Looking for AdSense alternative?" target="_blank"><img id="ai-media-1" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>contextual-1.gif" /></a>
-</div>
+    if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >=  4 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 10 || $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 20) $sidebar = 2;
 
-<!--<div class="ai-form header rounded">-->
-<!--  <div style="float: left;">-->
-<!--    <h2 style="display: inline-block; margin: 5px 0;">WordPress [Great Content] + Ad Inserter [AdSense, Amazon, media.net] = ?</h2>-->
-<!--  </div>-->
-<!--  <div style="clear: both;"></div>-->
-<!--</div>-->
+    if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >= 12 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 20 || $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 25) $sidebar = 3;
+    if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >=  8 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 25 || $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 35) $sidebar = 3;
 
-<?php } ?>
+    if (                                                         $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 40) $sidebar = 4;
+  } else {
+      if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >= 4) $sidebar = 4;
+    }
+
+//  $sidebar = 4;
+
+
+  if (!function_exists ('ai_settings_side') && $sidebar >= 2)  {
+
+    switch ($sidebar) {
+      case 0:
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+      case 3:
+        sidebar_ratings ();
+        break;
+      case 4:
+        sidebar_addense_alternative ();
+        break;
+    }
+
+  }
+?>
 
 <input id="ai-active-tab" type="hidden" name="ai-active-tab" value="[<?php echo $active_tab, ',', $active_tab_0; ?>]" />
 <?php wp_nonce_field ('save_adinserter_settings'); ?>
@@ -1585,106 +1701,32 @@ function generate_settings_form (){
 
 <?php
   if ($subpage == 'main') {
-    if (function_exists ('ai_settings_side')) ai_settings_side (); else { ?>
+    if (function_exists ('ai_settings_side')) ai_settings_side (); else {
+?>
     <div id="ai-sidebar" style="float: left;">
-      <div class="ai-form header rounded no-select">
-        <div style="float: left;">
-          <h2 style="display: inline-block; margin: 7px 0;">Support plugin development</h2>
-        </div>
-        <div style="float: right;">
-          <a href="https://twitter.com/AdInserter" class="clear-link" target="_blank"><img id="ai-tw" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>twitter.png" style="vertical-align: middle; margin: 0 0 0 20px;" title="Ad Inserter on Twitter" alt="Ad Inserter on Twitter" /></a>
-          <a href="https://www.facebook.com/AdInserter/" class="clear-link" target="_blank"><img id="ai-fb" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>facebook.png" style="vertical-align: middle; margin: 0 0 0 10px;" title="Ad Inserter on Facebook" alt="Ad Inserter on Facebook" /></a>
-        </div>
-        <div style="float: right; margin-top: 2px;">
-          <h2 style="display: inline-block; margin: 5px 0;">Follow Ad Inserter</h2>
-        </div>
 
-        <div style="clear: both;"></div>
-      </div>
-
-      <div class="ai-form header no-select rounded">
-        <ul style="margin: 0;">
-          <li><strong>&squf;</strong>
-            If you like Ad Inserter please do me a big favor and give plugin a 5 star rating on the <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">review page</a>.
-
-            <div id="ai-stars" style="float: right; margin: 0 0 -3px 0; cursor: pointer;"><span><?php echo $rating_value; ?></span><img id="ai-stars-img" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>stars.png" style="margin: 0 0 -3px 10px;"/></div>
-
-
-            <div id="ai-rating-bar" class="header" style="float: right; cursor: pointer; margin: 4px 0 0 0; width: 148px; display: none;" nonce="<?php echo wp_create_nonce ("adinserter_data"); ?>" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">
-              <div class="header" style="background: #ccc;" title="Average rating of the plugin - Thank you!">
-                <div id="rating-value" style="text-align: center; font-size: 11px; line-height: 12px; border-radius: 2px; background: #fddf87; height: 100%; <?php echo $rating_css; ?>"><span style=""><?php echo $rating_string; ?></span></div>
-              </div>
-            </div>
-          </li>
-          <li><strong>&squf;</strong>
-            If you're not happy then please open a thread on the <a href="https://wordpress.org/support/plugin/ad-inserter/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">support forum</a> and <a href="https://wordpress.org/support/topic/please-read-how-to-ask-for-help-2/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">describe the problem</a>.
-          </li>
-          <li><strong>&squf;</strong>
-            Ads are not showing? Check <a href="https://adinserter.pro/documentation#ads-not-displayed" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">troubleshooting guide</a> to find out how to fix the problem.
-          </li>
-        </ul>
-
-        <p style="text-align: justify;">Positive reviews are a great way to show your appreciation for my work. Besides being an incredible boost to my morale,<br />
-          they are also a great incentive to fix bugs and to add new features for better monetization of your website.
-          Thank you! Igor <img draggable="false" class="emoji" alt="happy" src="https://s.w.org/images/core/emoji/2.3/svg/1f642.svg" style="margin-left: 5px!important;"></p>
-      </div>
-
-      <div class="ai-form rounded no-select" style="background: #fff;">
-        <div style="float: right;" >
-          <div>
-            <a href="http://adinserter.pro/" style="text-decoration: none; box-shadow: 0 0 0;" title="Automate ad placement on posts and pages" target="_blank"><img id="ai-pro-1" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>icon-256x256.jpg" style="margin-top: 10px;" /></a>
-          </div>
-          <div>
-            <a href='http://bit.ly/2oF81Oh' class="clear-link" title="Looking for AdSense alternative?" target="_blank"><img id="ai-media-2" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>contextual-2.jpg" style="margin-top: 10px;" /></a>
-
-          </div>
-        </div>
-
-        <h3 style="text-align: justify;">Looking for Pro Ad Management plugin?</h3>
-        <h4 style="text-align: justify;">To Optimally Monetize your WordPress website?</h4>
-
-        <ul>
-          <li><strong>&squf;</strong> 64 code (ad) blocks</li>
-          <li><strong>&squf;</strong> Syntax highlighting editor</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#code-preview" class="simple-link" target="_blank">Code preview</a> with visual CSS editor</li>
-          <li><strong>&squf;</strong> Automatic insertion before or after post / content / <a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">paragraph</a> / excerpt</li>
-          <li><strong>&squf;</strong> Automatic insertion between posts on blog pages</li>
-          <li><strong>&squf;</strong> Automatic insertion before, between and after comments</li>
-          <li><strong>&squf;</strong> Insertion exceptions for posts and pages</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#manual" class="simple-link" target="_blank">Manual insertion</a>: widgets, shortcodes, PHP function call</li>
-          <li><strong>&squf;</strong> Sticky positions (left, top, right, bottom - ads stay fixed when the page scrolls)</li>
-          <li><strong>&squf;</strong> Sticky (fixed) widgets (sidebar does not move when the page scrolls)</li>
-          <li><strong>&squf;</strong> Block <a href="https://adinserter.pro/alignments-and-styles" class="simple-link" target="_blank">alignment and style</a> customizations</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">Clearance</a> options to avoid insertion near images or headers (AdSense TOS)</li>
-          <li><strong>&squf;</strong> Options to disable insertion on Ajax calls, 404 error pages or in feeds</li>
-          <li><strong>&squf;</strong> Ad rotation (works also with caching)</li>
-          <li><strong>&squf;</strong> Ad impression and click <a href="https://adinserter.pro/tracking" class="simple-link" target="_blank">tracking</a> (works also with Javascript ads like AdSense)</li>
-          <li><strong>&squf;</strong> Support for <a href="https://adinserter.pro/tracking#ab-testing" class="simple-link" target="_blank">A/B testing</a></li>
-          <li><strong>&squf;</strong> Support for ads on <a href="http://adinserter.pro/settings#amp" class="simple-link" target="_blank">AMP pages</a></li>
-          <li><strong>&squf;</strong> Support for contextual <a href="https://adinserter.pro/settings#amazon" class="simple-link" target="_blank">Amazon Native Shopping Ads</a> (responsive)</li>
-          <li><strong>&squf;</strong> Custom CSS class name for wrapping divs to avoid ad blockers</li>
-          <li><strong>&squf;</strong> PHP code processing</li>
-          <li><strong>&squf;</strong> Support for <a href="http://adinserter.pro/documentation#header-footer" class="simple-link" target="_blank">header and footer</a> code</li>
-          <li><strong>&squf;</strong> Support for Google Analytics, Piwik or any other web analytics code</li>
-          <li><strong>&squf;</strong> Desktop, tablet and phone server-side <a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">device detection</a></li>
-          <li><strong>&squf;</strong> Client-side <a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">device detection</a> (works with caching, 6 custom viewports)</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#lists" class="simple-link" target="_blank">Black/White-list</a> categories, tags, taxonomies, post IDs, urls, referers</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#lists" class="simple-link" target="_blank">Black/White-list</a> IP addresses or countries (works also with caching)</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#multisite" class="simple-link" target="_blank">Multisite options</a> to limit settings on the sites</li>
-          <li><strong>&squf;</strong> Import/Export block or plugin settings</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#scheduling" class="simple-link" target="_blank">Scheduling</a> with fallback option</li>
-          <li><strong>&squf;</strong> Country-level <a href="http://adinserter.pro/documentation#geo-targeting" class="simple-link" target="_blank">GEO targeting</a> (works also with caching)</li>
-          <li><strong>&squf;</strong> Simple troubleshooting with many <a href="http://adinserter.pro/documentation#debugging" class="simple-link" target="_blank">debugging functions</a></li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of inserted code blocks or ads for easier placement</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of available positions for automatic ad insertion</li>
-          <li><strong>&squf;</strong> <a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of HTML tags for easier ad placement between paragraphs</li>
-          <li><strong>&squf;</strong> Support via email</li>
-        </ul>
-
-        <p style="text-align: justify;">Ad Inserter Pro is a complete all-in-one ad management plugin for WordPress website with many advertising features to automatically insert adverts on posts and pages.
-           With Ad Inserter Pro you also get <strong>one year of free updates and support via email</strong>. If you find Ad Inserter useful and need more code blocks, GEO targeting,
-           impression and click tracking or multisite support then you can simply upgrade to <a href="http://adinserter.pro/" style="text-decoration: none;" target="_blank">Ad Inserter Pro</a> (existing settings will be preserved).</p>
-      </div>
+<?php
+      switch ($sidebar) {
+        case 0:
+          break;
+        case 1:
+          sidebar_support ();
+          break;
+        case 2:
+          sidebar_support ();
+          sidebar_addense_alternative ();
+          break;
+        case 3:
+          sidebar_support ();
+          sidebar_addense_alternative ();
+          break;
+        case 4:
+          sidebar_support ();
+          sidebar_ratings ();
+          sidebar_pro ();
+          break;
+      }
+?>
 
     </div>
 <?php
@@ -1704,7 +1746,8 @@ function generate_settings_form (){
       if (!jQuery(image_selector + ":visible").length) {
         var image = jQuery(image_selector);
         image.hide ().after (image.clone ().attr ('class', '').attr ("id", image_id + '-ajax').
-        attr ('src', '<?php echo wp_make_link_relative (get_site_url()); ?>/wp-admin/admin-ajax.php?action=ai_data&image=' + image_src + '&ai_check=<?php echo wp_create_nonce ('adinserter_data'); ?>').
+//        attr ('src', '<?php echo wp_make_link_relative (get_site_url()); ?>/wp-admin/admin-ajax.php?action=ai_ajax_backend&image=' + image_src + '&ai_check=<?php echo wp_create_nonce ('adinserter_data'); ?>').
+        attr ('src', ajaxurl+'?action=ai_ajax_backend&image=' + image_src + '&ai_check=<?php echo wp_create_nonce ('adinserter_data'); ?>').
         css ('display', css_display));
       }
     }
@@ -1728,3 +1771,142 @@ function generate_settings_form (){
 
 <?php
   }
+
+function sidebar_addense_alternative () { ?>
+
+      <div class="ai-form header rounded">
+        <div style="float: left;">
+          <h2 style="display: inline-block; margin: 5px 0;">Blank Ad Blocks? Looking for AdSense alternative?</h2>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+
+      <div class="ai-form rounded" style="height: 90px; padding: 8px 4px 8px 12px;">
+        <a href='http://bit.ly/2oF81Oh' class="clear-link" title="Looking for AdSense alternative?" target="_blank"><img id="ai-media-1" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>contextual-1.gif" /></a>
+      </div>
+
+<?php
+}
+
+function sidebar_ratings () {
+  if (!wp_is_mobile () && is_super_admin ()) {
+?>
+
+      <div class="ai-form header no-select rounded" style="position: relative;">
+        <ul style="margin: 0;">
+          <li>
+            Ads are not showing? Check <a href="https://adinserter.pro/documentation#ads-not-displayed" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">troubleshooting guide</a> to find out how to fix the problem.
+          </li>
+          <li>
+            If you need any kind of help or support, please do not hesitate to open a thread on the <a href="https://wordpress.org/support/plugin/ad-inserter/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">support forum</a>.
+          </li>
+        </ul>
+
+        <p style="text-align: justify;">
+          You've been using <strong>Ad Inserter</strong> for a while now, and I hope you're happy with it.
+          Positive <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">reviews</a> are a great way to show your appreciation for my work.
+          Besides being an incredible boost to my morale, they are also a great incentive to fix bugs and to add new features for better monetization of your website.
+          Thank you! Igor <img draggable="false" class="emoji" alt="happy" src="https://s.w.org/images/core/emoji/2.3/svg/1f642.svg" style="margin-left: 5px!important;"></p>
+      </div>
+
+<?php
+  }
+}
+
+function sidebar_support () {
+  global $rating_value, $rating_string, $rating_css;
+?>
+
+      <div class="ai-form header rounded no-select">
+        <div style="float: left;">
+          <h2 style="display: inline-block; margin: 7px 0;">Support plugin development</h2>
+        </div>
+
+        <div style="float: right;">
+          <a href="https://twitter.com/AdInserter" class="clear-link" target="_blank"><img id="ai-tw" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>twitter.png" style="vertical-align: middle; margin: 0 0 0 20px;" title="Ad Inserter on Twitter" alt="Ad Inserter on Twitter" /></a>
+          <a href="https://www.facebook.com/AdInserter/" class="clear-link" target="_blank"><img id="ai-fb" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>facebook.png" style="vertical-align: middle; margin: 0 0 0 10px;" title="Ad Inserter on Facebook" alt="Ad Inserter on Facebook" /></a>
+        </div>
+        <div style="float: right; margin-top: 2px;">
+          <h2 style="display: inline-block; margin: 5px 0;">Follow Ad Inserter</h2>
+        </div>
+
+        <div style="float: right; margin: 8px 20px 0 0;">
+            <div id="ai-stars" style="float: right; margin: 0 0 -3px 0; cursor: pointer; font-size: 11px;"><span><?php //echo $rating_value; ?></span><img id="ai-stars-img" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>stars.png" style="margin: 0 0 -3px 10px;"/></div>
+
+            <div id="ai-rating-bar" class="header" style="float: right; cursor: pointer; margin: 3px 0 0 0; width: 148px; display: none;" nonce="<?php echo wp_create_nonce ("adinserter_data"); ?>" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">
+              <div class="header" style="background: #ccc;" title="Average rating of the plugin - Thank you!">
+                <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">
+                  <div id="rating-value" style="text-align: center; font-size: 11px; line-height: 12px; border-radius: 2px; background: #fddf87; height: 100%; <?php echo $rating_css; ?>"><span style=""><?php echo $rating_string; ?></span></div>
+                </a>
+              </div>
+            </div>
+        </div>
+
+        <div style="clear: both;"></div>
+      </div>
+
+<?php
+}
+
+function sidebar_pro () { ?>
+
+      <div class="ai-form rounded no-select" style="background: #fff;">
+        <div style="float: right;" >
+          <div>
+            <a href="http://adinserter.pro/" style="text-decoration: none; box-shadow: 0 0 0;" title="Automate ad placement on posts and pages" target="_blank"><img id="ai-pro-1" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>icon-256x256.jpg" style="margin-top: 10px;" /></a>
+          </div>
+          <div>
+            <a href='http://bit.ly/2oF81Oh' class="clear-link" title="Looking for AdSense alternative?" target="_blank"><img id="ai-media-2" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>contextual-2.jpg" style="margin-top: 10px;" /></a>
+          </div>
+        </div>
+
+        <h3 style="text-align: justify;">Looking for Pro Ad Management plugin?</h3>
+        <h4 style="text-align: justify;">To Optimally Monetize your WordPress website?</h4>
+
+        <ul>
+          <li>64 code (ad) blocks</li>
+          <li>Syntax highlighting editor</li>
+          <li><a href="http://adinserter.pro/documentation#code-preview" class="simple-link" target="_blank">Code preview</a> with visual CSS editor</li>
+          <li>Automatic insertion before or after post / content / <a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">paragraph</a> / excerpt</li>
+          <li>Automatic insertion between posts on blog pages</li>
+          <li>Automatic insertion before, between and after comments</li>
+          <li>Insertion exceptions for posts and pages</li>
+          <li><a href="http://adinserter.pro/documentation#manual" class="simple-link" target="_blank">Manual insertion</a>: widgets, shortcodes, PHP function call</li>
+          <li>Sticky positions (left, top, right, bottom - ads stay fixed when the page scrolls)</li>
+          <li>Sticky (fixed) widgets (sidebar does not move when the page scrolls)</li>
+          <li>Block <a href="https://adinserter.pro/alignments-and-styles" class="simple-link" target="_blank">alignment and style</a> customizations</li>
+          <li><a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">Clearance</a> options to avoid insertion near images or headers (AdSense TOS)</li>
+          <li>Options to disable insertion on Ajax calls, 404 error pages or in feeds</li>
+          <li>Ad rotation (works also with caching)</li>
+          <li>Ad impression and click <a href="https://adinserter.pro/tracking" class="simple-link" target="_blank">tracking</a> (works also with Javascript ads like AdSense)</li>
+          <li>Support for <a href="https://adinserter.pro/tracking#ab-testing" class="simple-link" target="_blank">A/B testing</a></li>
+          <li>Support for ads on <a href="http://adinserter.pro/settings#amp" class="simple-link" target="_blank">AMP pages</a></li>
+          <li>Support for contextual <a href="https://adinserter.pro/settings#amazon" class="simple-link" target="_blank">Amazon Native Shopping Ads</a> (responsive)</li>
+          <li>Custom CSS class name for wrapping divs to avoid ad blockers</li>
+          <li>PHP code processing</li>
+          <li>Support for <a href="http://adinserter.pro/documentation#header-footer" class="simple-link" target="_blank">header and footer</a> code</li>
+          <li>Support for Google Analytics, Piwik or any other web analytics code</li>
+          <li>Desktop, tablet and phone server-side <a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">device detection</a></li>
+          <li>Client-side <a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">device detection</a> (works with caching, 6 custom viewports)</li>
+          <li><a href="http://adinserter.pro/documentation#lists" class="simple-link" target="_blank">Black/White-list</a> categories, tags, taxonomies, post IDs, urls, referers</li>
+          <li><a href="http://adinserter.pro/documentation#lists" class="simple-link" target="_blank">Black/White-list</a> IP addresses or countries (works also with caching)</li>
+          <li><a href="http://adinserter.pro/documentation#multisite" class="simple-link" target="_blank">Multisite options</a> to limit settings on the sites</li>
+          <li>Import/Export block or plugin settings</li>
+          <li><a href="http://adinserter.pro/documentation#scheduling" class="simple-link" target="_blank">Scheduling</a> with fallback option</li>
+          <li>Country-level <a href="http://adinserter.pro/documentation#geo-targeting" class="simple-link" target="_blank">GEO targeting</a> (works also with caching)</li>
+          <li>Simple troubleshooting with many <a href="http://adinserter.pro/documentation#debugging" class="simple-link" target="_blank">debugging functions</a></li>
+          <li><a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of inserted code blocks or ads for easier placement</li>
+          <li><a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of available positions for automatic ad insertion</li>
+          <li><a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of HTML tags for easier ad placement between paragraphs</li>
+          <li>Support via email</li>
+        </ul>
+
+        <p style="text-align: justify;">Ad Inserter Pro is a complete all-in-one ad management plugin for WordPress website with many advertising features to automatically insert adverts on posts and pages.
+           With Ad Inserter Pro you also get <strong>one year of free updates and support via email</strong>. If you find Ad Inserter useful and need more code blocks, GEO targeting,
+           impression and click tracking or multisite support then you can simply upgrade to <a href="http://adinserter.pro/" style="text-decoration: none;" target="_blank">Ad Inserter Pro</a> (existing settings will be preserved).</p>
+      </div>
+
+<?php
+}
+
+

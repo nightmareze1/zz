@@ -11,18 +11,31 @@ function alt_styles_data ($alt_styles_text) {
   }
 }
 
-function generate_code_preview ($block) {
+function generate_code_preview ($block, $name = null, $alignment = null, $alignment_css = null, $custom_css = null) {
   global $block_object, $ai_wp_data;
 
   $ai_wp_data [AI_WP_DEBUGGING] = 0;
 
   $obj = $block_object [$block];
 
-  $block_name     = isset ($_GET ["name"])      ? $_GET ["name"]      : $obj->get_ad_name();
-  $custom_css     = $obj->get_custom_css();
-  $alignment_type = isset ($_GET ["alignment"]) ? $_GET ["alignment"] : $obj->get_alignment_type();
-  $wrapper_css    = isset ($_GET ["css"])       ? $_GET ["css"]       : $obj->get_alignment_style ();
+  $block_name       = $name           != null ? $name           : $obj->get_ad_name();
+  $alignment_type   = $alignment      != null ? $alignment      : $obj->get_alignment_type();
+  $wrapper_css      = $alignment_css  != null ? $alignment_css  : $obj->get_alignment_style ();
+  $custom_css_code  = $custom_css     != null ? $custom_css     : $obj->get_custom_css();
+
+  // Head code must be called before ai_getProcessedCode (to process head PHP)
+  ob_start ();
+  ai_wp_head_hook ();
+  $head_code = ob_get_clean ();
+
   $block_code     = $obj->ai_getProcessedCode (true, true);
+
+  // Fix for relative urls
+  $block_code = str_replace ('src="wp-content', 'src="../wp-content', $block_code);
+  $block_code = str_replace ("src='wp-content", "src='../wp-content", $block_code);
+  $block_code = str_replace ('href="wp-content', 'href="../wp-content', $block_code);
+  $block_code = str_replace ("href='wp-content", "href='../wp-content", $block_code);
+
 
 ?><html>
 <head>
@@ -517,8 +530,23 @@ function generate_code_preview ($block) {
       var last_bkg_div  = "code-background-white";
       var invalid_tags = ['script', 'style'];
 
+//      console.log ('code_blocks', code_blocks);
+
+      var filtered_code_blocks = $();
       code_blocks.each (function () {
         var element_tag = $(this).prop("tagName").toLowerCase();
+        if (element_tag == 'a') {
+          var a_children = $(this).children ();
+          if (a_children.length == 0)
+            filtered_code_blocks = filtered_code_blocks.add ($(this)); else
+              filtered_code_blocks = filtered_code_blocks.add (a_children);
+        } else filtered_code_blocks = filtered_code_blocks.add ($(this));
+      });
+
+//      code_blocks.each (function () {
+      filtered_code_blocks.each (function () {
+        var element_tag = $(this).prop("tagName");
+        if (typeof element_tag != 'undefined') element_tag = element_tag.toLowerCase();
 
         if (invalid_tags.indexOf (element_tag) < 0) {
           code_index ++;
@@ -639,6 +667,20 @@ function generate_code_preview ($block) {
 
 </script>
 <style>
+
+/*html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {*/
+a, img {
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  font-style: inherit;
+  font-weight: inherit;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+  vertical-align: baseline;
+}
+
 .responsive-table td {
   white-space: nowrap;
 }
@@ -802,8 +844,7 @@ div.automatic-insertion img {
   width: 50px;
 }
 </style>
-<?php ai_wp_head_hook (); ?>
-
+<?php echo $head_code; ?>
 </head>
 <body style='font-family: arial; text-align: justify; overflow-x: hidden;'>
   <div id="ai-data" style="display: none;" version="<?php echo AD_INSERTER_VERSION; ?>"></div>
@@ -930,7 +971,7 @@ div.automatic-insertion img {
   <div id="css-code" style="margin: 20px 0;">
     <div style="margin: 20px 0 0 0;">
       Alignment and Style:&nbsp;&nbsp;&nbsp;
-      <select style="border-radius: 5px; width:120px; height: 25px;" id="block-alignment">
+      <select id="block-alignment" style="border-radius: 5px; width:120px;">
          <option data-img-src="<?php echo plugins_url ('images/default.png', __FILE__); ?>" data-img-class="automatic-insertion" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_DEFAULT, true)); ?> value="<?php echo AI_ALIGNMENT_DEFAULT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_DEFAULT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DEFAULT; ?></option>
          <option data-img-src="<?php echo plugins_url ('images/align-left.png', __FILE__); ?>" data-img-class="automatic-insertion" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_LEFT, true)); ?> value="<?php echo AI_ALIGNMENT_LEFT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_LEFT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_LEFT; ?></option>
          <option data-img-src="<?php echo plugins_url ('images/center.png', __FILE__); ?>" data-img-class="automatic-insertion" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_CENTER, true)); ?> value="<?php echo AI_ALIGNMENT_CENTER; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_CENTER) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CENTER; ?></option>
@@ -944,7 +985,7 @@ div.automatic-insertion img {
       <span id="css-index" style="margin: 0 0 0 10px; font-size: 14px;" title="CSS code index"></span>
     </div>
 
-    <div id="alignment-style" style="margin: 4px 0;"></div>
+    <div id="alignment-style" style="margin: 4px 0; min-height: 74px;"></div>
 
     <table class="responsive-table">
       <tr>
@@ -952,7 +993,7 @@ div.automatic-insertion img {
           <span id="css-label" style="vertical-align: middle; margin: 4px 0 0 0 0; width: 36px; font-size: 14px; font-weight: bold; display: none;">CSS</span>
         </td>
         <td style="width: 100%; height: 32px; padding:0;">
-          <input id="custom-css" style="width: 100%; display: inline-block; padding: 5px 0 0 0; border-radius: 4px; display: none; font-size: 12px; font-family: Courier, 'Courier New', monospace; font-weight: bold;" type="text" value="<?php echo $custom_css; ?>" size="70" maxlength="160" title="Custom CSS code for wrapping div" />
+          <input id="custom-css" style="width: 100%; display: inline-block; padding: 5px 0 0 0; border-radius: 4px; display: none; font-size: 12px; font-family: Courier, 'Courier New', monospace; font-weight: bold;" type="text" value="<?php echo $custom_css_code; ?>" size="70" maxlength="160" title="Custom CSS code for wrapping div" />
           <span style="width: 100%; display: inline-block; padding: 5px 0 0 2px; font-family: Courier, 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer;">
             <span id="css-no-wrapping" style="vertical-align: middle; display: none;"></span>
             <span id="css-<?php echo AI_ALIGNMENT_DEFAULT; ?>" class="css-code" style="vertical-align: middle; display: none;" title="CSS code for wrapping div, click to edit"><?php echo $obj->alignment_style (AI_ALIGNMENT_DEFAULT); ?></span>

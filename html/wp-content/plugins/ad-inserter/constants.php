@@ -4,6 +4,7 @@
 //error_reporting (E_ALL);
 
 define ('AI_OPTION_NAME',                'ad_inserter');
+define ('AI_INSTALL_NAME',               'ai-install');
 define ('AI_OPTION_GLOBAL',              'global');
 
 if (!defined ('AD_INSERTER_PLUGIN_DIR'))
@@ -17,7 +18,7 @@ if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.1.14');
+  define ('AD_INSERTER_VERSION', '2.2.2');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -35,7 +36,7 @@ define ('AD_EMPTY_DATA', '');
 define ('AD_ZERO', '0');
 define ('AD_ONE',  '1');
 define ('AD_TWO',  '2');
-define ('AD_GENERAL_TAG', 'electronics');
+define ('AD_GENERAL_TAG', '');
 define ('AD_NAME', 'Block');
 
 // Old options
@@ -51,6 +52,7 @@ define ('AI_ADB_MESSAGE_OPTION_NAME',            'a');
 
 define ('AI_OPTION_CODE',                        'code');
 define ('AI_OPTION_ENABLE_MANUAL',               'enable_manual');
+define ('AI_OPTION_ENABLE_AMP',                  'enable_amp');
 define ('AI_OPTION_ENABLE_WIDGET',               'enable_widget');
 define ('AI_OPTION_PROCESS_PHP',                 'process_php');
 define ('AI_OPTION_TRACKING',                    'tracking');
@@ -122,6 +124,8 @@ define ('AI_OPTION_DISPLAY_FOR_DEVICES',         'display_for_devices');
 define ('AI_OPTION_DETECT_SERVER_SIDE',          'detect_server_side');
 define ('AI_OPTION_DETECT_CLIENT_SIDE',          'detect_client_side');
 define ('AI_OPTION_DETECT_VIEWPORT',             'detect_viewport');
+define ('AI_OPTION_ADB_BLOCK_ACTION',            'adb-block-action');
+define ('AI_OPTION_ADB_BLOCK_REPLACEMENT',       'adb-block-replacement');
 
 define ('AI_OPTION_DISABLED',                    'disabled');
 
@@ -139,6 +143,7 @@ define ('AI_OPTION_ADB_MESSAGE_CSS',             'adb-message-css');
 define ('AI_OPTION_ADB_OVERLAY_CSS',             'adb-overlay-css');
 define ('AI_OPTION_ADB_UNDISMISSIBLE_MESSAGE',   'adb-undismissible-message');
 
+
 //misc
 define('AD_EMPTY_VALUE','');
 
@@ -151,6 +156,7 @@ define('AI_FORM_CLEAR_STATISTICS','ai-clear-statistics');
 define('AD_AUTHOR_SITE', '<!-- Powered by Ad Inserter Plugin By Spacetime -->');
 define('AD_ROTATE_SEPARATOR', '|rotate|');
 define('AD_COUNT_SEPARATOR',  '|count|');
+define('AD_AMP_SEPARATOR',    '|amp|');
 
 //form select options
 define('AD_SELECT_SELECTED','selected');
@@ -217,9 +223,18 @@ define('AD_DIRECTION_FROM_TOP','From Top');
 define('AD_DIRECTION_FROM_BOTTOM','From Bottom');
 
 //Post-Page options
+// Deprecated
 define('AD_ENABLED_ON_ALL',                     'On all');
 define('AD_ENABLED_ON_ALL_EXCEPT_ON_SELECTED',  'On all except selected');
 define('AD_ENABLED_ONLY_ON_SELECTED',           'Only on selected');
+
+define('AI_NO_INDIVIDUAL_EXCEPTIONS',           0);
+define('AI_INDIVIDUALLY_DISABLED',              1);
+define('AI_INDIVIDUALLY_ENABLED',               2);
+
+define('AI_TEXT_NO_INDIVIDUAL_EXCEPTIONS',      '');
+define('AI_TEXT_INDIVIDUALLY_DISABLED',         'Individually disabled');
+define('AI_TEXT_INDIVIDUALLY_ENABLED',          'Individually enabled');
 
 //Alignment options - Deprecated
 define('AD_ALIGNMENT_NO_WRAPPING','No Wrapping');
@@ -257,10 +272,10 @@ define('AI_TEXT_STICKY_RIGHT',        'Sticky Right');
 define('AI_TEXT_STICKY_TOP',          'Sticky Top');
 define('AI_TEXT_STICKY_BOTTOM',       'Sticky Bottom');
 
-define('AI_ALIGNMENT_CSS_DEFAULT',        'margin: 8px 0;');
-define('AI_ALIGNMENT_CSS_LEFT',           'margin: 8px 0; text-align: left;||margin: 8px 0; text-align: left; display: flex; justify-content: flex-start;');
-define('AI_ALIGNMENT_CSS_RIGHT',          'margin: 8px 0; text-align: right;||margin: 8px 0; text-align: right; display: flex; justify-content: flex-end;');
-define('AI_ALIGNMENT_CSS_CENTER',         'margin: 8px auto; text-align: center;||margin: 8px 0; text-align: center; display: flex; justify-content: center;');
+define('AI_ALIGNMENT_CSS_DEFAULT',        'margin: 8px 0; clear: both;');
+define('AI_ALIGNMENT_CSS_LEFT',           'margin: 8px 0; text-align: left; clear: both;||margin: 8px 0; text-align: left; clear: both; display: flex; justify-content: flex-start;');
+define('AI_ALIGNMENT_CSS_RIGHT',          'margin: 8px 0; text-align: right; clear: both;||margin: 8px 0; text-align: right; clear: both; display: flex; justify-content: flex-end;');
+define('AI_ALIGNMENT_CSS_CENTER',         'margin: 8px auto; text-align: center; clear: both;||margin: 8px 0; text-align: center; clear: both; display: flex; justify-content: center;');
 define('AI_ALIGNMENT_CSS_FLOAT_LEFT',     'margin: 8px 8px 8px 0; float: left;');
 define('AI_ALIGNMENT_CSS_FLOAT_RIGHT',    'margin: 8px 0 8px 8px; float: right;');
 define('AI_ALIGNMENT_CSS_STICKY_LEFT',    'position: fixed; left: 0px; top: 100px; z-index: 9999;');
@@ -370,13 +385,23 @@ define('AI_TRACKING_INTERNAL',       1);
 define('AI_TRACKING_ENABLED',        1);
 
 // Ad Blocking
-define ('AI_ACTION_NONE',             0);
-define ('AI_ACTION_WARNING_MESSAGE',  1);
-define ('AI_ACTION_REDIRECTION',      2);
+define ('AI_ADB_ACTION_NONE',             0);
+define ('AI_ADB_ACTION_MESSAGE',          1);
+define ('AI_ADB_ACTION_REDIRECTION',      2);
 
 define ('AI_TEXT_NONE',               'None');
-define ('AI_TEXT_WARNING_MESSAGE',    'Warning Message');
+define ('AI_TEXT_POPUP_MESSAGE',      'Popup Message');
 define ('AI_TEXT_REDIRECTION',        'Redirection');
+
+define ('AI_ADB_BLOCK_ACTION_DO_NOTHING', 0);
+define ('AI_ADB_BLOCK_ACTION_REPLACE',    1);
+define ('AI_ADB_BLOCK_ACTION_SHOW',       2);
+define ('AI_ADB_BLOCK_ACTION_HIDE',       3);
+
+define ('AI_TEXT_DO_NOTHING',             'Do nothnig');
+define ('AI_TEXT_REPLACE',                'Replace');
+define ('AI_TEXT_SHOW',                   'Show');
+define ('AI_TEXT_HIDE',                   'Hide');
 
 // Click detection
 define ('AI_CLICK_DETECTION_STANDARD', 0);
@@ -392,8 +417,16 @@ define ('AI_DISABLED',               '0');
 
 define ('AI_COOKIE_TIME', 3600);
 
-define ('AI_TRANSIENT_RATING',            'ai-rating');
-define ('AI_TRANSIENT_RATING_EXPIRATION', 48 * 3600);
+define ('AI_TRANSIENT_RATING',                  'ai-rating');
+define ('AI_TRANSIENT_RATING_EXPIRATION',       48 * 3600);
+
+define ('AI_TRANSIENT_ADB_CLASS_1',             'ai-adb-class-1');
+define ('AI_TRANSIENT_ADB_CLASS_2',             'ai-adb-class-2');
+define ('AI_TRANSIENT_ADB_CLASS_3',             'ai-adb-class-3');
+define ('AI_TRANSIENT_ADB_CLASS_4',             'ai-adb-class-4');
+define ('AI_TRANSIENT_ADB_CLASS_5',             'ai-adb-class-5');
+define ('AI_TRANSIENT_ADB_CLASS_6',             'ai-adb-class-6');
+define ('AI_TRANSIENT_ADB_CLASS_EXPIRATION',    48 * 3600);
 
 define ('AI_SYNTAX_HIGHLIGHTER_THEME',          'ad_inserter');
 define ('DEFAULT_SYNTAX_HIGHLIGHTER_THEME',     AI_SYNTAX_HIGHLIGHTER_THEME);
@@ -416,15 +449,23 @@ define ('DEFAULT_MULTISITE_MAIN_FOR_ALL_BLOGS', AI_DISABLED);
 define ('DEFAULT_TRACKING',                     AI_TRACKING_DISABLED);
 define ('DEFAULT_TRACKING_LOGGED_IN',           AI_TRACKING_ENABLED);
 define ('DEFAULT_CLICK_DETECTION',              AI_CLICK_DETECTION_STANDARD);
+define ('DEFAULT_ADB_BLOCK_ACTION',             AI_ADB_BLOCK_ACTION_DO_NOTHING);
 
-//define ('AI_ADBLOCKING_DETECTION',              true);
+define ('AI_ADBLOCKING_DETECTION',              true);
 define ('AI_ADB_1_NAME',                        'dqwpediwqswqma');
+define ('AI_ADB_2_DEFAULT_NAME',                'lfoswyekaaslsd');
+define ('AI_ADB_CONTENT_CSS_BEGIN',             'ai-adb-content-begin');
+define ('AI_ADB_CONTENT_CSS_END',               'ai-adb-content-end');
+define ('AI_ADB_CONTENT_DELETE_BEGIN',          'ai-adb-delete-begin');
+define ('AI_ADB_CONTENT_DELETE_END',            'ai-adb-delete-end');
+define ('AI_ADB_CONTENT_REPLACE_BEGIN',         'ai-adb-replace-begin');
+define ('AI_ADB_CONTENT_REPLACE_END',           'ai-adb-replace-end');
 define ('AI_BASIC_ADB_OVERLAY_CSS',             "position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99998; user-select: none;");
 define ('AI_DEFAULT_ADB_OVERLAY_CSS',           "background: #000; opacity: 0.85;");
 define ('AI_BASIC_ADB_MESSAGE_CSS',             "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99999; background: #000; color: #fff; user-select: none;");
 define ('AI_DEFAULT_ADB_MESSAGE_CSS',           "width: 300px; padding: 10px; border: 5px solid #f00; border-radius: 5px;");
 define ('AI_DEFAULT_ADB_MESSAGE',               "<p><strong>Blocked because of Ad Blocker</strong></p>\n<p>It seems that you are using some ad blocking software which is preventing the page from fully loading. Please whitelist this website or disable ad blocking software.</p>");
-define ('AI_DEFAULT_ADB_ACTION',                AI_ACTION_NONE);
+define ('AI_DEFAULT_ADB_ACTION',                AI_ADB_ACTION_NONE);
 define ('AI_DEFAULT_ADB_NO_ACTION_PERIOD',      30);
 define ('AI_DEFAULT_ADB_REDIRECTION_PAGE',      0);
 define ('AI_DEFAULT_ADB_UNDISMISSIBLE_MESSAGE', AI_DISABLED);
@@ -447,6 +488,7 @@ define ('POST_HOOK_BLOCKS',             'post_hook');
 define ('BEFORE_COMMENTS_HOOK_BLOCKS',  'before_comments_hook');
 define ('BETWEEN_COMMENTS_HOOK_BLOCKS', 'between_comments_hook');
 define ('AFTER_COMMENTS_HOOK_BLOCKS',   'after_comments_hook');
+define ('AI_EXTRACT_USED_BLOCKS',       'used_blocks');
 
 define ('AI_CHECK_NONE',                  - 1);
 define ('AI_CHECK_INSERTED',              0);
@@ -477,8 +519,8 @@ define ('AI_CHECK_LOGGED_IN_USER',        21);
 define ('AI_CHECK_NOT_LOGGED_IN_USER',    22);
 define ('AI_CHECK_ADMINISTRATOR',         23);
 
-define ('AI_CHECK_ENABLED_ON_ALL_EXCEPT_ON_SELECTED', 24);
-define ('AI_CHECK_ENABLED_ONLY_ON_SELECTED',          25);
+define ('AI_CHECK_INDIVIDUALLY_DISABLED', 24);
+define ('AI_CHECK_INDIVIDUALLY_ENABLED',  25);
 define ('AI_CHECK_DISABLED_MANUALLY',     26);
 define ('AI_CHECK_MAX_INSERTIONS',        27);
 define ('AI_CHECK_FILTER',                28);
@@ -523,10 +565,10 @@ define ('AI_USER_NOT_LOGGED_IN',          0);
 define ('AI_USER_LOGGED_IN',              1);
 define ('AI_USER_ADMINISTRATOR',          2);
 
-define ('AI_WP_PAGE_TYPE',                0);
-define ('AI_WP_USER_SET',                 1);
-define ('AI_WP_USER',                     2);
-define ('AI_WP_DEBUGGING',                3);
+define ('AI_WP_DEBUGGING',                0); // AI_WP_DEBUGGING_
+define ('AI_WP_PAGE_TYPE',                1);
+define ('AI_WP_USER_SET',                 2);
+define ('AI_WP_USER',                     3);
 define ('AI_WP_DEBUG_BLOCK',              4);
 define ('AI_WP_URL',                      5);
 define ('AI_SERVER_SIDE_DETECTION',       6);
@@ -538,6 +580,10 @@ define ('AI_NUMBER_OF_COMMENTS',         11);
 define ('AI_COMMENTS_SAVED_CALLBACK',    12);
 define ('AI_COMMENTS_SAVED_END_CALLBACK',13);
 define ('AI_ADB_DETECTION',              14);
+define ('AI_JS_DEBUGGING',               15);
+define ('AI_WP_AMP_PAGE',                16);
+define ('AI_INSTALL_TIME_DIFFERENCE',    17);
+define ('AI_DAYS_SINCE_INSTAL',          18);
 
 define ('AI_CONTEXT_NONE',                0);
 define ('AI_CONTEXT_CONTENT',             1);
@@ -554,23 +600,25 @@ define ('AI_CONTEXT_BEFORE_COMMENTS',    11);
 define ('AI_CONTEXT_BETWEEN_COMMENTS',   12);
 define ('AI_CONTEXT_AFTER_COMMENTS',     13);
 
-define ('AI_URL_DEBUG',               'ai-debug');
-define ('AI_URL_DEBUG_PROCESSING',    'ai-debug-processing');
-define ('AI_URL_DEBUG_BLOCKS',        'ai-debug-blocks');
-define ('AI_URL_DEBUG_USER',          'ai-debug-user');
-define ('AI_URL_DEBUG_TAGS',          'ai-debug-tags');
-define ('AI_URL_DEBUG_POSITIONS',     'ai-debug-positions');
-define ('AI_URL_DEBUG_NO_INSERTION',  'ai-debug-no-insertion');
-define ('AI_URL_DEBUG_PHP',           'ai-debug-php');
-define ('AI_URL_DEBUG_COUNTRY',       'ai-debug-country');
-define ('AI_URL_DEBUG_AD_BLOCKING' ,  'ai-debug-ad-blocking');
+define ('AI_URL_DEBUG',                      'ai-debug');               // AI_URL_DEBUG_
+define ('AI_URL_DEBUG_PROCESSING',           'ai-debug-processing');    // AI_URL_DEBUG_PROCESSING_
+define ('AI_URL_DEBUG_PHP',                  'ai-debug-php');           // AI_URL_DEBUG_PHP
+define ('AI_URL_DEBUG_BLOCKS',               'ai-debug-blocks');
+define ('AI_URL_DEBUG_USER',                 'ai-debug-user');
+define ('AI_URL_DEBUG_TAGS',                 'ai-debug-tags');
+define ('AI_URL_DEBUG_POSITIONS',            'ai-debug-positions');
+define ('AI_URL_DEBUG_NO_INSERTION',         'ai-debug-no-insertion');
+define ('AI_URL_DEBUG_COUNTRY',              'ai-debug-country');
+define ('AI_URL_DEBUG_AD_BLOCKING' ,         'ai-debug-adb');
+define ('AI_URL_DEBUG_AD_BLOCKING_STATUS',   'ai-debug-adb-status');
 
-define ('AI_DEBUG_PROCESSING',            0x01);
+define ('AI_DEBUG_PROCESSING',            0x01); // AI_DEBUG_PROCESSING_
 define ('AI_DEBUG_BLOCKS',                0x02);
 define ('AI_DEBUG_TAGS',                  0x04);
 define ('AI_DEBUG_POSITIONS',             0x08);
 define ('AI_DEBUG_NO_INSERTION',          0x10);
 define ('AI_DEBUG_AD_BLOCKING',           0x20);
+define ('AI_DEBUG_AD_BLOCKING_STATUS',    0x40);
 
 if (!defined ('AD_INSERTER_BLOCKS'))
   define ('AD_INSERTER_BLOCKS', 16);
@@ -581,6 +629,7 @@ if (!defined ('AD_INSERTER_VIEWPORTS'))
 define ('AI_DEBUG_TAGS_STYLE',           'font-weight: bold; color: white; padding: 2px;');
 define ('AI_DEBUG_POSITIONS_STYLE',      'text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid blue; color: blue; background: #eef;');
 define ('AI_DEBUG_PAGE_TYPE_STYLE',      'text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid green; color: green; background: #efe;');
+define ('AI_DEBUG_ADB_STYLE',            'text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid red; color: red; background: #fee; opacity: 0.85; cursor: pointer;');
 define ('AI_DEBUG_WIDGET_STYLE',         'margin: 0; padding: 0 5px; font-size: 10px; white-space: pre; overflow-x: auto; overflow-y: hidden;');
 
 

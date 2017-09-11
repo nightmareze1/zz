@@ -32,7 +32,7 @@ background: rgb(102, 82, 0)\
 margin: -1px 0 0 -1px;\
 border: 1px solid #FF00FF\
 }\
-.ace-tomorrow-night-bright .ace_stack {\
+.ace-ad-inserter .ace_stack {\
 background: rgb(66, 90, 44)\
 }\
 .ace-ad-inserter .ace_marker-layer .ace_active-line {\
@@ -55,8 +55,8 @@ color: #6A6A6A\
 color: #00FF00\
 }\
 .ace-ad-inserter .ace_paren,\
-.ace-ad-inserter .ace_punctuation.ace_operator,\
-.ace-ad-inserter .ace_keyword.ace_operator {\
+.ace-ad-inserter .ace_keyword.ace_operator,\
+.ace-ad-inserter .ace_punctuation.ace_operator {\
 color: #FF4444\
 }\
 .ace-ad-inserter .ace_constant.ace_character,\
@@ -65,7 +65,7 @@ color: #FF4444\
 color: #FFFF00\
 }\
 .ace-ad-inserter .ace_constant.ace_language {\
-color: #00FF00\
+color: #00ff00\
 }\
 .ace-ad-inserter .ace_invalid {\
 color: #CDCDCD;\
@@ -108,7 +108,19 @@ color: #FF88FF\
 }\
 .ace-ad-inserter .ace_entity.ace_name.ace_tag,\
 .ace-ad-inserter .ace_entity.ace_other.ace_attribute-name {\
-color: #DDFF44\
+color: #fffF80\
+}\
+.ace-ad-inserter .ace_support.ace_php_tag {\
+color: #ff8888\
+}\
+.ace-ad-inserter .ace_shortcode {\
+color: #ff8888\
+}\
+.ace-ad-inserter .ace_shortcode.ace_adinserter {\
+color: #ff88ff\
+}\
+.ace-ad-inserter .ace_shortcode.ace_ai-attribute {\
+color: #80ff80\
 }\
 .ace-ad-inserter .ace_indent-guide {\
 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWPQ09NrYAgMjP4PAAtGAwchHMyAAAAAAElFTkSuQmCC) right repeat-y\
@@ -117,3 +129,4 @@ background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgb
 var dom = require("../lib/dom");
 dom.importCssString(exports.cssText, exports.cssClass);
 });
+
