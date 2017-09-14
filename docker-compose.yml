@@ -24,6 +24,11 @@ services:
        - mysql-test11:itshelldb
      environment:
        - VIRTUAL_HOST=www.itshellws.org,www.itshellweb.org
+     logging:
+       driver: fluentd
+       options:
+         fluentd-address: 127.0.0.1:24224
+         tag: httpd.access
 
   nginx-proxy:
       image: jwilder/nginx-proxy
