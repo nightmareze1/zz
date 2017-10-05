@@ -1,5 +1,5 @@
 #ai-data {
-  font-family: "2.2.2"; /* Used for version number of the file */
+  font-family: "2.2.3"; /* Used for version number of the file */
 }
 
 #blocked-warning {
@@ -18,6 +18,11 @@
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
    font-family: sans-serif,Arial,Verdana;
    font-size: 12px;
+}
+
+.ui-widget-header {
+  border: 1px solid #aaa;
+  background: #ccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x;
 }
 
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
@@ -282,9 +287,15 @@ textarea.simple-editor.small {
   font-size: 12px;
 }
 
-.ms-container  dd, li {
+.ms-container dd, .ms-container li {
+/*.ms-container dd, li {*/
   margin-bottom: 4px;
 }
+
+.feature-list li {
+  margin-bottom: 2px;
+}
+
 .ms-container .search-input {
   width: 100%;
   border-radius: 4px;
@@ -298,7 +309,7 @@ div.custom-range-controls {
   width: 696px;
 }
 
-div.custom-range-controls input.chart-date {
+input.ai-date-input {
   width: 85px;
 }
 
@@ -448,6 +459,15 @@ div.automatic-insertion img {
   background: url('images/icons.png') -60px 0;
 }
 
+.checkbox-icon.icon-adb {
+  background: url('images/icons.png') -120px -20px;
+}
+
+.checkbox-icon.icon-adb.on {
+  background: url('images/icons.png') -120px 0;
+}
+
+
 .checkbox-icon.icon-loading {
   width: 12px;
   height: 12px;
@@ -522,9 +542,9 @@ div.automatic-insertion img {
       font-size: 16px;
    }
    div.custom-range-controls {
-     width: 715px;
+     width: 720px;
    }
-   div.custom-range-controls input.chart-date {
+   input.ai-date-input {
      width: 90px;
      padding: 3px 3px;
    }

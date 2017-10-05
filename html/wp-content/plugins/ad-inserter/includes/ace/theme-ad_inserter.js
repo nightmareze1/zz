@@ -113,14 +113,25 @@ color: #fffF80\
 .ace-ad-inserter .ace_support.ace_php_tag {\
 color: #ff8888\
 }\
+//.ace-ad-inserter .ace_paren.ace_adinserter {\
+//color: #FF4444;\
+//border-left: 1px solid #BBBBFF;\
+//border-top: 1px solid #BBBBFF;\
+//border-bottom: 1px solid #BBBBFF;\
+//border-radius: 3px;\
+//}\
 .ace-ad-inserter .ace_shortcode {\
 color: #ff8888\
 }\
 .ace-ad-inserter .ace_shortcode.ace_adinserter {\
-color: #ff88ff\
+color: #ff88ff;\
+//border-top: 1px solid #BBBBFF;\
+//border-bottom: 1px solid #BBBBFF;\
 }\
 .ace-ad-inserter .ace_shortcode.ace_ai-attribute {\
-color: #80ff80\
+color: #80ff80;\
+//border: 1px solid #FFBBBB;\
+//border-radius: 3px;\
 }\
 .ace-ad-inserter .ace_indent-guide {\
 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWPQ09NrYAgMjP4PAAtGAwchHMyAAAAAAElFTkSuQmCC) right repeat-y\

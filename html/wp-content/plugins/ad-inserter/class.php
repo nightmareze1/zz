@@ -341,11 +341,9 @@ abstract class ai_BaseCodeBlock {
   public function ai_getCode (){
     global $block_object, $ai_total_php_time, $ai_wp_data;
 
-    $obj = $this;
-    if ($this->fallback != 0) {
-      $obj = $block_object [$this->fallback];
-    }
+    if ($this->fallback != 0) return $block_object [$this->fallback]->ai_getCode ();
 
+    $obj = $this;
     $code = $obj->get_ad_data();
 
     if ($obj->get_process_php () && (!is_multisite() || is_main_site () || multisite_php_processing ())) {
@@ -1110,7 +1108,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
     $code = $this->ai_getCode ();
 
-    $processed_code = do_shortcode ($this->replace_ai_tags ($code));
+    $processed_code = $this->replace_ai_tags (do_shortcode ($code));
 
     if (strpos ($code, AD_COUNT_SEPARATOR) !== false) {
       $ads = explode (AD_COUNT_SEPARATOR, $code);
@@ -1223,9 +1221,11 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       }
     }
 
+    if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 && !$hide_label) {
+      $processed_code =  "<div class='ai-code'>\n" . $processed_code ."</div>\n";
+    }
 
-
-    if (function_exists ('ai_adb_block_actions')) $url_parameters = ai_adb_block_actions ($this, $processed_code);
+    if (function_exists ('ai_adb_block_actions')) ai_adb_block_actions ($this, $processed_code, $hide_label);
 
     $title = '';
     $fallback_code = '';
@@ -1251,7 +1251,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
   }
 
   public function get_code_for_insertion ($include_viewport_classes = true, $hidden_widgets = false) {
-    global $ai_wp_data;
+    global $ai_wp_data, $block_object;
 
     if ($this->get_alignment_type() == AI_ALIGNMENT_NO_WRAPPING) return $this->ai_getProcessedCode ();
 
@@ -1298,13 +1298,24 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       $tracking_code_data = '';
       $tracking_code_post = '';
       $tracking_code      = '';
-      if ($this->get_tracking ()) {
-        $tracking_code_pre = " data-ai='";
-        $tracking_code_data = "[{$this->number},{$this->code_version}]";
-        $tracking_code_post = "'";
 
-        $tracking_code = $tracking_code_pre . base64_encode ($tracking_code_data) . $tracking_code_post;
-      }
+      if ($this->fallback != 0) {
+        if ($block_object [$this->fallback]->get_tracking ()) {
+          $tracking_code_pre = " data-ai='";
+          $tracking_code_data = "[{$this->fallback},{$this->code_version}]";
+          $tracking_code_post = "'";
+
+          $tracking_code = $tracking_code_pre . base64_encode ($tracking_code_data) . $tracking_code_post;
+        }
+      } else {
+          if ($this->get_tracking ()) {
+            $tracking_code_pre = " data-ai='";
+            $tracking_code_data = "[{$this->number},{$this->code_version}]";
+            $tracking_code_post = "'";
+
+            $tracking_code = $tracking_code_pre . base64_encode ($tracking_code_data) . $tracking_code_post;
+          }
+        }
 
       $wrapper_before = $hidden_viewports . "<div" . $class . $tracking_code . " style='" . $additional_block_style . $this->get_alignment_style() . "'>\n";
 
@@ -2606,7 +2617,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     $tags = $this->get_ad_block_tag();
     $tag_type = $this->get_ad_block_tag_type();
 
-    $tags = trim (strtolower ($tags));
+//    $tags = trim (strtolower ($tags));
+    $tags = trim ($tags);
     $tags_listed = explode (",", $tags);
     foreach ($tags_listed as $index => $tag_listed) {
       $tags_listed [$index] = trim ($tag_listed);
@@ -2651,17 +2663,33 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       if ($taxonomies == AD_EMPTY_DATA) return true;
 
       $taxonomies_listed = explode (",", $taxonomies);
-
       $taxonomy_names = get_post_taxonomies ();
-      foreach ($taxonomy_names as $taxonomy_name) {
-        $terms = get_the_terms (0, $taxonomy_name);
-        if (is_array ($terms)) {
-          foreach ($terms as $term) {
 
-            foreach ($taxonomies_listed as $taxonomy_disabled){
+      foreach ($taxonomies_listed as $taxonomy_disabled) {
+        $taxonomy_disabled = trim ($taxonomy_disabled);
 
-              $taxonomy_disabled = trim ($taxonomy_disabled);
+        if (strpos ($taxonomy_disabled, 'user:') === 0) {
+          $current_user = wp_get_current_user();
+          $terms = explode (':', $taxonomy_disabled);
+          if ($terms [1] == $current_user->user_login) return false;
+        }
+        elseif (strpos ($taxonomy_disabled, 'user-role:') === 0) {
+          $current_user = wp_get_current_user();
+          $terms = explode (':', $taxonomy_disabled);
+          foreach (wp_get_current_user()->roles as $role) {
+            if ($terms [1] == $role) return false;
+          }
+        }
+        elseif (strpos ($taxonomy_disabled, 'post-type:') === 0) {
+          $post_type = get_post_type ();
+          $terms = explode (':', $taxonomy_disabled);
+          if ($terms [1] == $post_type) return false;
+        }
 
+        foreach ($taxonomy_names as $taxonomy_name) {
+          $terms = get_the_terms (0, $taxonomy_name);
+          if (is_array ($terms)) {
+            foreach ($terms as $term) {
               $post_term_name = strtolower ($term->name);
               $post_term_slug = strtolower ($term->slug);
               $post_taxonomy  = strtolower ($term->taxonomy);
@@ -2676,6 +2704,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
           }
         }
       }
+
       return true;
 
     } else {
@@ -2683,19 +2712,36 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
         if ($taxonomies == AD_EMPTY_DATA) return false;
 
         $taxonomies_listed = explode (",", $taxonomies);
-
         $taxonomy_names = get_post_taxonomies ();
-        foreach ($taxonomy_names as $taxonomy_name) {
-          $terms = get_the_terms (0, $taxonomy_name);
-          if (is_array ($terms)) {
-            foreach ($terms as $term) {
 
-              foreach ($taxonomies_listed as $taxonomy_enabled) {
+        foreach ($taxonomies_listed as $taxonomy_enabled) {
+          $taxonomy_enabled = trim ($taxonomy_enabled);
 
-                $taxonomy_enabled = trim ($taxonomy_enabled);
+          if (strpos ($taxonomy_enabled, 'user:') === 0) {
+            $current_user = wp_get_current_user();
+            $terms = explode (':', $taxonomy_enabled);
+            if ($terms [1] == $current_user->user_login) return true;
+          }
+          elseif (strpos ($taxonomy_enabled, 'user-role:') === 0) {
+            $current_user = wp_get_current_user();
+            $terms = explode (':', $taxonomy_enabled);
+            foreach (wp_get_current_user()->roles as $role) {
+              if ($terms [1] == $role) return true;
+            }
+          }
+          elseif (strpos ($taxonomy_enabled, 'post-type:') === 0) {
+            $post_type = get_post_type ();
+            $terms = explode (':', $taxonomy_enabled);
+            if ($terms [1] == $post_type) return true;
+          }
 
+          foreach ($taxonomy_names as $taxonomy_name) {
+            $terms = get_the_terms (0, $taxonomy_name);
+            if (is_array ($terms)) {
+              foreach ($terms as $term) {
                 $post_term_name = strtolower ($term->name);
                 $post_term_slug = strtolower ($term->slug);
+                $post_taxonomy  = strtolower ($term->taxonomy);
 
                 if ($post_term_name == $taxonomy_enabled || $post_term_slug == $taxonomy_enabled) return true;
 
@@ -2707,6 +2753,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
             }
           }
         }
+
         return false;
       }
   }
@@ -2892,17 +2939,32 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     return !$return;
   }
 
-  function check_number_of_words (&$content, $number_of_words = 0) {
-    global $ai_last_check;
+  function check_number_of_words (&$content = null, $number_of_words = 0) {
+    global $ai_last_check, $ai_wp_data;
 
-    if ($number_of_words == 0) {
-      $number_of_words = number_of_words ($content);
-    }
+    $minimum_words = intval ($this->get_minimum_words());
+    $maximum_words = intval ($this->get_maximum_words());
+
+    if ($minimum_words == 0 && $maximum_words == 0) return true;
+
+    if ($ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_POST || $ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_STATIC) {
+      if ($number_of_words == 0) {
+        if (!isset ($ai_wp_data [AI_WORD_COUNT])) {
+          if ($content === null) {
+            $content = '';
+            $content_post = get_post ();
+            if (isset ($content_post->post_content)) $content = $content_post->post_content;
+          }
+
+          $number_of_words = number_of_words ($content);
+        } else $number_of_words = $ai_wp_data [AI_WORD_COUNT];
+      }
+    } else $number_of_words = 0;
+    $ai_wp_data [AI_WORD_COUNT] = $number_of_words;
 
     $ai_last_check = AI_CHECK_MIN_NUMBER_OF_WORDS;
-    if ($number_of_words < intval ($this->get_minimum_words())) return false;
+    if ($number_of_words < $minimum_words) return false;
 
-    $maximum_words = intval ($this->get_maximum_words());
     if ($maximum_words <= 0) $maximum_words = 1000000;
 
     $ai_last_check = AI_CHECK_MAX_NUMBER_OF_WORDS;
@@ -2987,9 +3049,6 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
     $ai_last_check = AI_CHECK_SCHEDULING;
     if (!$this->check_scheduling ()) return false;
-
-//    $ai_last_check = AI_CHECK_CODE;
-//    if ($this->ai_getCode () == '') return false;
 
     $display_for_users = $this->get_display_for_users ();
 
@@ -3150,166 +3209,184 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
   function replace_ai_tags ($content){
     global $ai_wp_data;
 
-    $general_tag = str_replace ("&amp;", " and ", $this->get_ad_general_tag());
-    $title = $general_tag;
-    $short_title = $general_tag;
-    $category = $general_tag;
-    $short_category = $general_tag;
-    $tag = $general_tag;
-    $smart_tag = $general_tag;
-    if ($ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_CATEGORY) {
-        $categories = get_the_category();
-        if (!empty ($categories)) {
-          $first_category = reset ($categories);
-          $category = str_replace ("&amp;", "and", $first_category->name);
-          if ($category == "Uncategorized") $category = $general_tag;
-        } else {
-            $category = $general_tag;
-        }
-        if (strpos ($category, ",") !== false) {
-          $short_category = trim (substr ($category, 0, strpos ($category, ",")));
-        } else $short_category = $category;
-        if (strpos ($short_category, "and") !== false) {
-          $short_category = trim (substr ($short_category, 0, strpos ($short_category, "and")));
-        }
-
-        $title = $category;
-        $title = str_replace ("&amp;", "and", $title);
-        $short_title = implode (" ", array_slice (explode (" ", $title), 0, 3));
-        $tag = $short_title;
-        $smart_tag = $short_title;
-    } elseif (is_tag ()) {
-        $title = single_tag_title('', false);
-        $title = str_replace (array ("&amp;", "#"), array ("and", ""), $title);
-        $short_title = implode (" ", array_slice (explode (" ", $title), 0, 3));
-        $category = $short_title;
-        if (strpos ($category, ",") !== false) {
-          $short_category = trim (substr ($category, 0, strpos ($category, ",")));
-        } else $short_category = $category;
-        if (strpos ($short_category, "and") !== false) {
-          $short_category = trim (substr ($short_category, 0, strpos ($short_category, "and")));
-        }
-        $tag = $short_title;
-        $smart_tag = $short_title;
-    } elseif ($ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_SEARCH) {
-        $title = get_search_query();
-        $title = str_replace ("&amp;", "and", $title);
-        $short_title = implode (" ", array_slice (explode (" ", $title), 0, 3));
-        $category = $short_title;
-        if (strpos ($category, ",") !== false) {
-          $short_category = trim (substr ($category, 0, strpos ($category, ",")));
-        } else $short_category = $category;
-        if (strpos ($short_category, "and") !== false) {
-          $short_category = trim (substr ($short_category, 0, strpos ($short_category, "and")));
-        }
-        $tag = $short_title;
-        $smart_tag = $short_title;
-    } elseif ($ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_STATIC || $ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_POST) {
-        $title = get_the_title();
-        $title = str_replace ("&amp;", "and", $title);
-
-        $short_title = implode (" ", array_slice (explode (" ", $title), 0, 3));
-
-        $categories = get_the_category();
-        if (!empty ($categories)) {
-          $first_category = reset ($categories);
-          $category = str_replace ("&amp;", "and", $first_category->name);
-          if ($category == "Uncategorized") $category = $general_tag;
-        } else {
-            $category = $short_title;
-        }
-        if (strpos ($category, ",") !== false) {
-          $short_category = trim (substr ($category, 0, strpos ($category, ",")));
-        } else $short_category = $category;
-        if (strpos ($short_category, "and") !== false) {
-          $short_category = trim (substr ($short_category, 0, strpos ($short_category, "and")));
-        }
-
-        $tags = get_the_tags();
-        if (!empty ($tags)) {
-
-          $first_tag = reset ($tags);
-          $tag = str_replace (array ("&amp;", "#"), array ("and", ""), isset ($first_tag->name) ? $first_tag->name : '');
-
-          $tag_array = array ();
-          foreach ($tags as $tag_data) {
-            if (isset ($tag_data->name))
-              $tag_array [] = explode (" ", $tag_data->name);
+    if (!isset ($ai_wp_data [AI_TAGS])) {
+      $general_tag = str_replace ("&amp;", " and ", $this->get_ad_general_tag());
+      $title = $general_tag;
+      $short_title = $general_tag;
+      $category = $general_tag;
+      $short_category = $general_tag;
+      $tag = $general_tag;
+      $smart_tag = $general_tag;
+      if ($ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_CATEGORY) {
+          $categories = get_the_category();
+          if (!empty ($categories)) {
+            $first_category = reset ($categories);
+            $category = str_replace ("&amp;", "and", $first_category->name);
+            if ($category == "Uncategorized") $category = $general_tag;
+          } else {
+              $category = $general_tag;
+          }
+          if (strpos ($category, ",") !== false) {
+            $short_category = trim (substr ($category, 0, strpos ($category, ",")));
+          } else $short_category = $category;
+          if (strpos ($short_category, "and") !== false) {
+            $short_category = trim (substr ($short_category, 0, strpos ($short_category, "and")));
           }
 
-          $selected_tag = '';
+          $title = $category;
+          $title = str_replace ("&amp;", "and", $title);
+          $short_title = implode (" ", array_slice (explode (" ", $title), 0, 3));
+          $tag = $short_title;
+          $smart_tag = $short_title;
+      } elseif (is_tag ()) {
+          $title = single_tag_title('', false);
+          $title = str_replace (array ("&amp;", "#"), array ("and", ""), $title);
+          $short_title = implode (" ", array_slice (explode (" ", $title), 0, 3));
+          $category = $short_title;
+          if (strpos ($category, ",") !== false) {
+            $short_category = trim (substr ($category, 0, strpos ($category, ",")));
+          } else $short_category = $category;
+          if (strpos ($short_category, "and") !== false) {
+            $short_category = trim (substr ($short_category, 0, strpos ($short_category, "and")));
+          }
+          $tag = $short_title;
+          $smart_tag = $short_title;
+      } elseif ($ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_SEARCH) {
+          $title = get_search_query();
+          $title = str_replace ("&amp;", "and", $title);
+          $short_title = implode (" ", array_slice (explode (" ", $title), 0, 3));
+          $category = $short_title;
+          if (strpos ($category, ",") !== false) {
+            $short_category = trim (substr ($category, 0, strpos ($category, ",")));
+          } else $short_category = $category;
+          if (strpos ($short_category, "and") !== false) {
+            $short_category = trim (substr ($short_category, 0, strpos ($short_category, "and")));
+          }
+          $tag = $short_title;
+          $smart_tag = $short_title;
+      } elseif ($ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_STATIC || $ai_wp_data [AI_WP_PAGE_TYPE] == AI_PT_POST) {
+          $title = get_the_title();
+          $title = str_replace ("&amp;", "and", $title);
 
-          if (count ($tag_array [0]) == 2) $selected_tag = $tag_array [0];
-          elseif (count ($tag_array) > 1 && count ($tag_array [1]) == 2) $selected_tag = $tag_array [1];
-          elseif (count ($tag_array) > 2 && count ($tag_array [2]) == 2) $selected_tag = $tag_array [2];
-          elseif (count ($tag_array) > 3 && count ($tag_array [3]) == 2) $selected_tag = $tag_array [3];
-          elseif (count ($tag_array) > 4 && count ($tag_array [4]) == 2) $selected_tag = $tag_array [4];
+          $short_title = implode (" ", array_slice (explode (" ", $title), 0, 3));
 
+          $categories = get_the_category();
+          if (!empty ($categories)) {
+            $first_category = reset ($categories);
+            $category = str_replace ("&amp;", "and", $first_category->name);
+            if ($category == "Uncategorized") $category = $general_tag;
+          } else {
+              $category = $short_title;
+          }
+          if (strpos ($category, ",") !== false) {
+            $short_category = trim (substr ($category, 0, strpos ($category, ",")));
+          } else $short_category = $category;
+          if (strpos ($short_category, "and") !== false) {
+            $short_category = trim (substr ($short_category, 0, strpos ($short_category, "and")));
+          }
 
-          if ($selected_tag == '' && count ($tag_array) >= 2 && count ($tag_array [0]) == 1 && count ($tag_array [1]) == 1) {
+          $tags = get_the_tags();
+          if (!empty ($tags)) {
 
-            if (isset ($tag_array [0][0]) && isset ($tag_array [1][0])) {
-              if (strpos ($tag_array [0][0], $tag_array [1][0]) !== false) $tag_array = array_slice ($tag_array, 1, count ($tag_array) - 1);
+            $first_tag = reset ($tags);
+            $tag = str_replace (array ("&amp;", "#"), array ("and", ""), isset ($first_tag->name) ? $first_tag->name : '');
+
+            $tag_array = array ();
+            foreach ($tags as $tag_data) {
+              if (isset ($tag_data->name))
+                $tag_array [] = explode (" ", $tag_data->name);
             }
 
-            if (isset ($tag_array [0][0]) && isset ($tag_array [1][0])) {
-              if (strpos ($tag_array [1][0], $tag_array [0][0]) !== false) $tag_array = array_slice ($tag_array, 1, count ($tag_array) - 1);
-            }
+            $selected_tag = '';
 
-            if (isset ($tag_array [0][0]) && isset ($tag_array [1][0])) {
-              if (count ($tag_array) >= 2 && count ($tag_array [0]) == 1 && count ($tag_array [1]) == 1) {
-                $selected_tag = array ($tag_array [0][0], $tag_array [1][0]);
+            if (count ($tag_array [0]) == 2) $selected_tag = $tag_array [0];
+            elseif (count ($tag_array) > 1 && count ($tag_array [1]) == 2) $selected_tag = $tag_array [1];
+            elseif (count ($tag_array) > 2 && count ($tag_array [2]) == 2) $selected_tag = $tag_array [2];
+            elseif (count ($tag_array) > 3 && count ($tag_array [3]) == 2) $selected_tag = $tag_array [3];
+            elseif (count ($tag_array) > 4 && count ($tag_array [4]) == 2) $selected_tag = $tag_array [4];
+
+
+            if ($selected_tag == '' && count ($tag_array) >= 2 && count ($tag_array [0]) == 1 && count ($tag_array [1]) == 1) {
+
+              if (isset ($tag_array [0][0]) && isset ($tag_array [1][0])) {
+                if (strpos ($tag_array [0][0], $tag_array [1][0]) !== false) $tag_array = array_slice ($tag_array, 1, count ($tag_array) - 1);
+              }
+
+              if (isset ($tag_array [0][0]) && isset ($tag_array [1][0])) {
+                if (strpos ($tag_array [1][0], $tag_array [0][0]) !== false) $tag_array = array_slice ($tag_array, 1, count ($tag_array) - 1);
+              }
+
+              if (isset ($tag_array [0][0]) && isset ($tag_array [1][0])) {
+                if (count ($tag_array) >= 2 && count ($tag_array [0]) == 1 && count ($tag_array [1]) == 1) {
+                  $selected_tag = array ($tag_array [0][0], $tag_array [1][0]);
+                }
               }
             }
+
+            if ($selected_tag == '') {
+              $first_tag = reset ($tags);
+              $smart_tag = implode (" ", array_slice (explode (" ", isset ($first_tag->name) ? $first_tag->name : ''), 0, 3));
+            } else $smart_tag = implode (" ", $selected_tag);
+
+            $smart_tag = str_replace (array ("&amp;", "#"), array ("and", ""), $smart_tag);
+
+          } else {
+              $tag = $category;
+              $smart_tag = $category;
           }
+      }
 
-          if ($selected_tag == '') {
-            $first_tag = reset ($tags);
-            $smart_tag = implode (" ", array_slice (explode (" ", isset ($first_tag->name) ? $first_tag->name : ''), 0, 3));
-          } else $smart_tag = implode (" ", $selected_tag);
+      $title = str_replace (array ("'", '"'), array ("&#8217;", "&#8221;"), $title);
+      $title = html_entity_decode ($title, ENT_QUOTES, "utf-8");
 
-          $smart_tag = str_replace (array ("&amp;", "#"), array ("and", ""), $smart_tag);
+      $short_title = str_replace (array ("'", '"'), array ("&#8217;", "&#8221;"), $short_title);
+      $short_title = html_entity_decode ($short_title, ENT_QUOTES, "utf-8");
 
-        } else {
-            $tag = $category;
-            $smart_tag = $category;
-        }
+      $search_query = "";
+      if (isset ($_SERVER['HTTP_REFERER'])) {
+        $referrer = $_SERVER['HTTP_REFERER'];
+      } else $referrer = '';
+      if (preg_match ("/[\.\/](google|yahoo|bing|ask)\.[a-z\.]{2,5}[\/]/i", $referrer, $search_engine)){
+         $referrer_query = parse_url ($referrer);
+         $referrer_query = isset ($referrer_query ["query"]) ? $referrer_query ["query"] : "";
+         parse_str ($referrer_query, $value);
+         $search_query = isset ($value ["q"]) ? $value ["q"] : "";
+         if ($search_query == "") {
+           $search_query = isset ($value ["p"]) ? $value ["p"] : "";
+         }
+      }
+      if ($search_query == "") $search_query = $smart_tag;
+
+      $author = get_the_author_meta ('display_name');
+      $author_name = get_the_author_meta ('first_name') . " " . get_the_author_meta ('last_name');
+      if ($author_name == '') $author_name = $author;
+
+      $ai_wp_data [AI_TAGS]['TITLE']          = $title;
+      $ai_wp_data [AI_TAGS]['SHORT_TITLE']    = $short_title;
+      $ai_wp_data [AI_TAGS]['CATEGORY']       = $category;
+      $ai_wp_data [AI_TAGS]['SHORT_CATEGORY'] = $short_category;
+      $ai_wp_data [AI_TAGS]['TAG']            = $tag;
+      $ai_wp_data [AI_TAGS]['SMART_TAG']      = $smart_tag;
+      $ai_wp_data [AI_TAGS]['SEARCH_QUERY']   = $search_query;
+      $ai_wp_data [AI_TAGS]['AUTHOR']         = $author;
+      $ai_wp_data [AI_TAGS]['AUTHOR_NAME']    = $author_name;
     }
 
-    $title = str_replace (array ("'", '"'), array ("&#8217;", "&#8221;"), $title);
-    $title = html_entity_decode ($title, ENT_QUOTES, "utf-8");
+    $ad_data = preg_replace ("/{title}/i",          $ai_wp_data [AI_TAGS]['TITLE'],          $content);
+    $ad_data = preg_replace ("/{short-title}/i",    $ai_wp_data [AI_TAGS]['SHORT_TITLE'],    $ad_data);
+    $ad_data = preg_replace ("/{category}/i",       $ai_wp_data [AI_TAGS]['CATEGORY'],       $ad_data);
+    $ad_data = preg_replace ("/{short-category}/i", $ai_wp_data [AI_TAGS]['SHORT_CATEGORY'], $ad_data);
+    $ad_data = preg_replace ("/{tag}/i",            $ai_wp_data [AI_TAGS]['TAG'],            $ad_data);
+    $ad_data = preg_replace ("/{smart-tag}/i",      $ai_wp_data [AI_TAGS]['SMART_TAG'],      $ad_data);
+    $ad_data = preg_replace ("/{search-query}/i",   $ai_wp_data [AI_TAGS]['SEARCH_QUERY'],   $ad_data);
+    $ad_data = preg_replace ("/{author}/i",         $ai_wp_data [AI_TAGS]['AUTHOR'],         $ad_data);
+    $ad_data = preg_replace ("/{author-name}/i",    $ai_wp_data [AI_TAGS]['AUTHOR_NAME'],    $ad_data);
 
-    $short_title = str_replace (array ("'", '"'), array ("&#8217;", "&#8221;"), $short_title);
-    $short_title = html_entity_decode ($short_title, ENT_QUOTES, "utf-8");
-
-    $search_query = "";
-    if (isset ($_SERVER['HTTP_REFERER'])) {
-      $referrer = $_SERVER['HTTP_REFERER'];
-    } else $referrer = '';
-    if (preg_match ("/[\.\/](google|yahoo|bing|ask)\.[a-z\.]{2,5}[\/]/i", $referrer, $search_engine)){
-       $referrer_query = parse_url ($referrer);
-       $referrer_query = isset ($referrer_query ["query"]) ? $referrer_query ["query"] : "";
-       parse_str ($referrer_query, $value);
-       $search_query = isset ($value ["q"]) ? $value ["q"] : "";
-       if ($search_query == "") {
-         $search_query = isset ($value ["p"]) ? $value ["p"] : "";
-       }
-    }
-    if ($search_query == "") $search_query = $smart_tag;
-
-    $author = get_the_author_meta ('display_name');
-    $author_name = get_the_author_meta ('first_name') . " " . get_the_author_meta ('last_name');
-    if ($author_name == '') $author_name = $author;
-
-    $ad_data = preg_replace ("/{title}/i",          $title,          $content);
-    $ad_data = preg_replace ("/{short_title}/i",    $short_title,    $ad_data);
-    $ad_data = preg_replace ("/{category}/i",       $category,       $ad_data);
-    $ad_data = preg_replace ("/{short_category}/i", $short_category, $ad_data);
-    $ad_data = preg_replace ("/{tag}/i",            $tag,            $ad_data);
-    $ad_data = preg_replace ("/{smart_tag}/i",      $smart_tag,      $ad_data);
-    $ad_data = preg_replace ("/{search_query}/i",   $search_query,   $ad_data);
-    $ad_data = preg_replace ("/{author}/i",         $author,         $ad_data);
-    $ad_data = preg_replace ("/{author_name}/i",    $author_name,    $ad_data);
+    $ad_data = preg_replace ("/{short_title}/i",    $ai_wp_data [AI_TAGS]['SHORT_TITLE'],    $ad_data);
+    $ad_data = preg_replace ("/{short_category}/i", $ai_wp_data [AI_TAGS]['SHORT_CATEGORY'], $ad_data);
+    $ad_data = preg_replace ("/{smart_tag}/i",      $ai_wp_data [AI_TAGS]['SMART_TAG'],      $ad_data);
+    $ad_data = preg_replace ("/{search_query}/i",   $ai_wp_data [AI_TAGS]['SEARCH_QUERY'],   $ad_data);
+    $ad_data = preg_replace ("/{author_name}/i",    $ai_wp_data [AI_TAGS]['AUTHOR_NAME'],    $ad_data);
 
     if (function_exists ('ai_tags')) ai_tags ($ad_data);
 

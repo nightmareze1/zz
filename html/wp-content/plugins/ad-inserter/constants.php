@@ -18,7 +18,7 @@ if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.2.2');
+  define ('AD_INSERTER_VERSION', '2.2.3');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -380,9 +380,9 @@ define('AI_TEXT_MULTIBYTE',          'Multibyte');
 
 // Tracking
 define('AI_TRACKING_DISABLED',       0);
-define('AI_TRACKING_INTERNAL',       1);
-
 define('AI_TRACKING_ENABLED',        1);
+
+define('AI_TRACKING_INTERNAL',       0);
 
 // Ad Blocking
 define ('AI_ADB_ACTION_NONE',             0);
@@ -411,6 +411,13 @@ define ('AI_TEXT_INTERNAL',           'Internal');
 define ('AI_TEXT_ADVANCED',           'Advanced');
 define ('AI_TEXT_ENABLED',            'Enabled');
 
+// Sticky widget mode
+define ('AI_STICKY_WIDGET_MODE_CSS', 0);
+define ('AI_STICKY_WIDGET_MODE_JS',  1);
+
+define ('AI_TEXT_CSS', 'CSS');
+define ('AI_TEXT_JS',  'JavaScript ');
+
 //Settings
 define ('AI_ENABLED',                '1');
 define ('AI_DISABLED',               '0');
@@ -432,6 +439,7 @@ define ('AI_SYNTAX_HIGHLIGHTER_THEME',          'ad_inserter');
 define ('DEFAULT_SYNTAX_HIGHLIGHTER_THEME',     AI_SYNTAX_HIGHLIGHTER_THEME);
 define ('DEFAULT_BLOCK_CLASS_NAME',             'code-block');
 define ('DEFAULT_MINIMUM_USER_ROLE',            'administrator');
+define ('DEFAULT_STICKY_WIDGET_MODE',           AI_STICKY_WIDGET_MODE_CSS);
 define ('DEFAULT_STICKY_WIDGET_MARGIN',         15);
 define ('DEFAULT_PLUGIN_PRIORITY',              99999);
 define ('DEFAULT_DYNAMIC_BLOCKS',               AI_DYNAMIC_BLOCKS_SERVER_SIDE);
@@ -447,7 +455,9 @@ define ('DEFAULT_MULTISITE_PHP_PROCESSING',     AI_ENABLED);
 define ('DEFAULT_MULTISITE_EXCEPTIONS',         AI_ENABLED);
 define ('DEFAULT_MULTISITE_MAIN_FOR_ALL_BLOGS', AI_DISABLED);
 define ('DEFAULT_TRACKING',                     AI_TRACKING_DISABLED);
+define ('DEFAULT_TRACKING_MODE',                AI_TRACKING_INTERNAL);
 define ('DEFAULT_TRACKING_LOGGED_IN',           AI_TRACKING_ENABLED);
+define ('DEFAULT_TRACK_PAGEVIEWS',              AI_TRACKING_DISABLED);
 define ('DEFAULT_CLICK_DETECTION',              AI_CLICK_DETECTION_STANDARD);
 define ('DEFAULT_ADB_BLOCK_ACTION',             AI_ADB_BLOCK_ACTION_DO_NOTHING);
 
@@ -469,6 +479,8 @@ define ('AI_DEFAULT_ADB_ACTION',                AI_ADB_ACTION_NONE);
 define ('AI_DEFAULT_ADB_NO_ACTION_PERIOD',      30);
 define ('AI_DEFAULT_ADB_REDIRECTION_PAGE',      0);
 define ('AI_DEFAULT_ADB_UNDISMISSIBLE_MESSAGE', AI_DISABLED);
+define ('AI_ADB_VERSION_MASK',                  0x7F);
+define ('AI_ADB_FLAG_BLOCKED',                  0x80);
 
 define ('DEFAULT_VIEWPORT_NAME_1', "Desktop");
 define ('DEFAULT_VIEWPORT_NAME_2', "Tablet");
@@ -584,6 +596,9 @@ define ('AI_JS_DEBUGGING',               15);
 define ('AI_WP_AMP_PAGE',                16);
 define ('AI_INSTALL_TIME_DIFFERENCE',    17);
 define ('AI_DAYS_SINCE_INSTAL',          18);
+define ('AI_TAGS',                       19);
+define ('AI_VIEWPORTS',                  20);
+define ('AI_WORD_COUNT',                 21);
 
 define ('AI_CONTEXT_NONE',                0);
 define ('AI_CONTEXT_CONTENT',             1);

@@ -1,4 +1,4 @@
-var javascript_version = "2.2.2";
+var javascript_version = "2.2.3";
 var ignore_key = true;
 var start = 1;
 var end = 16;
@@ -312,6 +312,9 @@ jQuery(document).ready(function($) {
         serie9 : {
           color : "#000",
         },
+        serie10 : {
+          color : "#000",   // Used also for BLOCKED
+        },
       },
       defaultAxis : {
         labels : true,
@@ -431,6 +434,10 @@ jQuery(document).ready(function($) {
         }, {
          plotProps : {
           fill : "#000"
+         }
+        }, {
+         plotProps : {
+          fill : "#000"   // Used also for BLOCKED
          }
         }]
       }
@@ -681,7 +688,7 @@ jQuery(document).ready(function($) {
   function process_display_elements (block) {
 
     $("#paragraph-settings-"+block).hide();
-    $("#content-settings-"+block).hide();
+//    $("#content-settings-"+block).hide();
 
     var automatic_insertion = $("select#display-type-"+block+" option:selected").attr('value');
 
@@ -693,9 +700,9 @@ jQuery(document).ready(function($) {
       }
 
     var content_settings = automatic_insertion == AI_BEFORE_PARAGRAPH || automatic_insertion == AI_AFTER_PARAGRAPH || automatic_insertion == AI_BEFORE_CONTENT || automatic_insertion == AI_AFTER_CONTENT;
-    if (content_settings) {
-      $("#content-settings-"+block).show();
-    }
+//    if (content_settings) {
+//      $("#content-settings-"+block).show();
+//    }
 
     $("#css-label-"+block).css('display', 'table-cell');
     $("#edit-css-button-"+block).css('display', 'table-cell');
@@ -856,13 +863,153 @@ jQuery(document).ready(function($) {
     }
   }
 
+
+  function configure_statistics_toolbar (tab) {
+    $("input#load-custom-range-"+tab).click (function () {
+      var block = $(this).attr ("id");
+      block = block.replace ("load-custom-range-","");
+
+      var label = $(this).next ().find ('.checkbox-icon');
+      label.addClass ('on');
+
+      var nonce = $(this).attr ('nonce');
+      var start_date = $("input#chart-start-date-" + block).attr('value');
+      var end_date = $("input#chart-end-date-" + block).attr('value');
+      var container = $("div#statistics-elements-" + block);
+
+      var version_charts_container = $("div#ai-version-charts-" + block);
+      var version_charts_container_visible = version_charts_container.is (':visible');
+
+      var delete_range = '';
+      if ($("input#clear-range-"+block).hasClass ('delete')) {
+        delete_range = '&delete=1';
+      }
+
+      var adb = '';
+      if ($("input#adb-statistics-button-"+block).next ().find ('.icon-adb').hasClass ('on')) {
+        adb = '&adb=1';
+      }
+
+      container.load (ajaxurl+"?action=ai_ajax_backend&statistics=" + block + "&start-date=" + start_date + "&end-date=" + end_date + delete_range + adb + "&ai_check=" + nonce, function (response, status, xhr) {
+        label.removeClass ('on');
+        if ( status == "error" ) {
+          var message = "Error downloading data: " + xhr.status + " " + xhr.statusText ;
+          $( "div#load-error-" + block).html (message);
+          if (debug) console.log (message);
+        } else {
+            $( "div#load-error-" + block).html ('');
+            if (debug) console.log ("Custom statistics loaded: " + block);
+            configure_charts (container);
+
+            container.find ("label.ai-version-charts-button.not-configured").click (function () {
+              var no_delay_version_charts = $(this).hasClass ('no-version-charts-delay');
+
+              $(this).removeClass ('not-configured');
+              var version_charts_container = $(this).closest (".ai-charts").find ('div.ai-version-charts');
+              version_charts_container.toggle ();
+
+              var not_configured_charts = version_charts_container.find ('.ai-chart.not-configured.hidden');
+              if (not_configured_charts.length) {
+                not_configured_charts.each (function() {
+                  $(this).removeClass ('hidden');
+                });
+                if (no_delay_version_charts) {
+                  configure_charts (version_charts_container);
+                } else setTimeout (function() {configure_charts (version_charts_container);}, 10);
+              }
+            });
+
+            if (version_charts_container_visible) {
+              container.find ("label.ai-version-charts-button.not-configured").addClass ('no-version-charts-delay').click ();
+            }
+
+            $("input#chart-start-date-"+block).css ('color', '#32373c');
+            $("input#chart-end-date-"+block).css ('color', '#32373c');
+          }
+      });
+    });
+
+    $("input#auto-refresh-"+tab).click (function () {
+      var block = $(this).attr ("id");
+      block = block.replace ("auto-refresh-","");
+      var label = $(this).next ().find ('.checkbox-icon');
+      label.toggleClass ('on');
+      if (label.hasClass ('on')) {
+        reload_statistics (block);
+      }
+    });
+
+    $("input#clear-range-"+tab).click (function () {
+      var block = $(this).attr ("id");
+      block = block.replace ("clear-range-","");
+
+      var delete_button = this;
+      var start_date = $("input#chart-start-date-" + block).attr('value');
+      var end_date = $("input#chart-end-date-" + block).attr('value');
+
+      var message = '';
+      if (start_date == '' && end_date == '')
+        var message = 'Delete all statistics data?'; else
+          if (start_date != '' && end_date != '') var message = 'Delete statistics data between ' + start_date + ' and ' + end_date + '?';
+
+      if (message != '')
+        $('<div />').html(message).attr ('title', 'Warning').dialog({
+          bgiframe: true,
+          draggable: false,
+          resizable: false,
+          modal: true,
+          height: "auto",
+          width: 400,
+          position: {my: 'center', at: 'center', of: '#ai-settings'},
+          buttons: {
+            "Delete": function() {
+              $(this).dialog ("close");
+
+              $(delete_button).addClass ('delete');
+              $("input#load-custom-range-"+block).click ();
+              $(delete_button).removeClass ('delete');
+            },
+            Cancel: function() {
+              $(this).dialog ("close");
+            },
+          },
+          open: function() {$(this).parent ().find ('button:nth-child(2)').focus();}
+        });
+    });
+
+    $("input#chart-start-date-"+tab).datepicker ({dateFormat: dateFormat, autoSize: true});
+    $("input#chart-end-date-"+tab).datepicker ({dateFormat: dateFormat, autoSize: true});
+
+    $("input#chart-start-date-"+tab).change (function() {
+      disable_auto_refresh_statistics ();
+      var block = $(this).attr('id').replace ("chart-start-date-", "");
+      $(this).css ('color', 'red');
+      process_chart_dates (block);
+    });
+
+    $("input#chart-end-date-"+tab).change (function() {
+      disable_auto_refresh_statistics ();
+      var block = $(this).attr('id').replace ("chart-end-date-", "");
+      $(this).css ('color', 'red');
+      process_chart_dates (block);
+    });
+
+    $("div#custom-range-controls-"+tab+" span.data-range").click (function () {
+      disable_auto_refresh_statistics ();
+      var id = $(this).closest (".custom-range-controls").attr ("id");
+      block = id.replace ("custom-range-controls-","");
+      $("input#chart-start-date-"+block).attr ("value", $(this).data ("start-date"));
+      $("input#chart-end-date-"+block).attr ("value", $(this).data ("end-date"));
+      $("input#load-custom-range-"+block).click ();
+    });
+  }
+
   function configure_tab_0 () {
 
     if (debug) console.log ("configure_tab_0");
 
     $('#tab-0').addClass ('configured');
 
-//    $('#tab-0 input[type=submit], #tab-0 button').button().show ();
     $('#tab-0 input[type=submit]').button().show ();
 
     configure_editor ('h');
@@ -918,6 +1065,22 @@ jQuery(document).ready(function($) {
     $('#simple-editor-f').checkboxButton ();
     $('#process-php-f').checkboxButton ();
 
+    $('#tracking').checkboxButton ();
+
+    configure_statistics_toolbar (0);
+
+    $("input#statistics-button-0").checkboxButton ().click (function () {
+      $("div#statistics-container-0").toggle ();
+      $("div#tab-tracking-settings").toggle ();
+      var container = $("div#statistics-container-0");
+      if (container.is(':visible')) {
+        if (!$(this).hasClass ('loaded')) {
+          $("input#load-custom-range-0").click ();
+          $(this).addClass ('loaded');
+        }
+      }
+    });
+
     $('#enable-adb-detection').checkboxButton ();
     $('#simple-editor-a').checkboxButton ();
     $('#process-php-a').checkboxButton ();
@@ -938,11 +1101,6 @@ jQuery(document).ready(function($) {
       var window_left  = 120;
       var window_top   = (screen.height / 2) - (870 / 2);
       var nonce = $(this).attr ('nonce');
-//      var site_url = $(this).attr ('site-url');
-//      var page = site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&preview=adb&ai_check=" + nonce;
-//      var page = ajaxurl+"?action=ai_ajax_backend&preview=adb&ai_check=" + nonce;
-//      var preview_window = window.open (page, 'preview','width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
-
       var param = {'action': 'ai_ajax_backend', 'preview': 'adb', 'ai_check': nonce};
       window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
     });
@@ -1207,8 +1365,6 @@ jQuery(document).ready(function($) {
 
       if ($("#export-container-" + block).is(':visible') && !$(this).hasClass ("loaded")) {
         var nonce = $(this).attr ('nonce');
-//        var site_url = $(this).attr ('site-url');
-//        $("#export_settings_" + block).load (site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&export=" + block + "&ai_check=" + nonce, function() {
         $("#export_settings_" + block).load (ajaxurl+"?action=ai_ajax_backend&export=" + block + "&ai_check=" + nonce, function() {
           $("#export_settings_" + block).attr ("name", "export_settings_" + block);
           $("#export-switch-"+block).addClass ("loaded");
@@ -1238,137 +1394,13 @@ jQuery(document).ready(function($) {
         }
     });
 
-    $("input#load-custom-range-"+tab).click (function () {
+    $("input#adb-statistics-button-"+tab).checkboxButton ().click (function () {
       var block = $(this).attr ("id");
-      block = block.replace ("load-custom-range-","");
-      var label = $(this).next ().find ('.checkbox-icon');
-
-      label.addClass ('on');
-
-      var nonce = $(this).attr ('nonce');
-//      var site_url = $(this).attr ('site-url');
-      var start_date = $("input#chart-start-date-" + block).attr('value');
-      var end_date = $("input#chart-end-date-" + block).attr('value');
-      var container = $("div#statistics-elements-" + block);
-
-      var version_charts_container = $("div#ai-version-charts-" + block);
-      var version_charts_container_visible = version_charts_container.is (':visible');
-
-      var delete_range = '';
-      if ($("input#clear-range-"+block).hasClass ('delete')) {
-        delete_range = '&delete=1';
-      }
-
-//      container.load (site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&statistics=" + block + "&start-date=" + start_date + "&end-date=" + end_date + delete_range + "&ai_check=" + nonce, function (response, status, xhr) {
-      container.load (ajaxurl+"?action=ai_ajax_backend&statistics=" + block + "&start-date=" + start_date + "&end-date=" + end_date + delete_range + "&ai_check=" + nonce, function (response, status, xhr) {
-        label.removeClass ('on');
-        if ( status == "error" ) {
-          var message = "Error downloading data: " + xhr.status + " " + xhr.statusText ;
-          $( "div#load-error-" + block).html (message);
-          if (debug) console.log (message);
-        } else {
-            $( "div#load-error-" + block).html ('');
-            if (debug) console.log ("Custom statistics loaded: " + block);
-            configure_charts (container);
-
-            container.find ("label.ai-version-charts-button.not-configured").click (function () {
-              $(this).removeClass ('not-configured');
-              var version_charts_container = $(this).closest (".ai-charts").find ('div.ai-version-charts');
-              version_charts_container.toggle ();
-
-              var not_configured_charts = version_charts_container.find ('.ai-chart.not-configured.hidden');
-              if (not_configured_charts.length) {
-                not_configured_charts.each (function() {
-                  $(this).removeClass ('hidden');
-                });
-                setTimeout (function() {configure_charts (version_charts_container);}, 10);
-              }
-            });
-
-            if (version_charts_container_visible) {
-              container.find ("label.ai-version-charts-button.not-configured").click ();
-            }
-
-            $("input#chart-start-date-"+block).css ('color', '#32373c');
-            $("input#chart-end-date-"+block).css ('color', '#32373c');
-          }
-      });
+      block = block.replace ("adb-statistics-button-","");
+      setTimeout (function() {$("input#load-custom-range-"+block).click ();}, 2);
     });
 
-    $("input#auto-refresh-"+tab).click (function () {
-      var block = $(this).attr ("id");
-      block = block.replace ("auto-refresh-","");
-      var label = $(this).next ().find ('.checkbox-icon');
-      label.toggleClass ('on');
-      if (label.hasClass ('on')) {
-        reload_statistics (block);
-      }
-    });
-
-    $("input#clear-range-"+tab).click (function () {
-      var block = $(this).attr ("id");
-      block = block.replace ("clear-range-","");
-
-      var delete_button = this;
-      var start_date = $("input#chart-start-date-" + block).attr('value');
-      var end_date = $("input#chart-end-date-" + block).attr('value');
-
-      var message = '';
-      if (start_date == '' && end_date == '')
-        var message = 'Delete all statistics data?'; else
-          if (start_date != '' && end_date != '') var message = 'Delete statistics data between ' + start_date + ' and ' + end_date + '?';
-
-      if (message != '')
-        $('<div />').html(message).attr ('title', 'Warning').dialog({
-          bgiframe: true,
-          draggable: false,
-          resizable: false,
-          modal: true,
-          height: "auto",
-          width: 400,
-          position: {my: 'center', at: 'center', of: '#ai-settings'},
-          buttons: {
-            "Delete": function() {
-              $(this).dialog ("close");
-
-              $(delete_button).addClass ('delete');
-              $("input#load-custom-range-"+block).click ();
-              $(delete_button).removeClass ('delete');
-            },
-            Cancel: function() {
-              $(this).dialog ("close");
-            },
-          },
-          open: function() {$(this).parent ().find ('button:nth-child(2)').focus();}
-        });
-    });
-
-    $("input#chart-start-date-"+tab).datepicker ({dateFormat: dateFormat, autoSize: true});
-    $("input#chart-end-date-"+tab).datepicker ({dateFormat: dateFormat, autoSize: true});
-
-    $("input#chart-start-date-"+tab).change (function() {
-      disable_auto_refresh_statistics ();
-      var block = $(this).attr('id').replace ("chart-start-date-", "");
-      $(this).css ('color', 'red');
-      process_chart_dates (block);
-    });
-
-    $("input#chart-end-date-"+tab).change (function() {
-      disable_auto_refresh_statistics ();
-      var block = $(this).attr('id').replace ("chart-end-date-", "");
-      $(this).css ('color', 'red');
-      process_chart_dates (block);
-    });
-
-    $("div#custom-range-controls-"+tab+" span.data-range").click (function () {
-      disable_auto_refresh_statistics ();
-      var id = $(this).closest (".custom-range-controls").attr ("id");
-      block = id.replace ("custom-range-controls-","");
-      $("input#chart-start-date-"+block).attr ("value", $(this).data ("start-date"));
-      $("input#chart-end-date-"+block).attr ("value", $(this).data ("end-date"));
-      $("input#load-custom-range-"+block).click ();
-    });
-
+    configure_statistics_toolbar (tab);
 
     $("#device-detection-button-"+tab).button ({
     }).show ().click (function () {
@@ -1476,6 +1508,8 @@ jQuery(document).ready(function($) {
     $('#ai-misc-container-' + tab).tabs();
     $('#ai-misc-tabs-' + tab).show();
 
+    $('#ai-devices-container-' + tab).tabs();
+    $('#ai-devices-tabs-' + tab).show();
   }
 
   function generate_country_list (element_name_prefix, index) {
@@ -1584,6 +1618,8 @@ jQuery(document).ready(function($) {
   }
 
   function configure_chart (container) {
+    var ai_adb_flag_blocked = 0x80;
+
     if (!$(container).hasClass ('not-configured')) return;
     var template = $(container).data ('template');
 
@@ -1593,7 +1629,9 @@ jQuery(document).ready(function($) {
       if (typeof color_indexes != 'undefined') {
         var colors = $.elycharts.templates['ai-pie'].defaultSeries.values;
         color_indexes.forEach (function (element) {
-          new_colors.push (colors [element]);
+          if (element == ai_adb_flag_blocked )
+            new_colors.push (colors [9]); else
+              new_colors.push (colors [element]);
         });
       }
 
@@ -1606,6 +1644,17 @@ jQuery(document).ready(function($) {
       if (values == null) values = $(container).data ('values-7');
       if (values == null) values = $(container).data ('values-8');
       if (values == null) values = $(container).data ('values-9');
+
+      var legend = $(container).data ('legend');
+      if (typeof legend != 'undefined' && typeof legend ['serie' + (ai_adb_flag_blocked + 1)] != 'undefined') {
+        var new_legend = {};
+        for (var legend_item in legend) {
+          if (legend_item == 'serie' + (ai_adb_flag_blocked + 1))
+            new_legend ['serie10'] = legend [legend_item]; else
+              new_legend [legend_item] = legend [legend_item];
+        }
+        legend = new_legend;
+      }
 
       $(container).chart({
         template: template,
@@ -1620,10 +1669,11 @@ jQuery(document).ready(function($) {
           serie7: $(container).data ('values-7'),
           serie8: $(container).data ('values-8'),
           serie9: $(container).data ('values-9'),
+          serie10: $(container).data ('values-' + (ai_adb_flag_blocked + 1)),  // BLOCKED
         },
-        legend: $(container).data ('legend'),
+        legend: legend,
         tooltips: {serie1: $(container).data ('tooltips')},
-        defaultSeries: {values: new_colors},
+        defaultSeries: {values: new_colors, tooltip: {height: $(container).data ('tooltip-height')}},
         defaultAxis : {
           max: $(container).data ('max'),
         },
@@ -1642,10 +1692,8 @@ jQuery(document).ready(function($) {
   function update_rating (parameter = '') {
     var rating_bar = $('#ai-rating-bar');
     var nonce = rating_bar.attr ('nonce');
-//    var site_url = rating_bar.attr ('site-url');
-//    $("#rating-value span").load (site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&rating=" + parameter + "&ai_check=" + nonce, function() {
     $("#rating-value span").load (ajaxurl+"?action=ai_ajax_backend&rating=" + parameter + "&ai_check=" + nonce, function() {
-      var rating = $("#rating-value span").text ()
+      var rating = $("#rating-value span").text ();
       var rating_value = 0;
       if (rating != '') var rating_value = parseFloat (rating);
       $("#rating-value").css ('width', rating_value * 20 + '%');
@@ -1660,6 +1708,7 @@ jQuery(document).ready(function($) {
   function configure_charts (container) {
     $(container).find ('.ai-chart.not-configured').each (function() {
       if (!$(this).hasClass ('hidden')) {
+        $(this).attr ('style', '');
         configure_chart (this);
       }
     });

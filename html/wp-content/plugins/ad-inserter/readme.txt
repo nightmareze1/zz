@@ -2,11 +2,11 @@
 
 Contributors: spacetime
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4
-Tags: ads, adsense, ad management, advertising manager, advanced contextual ads, ad rotation, ad injection, adverts, sticky widgets, amazon, banners, automatic insertion, amp, geo targeting, multisite, shortcodes, PHP, Javascript, HTML, header, footer, tracking
+Tags: ads, adsense, ad management, advertising manager, advanced contextual ads, ad rotation, ad injection, adverts, sticky widgets, sticky sidebar, amazon, banners, automatic insertion, amp, geo targeting, multisite, shortcodes, PHP, Javascript, HTML, header, footer, tracking, ad blocking, custom fields
 Requires at least: 4.0
-Tested up to: 4.8
-Requires PHP: 5.2
-Stable tag: 2.2.1
+Tested up to: 4.8.2
+Requires PHP: 5.2.4
+Stable tag: 2.2.2
 License: GPLv3
 
 Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
@@ -41,13 +41,15 @@ Ad Inserter is more than just ad manager plugin. It provides many advanced optio
 > *   Insert Google Analytics, Piwik or any other web analytics code
 > *   Insert HTML, CSS, Javascript or PHP code
 > *   Manual insertion: widgets, shortcodes, PHP function call
-> *   Sticky (fixed) widgets (the sidebar does not move when the page is scrolled, works with most themes)
-> *   Custom block alignment and style
-> *   Insert ads on AMP pages
+> *   Sticky (fixed) widgets (sticky sidebar - the sidebar does not move when the page is scrolled)
+> *   Custom block alignments and styles
+> *   Insert (different) ads on AMP pages
 > *   Custom CSS class name for wrapping divs to avoid ad blockers
 > *   Use shortcodes from other plugins
+> *   Use custom fields as defined in posts
 > *   PHP code processing
 > *   Ad rotation (server-side and client-side - works with caching)
+> *   Ad blocking detection - popup message, page redirection
 > *   Desktop/mobile device detection (server-side and client-side - works with caching)
 > *   Black/White-list categories, tags, taxonomies, post IDs, urls, url query parameters, referers
 > *   Simple troubleshooting with many debugging functions
@@ -64,6 +66,8 @@ And Ad Inserter Pro - all-in-one <a href="http://adinserter.pro/" target="_blank
 > *   A/B testing
 > *   Sticky ad positions (left, top, right, bottom)
 > *   Scheduling with fallback option
+> *   Ad blocking detection - ad replacement, content protection
+> *   Ad blocking statistics
 > *   Multisite options to limit settings on the sites
 > *   Post/page exception management
 > *   6 custom viewports for client-side desktop/mobile device detection
@@ -117,11 +121,10 @@ Few very important things you need to know in order to <a href="http://adinserte
 *   **Enable and use at least one insertion option** (Automatic insertion, Widget, Shortcode, PHP function call)
 *   **Enable insertion on at least one <a href="https://adinserter.pro/page-types">Wordpress page type</a>** (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages)
 *   For Posts and Static pages **leave default BLANK selection value** after the checkbox unless you really know what are you doing (using individual exceptions)
-*   If you don't see inserted code block turn on **debugging functions**: Label inserted blocks, Show available positions for automatic insertion (Ad Inserter menu item in the Wordpress toolbar on the top of every post/page)
-*   If you are using AdSense you may get blank (empty) ad blocks.  This might be because there is some error in the code (wrong IDs), your Google AdSense account is not fully approved yet, your website was not accepted or your Google AdSense account is banned. Try <a href="http://bit.ly/2oF81Oh" target="_blank">Media net ads</a> - they seem to be a good alternative for contextual ads.
+*   If you don't see inserted code block, turn on **debugging functions**: Label inserted blocks, Show available positions for automatic insertion (Ad Inserter menu item in the Wordpress toolbar on the top of every post/page)
+*   If you are using AdSense you may get blank (empty) ad blocks. This might be because there is some error in the code (wrong IDs), your Google AdSense account is not fully approved yet, your website was not accepted or your Google AdSense account is banned. In such case you can try other ad networks for contextual ads. Check <a href="https://adinserter.pro/documentation#ads-not-displayed">Ads Not Displayed</a> for more information.
 
-Few typical settings are described on the <a href="https://wordpress.org/plugins/ad-inserter/faq/">FAQ</a> page. Please make sure you have also read <a href="https://wordpress.org/plugins/ad-inserter/installation/">Installation</a> page.
-For more detailed instructions please read <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation page</a>.
+Few typical settings are described on the <a href="https://wordpress.org/plugins/ad-inserter/faq/">FAQ</a> page. Please make sure you have also read <a href="https://wordpress.org/plugins/ad-inserter/installation/">Installation</a> page. For more detailed instructions please read <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation page</a>.
 
 **Please support plugin development**
 
@@ -232,6 +235,9 @@ Automatic Insertion Options:
 *   Insert Before Excerpt (on blog pages)
 *   Insert After Excerpt (on blog pages)
 *   Insert Between Posts (on blog pages)
+*   Insert Before Comments (on posts)
+*   Insert Between Comments (on posts)
+*   Insert After Comments (on posts)
 
 For single posts or static pages insertion position Before Post usually means position above the post/page title, for blog pages Before Post position means position above all the posts on the blog page.
 
@@ -390,34 +396,31 @@ Support the advancement of this plugin:
 3. Set automatic insertion option (for example: Before Post)
 4. Enable at least one page type (for example: Posts, some insertion options don't work on all page types)
 5. Save settings
-6. Check also <a href="http://adinserter.pro/settings" target="_blank">common settings</a>
+6. Check also <a href="http://adinserter.pro/settings" target="_blank">common Ad Inserter settings</a>
 7. Check inserted code on the posts
-8. Ads are not showing? Check <a href="https://adinserter.pro/documentation#ads-not-displayed" target="_blank">troubleshooting guide</a> to find out how to fix the problem.
+8. Ads are not showing? Check <a href="https://adinserter.pro/documentation#ads-not-displayed" target="_blank">troubleshooting guide</a> to find out what to check to fix the problem.
 
 
 = I have installed code for AdSense ads but the ad blocks are blank. =
 
 If you get blank ads then this might be because there is some error in the code (wrong IDs), your AdSense account is not fully approved yet, your website was not accepted or your AdSense account is banned.
-You can also try <a href="http://bit.ly/2oF81Oh" target="_blank">Media net ads</a> as good AdSense alternative for contextual ads.
-
+In such case you can try other ad networks for contextual ads. Check <a href="https://adinserter.pro/documentation#ads-not-displayed">Ads Not Displayed</a> for more information.
 
 = Settings for widget =
 
 *   Nothing needed, just enter the code and save settings - widget is enabled by default
 *   Go to Appearance / Widgets, drag Ad Inserter widget to the sidebar or any other widget position, select code block and click on Save
-*   Optionally you can enable Sticky widget - this means that this widget (and widgets below) will stay fixed in the sidebar when the page is scrolled, but please note that this may not work with all themes
+*   Optionally you can enable Sticky widget - this means that this widget (and widgets below) will stay fixed in the sidebar when the page is scrolled - Sticky Sidebar
 *   You can also make other widgets sticky even if you don't use Ad Inserter widgets - drag Ad Inserter widget to the sidebar ABOVE the top widget that needs to be sticky, select Dummy Widget for Block, check Sticky and save widget
-*   In general plugin settings (tab *) you can also define Sticky Widget Top Margin to precisely define top position where the first sticky widget will stop
+*   In general plugin settings (tab *) you can also define Sticky Widget Top Margin to precisely define top position where the first sticky widget will stick
 
-Additional note regarding *sticky widgets*:
+Additional note regarding *Sticky Widgets* - *Sticky Sidebars*:
 
-Sticky widgets work by changing sidebar CSS to `position: sticky;`. This works in most themes but not all.
+There are two modes for sticky widgets (or sticky sidebars) available as **Sticky widget mode** in general plugin settings (tab *):
 
-If your widgets and sidebar aren't sticking as expected the first thing to check are the rules applied to the sidebar parent containers.
-Specifically, look for any overflow property set on the parent. You can't use: `overflow: hidden`, `overflow: scroll` or `overflow: auto` on the parent of a `position: sticky` sidebar.
+*   CSS mode - This mode is the best approach but may not work with all themes. CSS mode works by changing sidebar CSS to `position: sticky`. This works with most themes but not all. If your widgets and sidebar aren't sticking as expected you can use **JavaScript mode** described below.
+*   JavaScript mode - This mode should work with practically all themes but may reload ads on page load when sticky sidebar is initialized.
 
-If your theme is not using overflow and still having problems it's worth checking if a height is set on the parent.
-This may constrain the sticky positioning, stopping it from occurring. Remove the height and see if that fixes the problem.
 
 = Settings for contextual Amazon Native Shopping Ads =
 
@@ -437,19 +440,19 @@ amzn_assoc_ad_type = "smart";
 amzn_assoc_marketplace = "amazon";
 amzn_assoc_region = "US";
 amzn_assoc_title = "Search Results from Amazon";
-amzn_assoc_default_search_phrase = "{smart_tag}";
+amzn_assoc_default_search_phrase = "[adinserter data='smart-tag']";
 amzn_assoc_default_category = "All";
 amzn_assoc_linkid = "cf1873f027a57f63cede634cfd444bea";
 </script>
 <script src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US"></script>`
 
-Use your own tracking id! Please note `{smart_tag}` as default search phrase. This makes this widget contextual. It will show products related to the tags for this post.
-You can also try with `{tag}', `{short_title}`, `{category}` or `{short_category}`. For more options check <a href="http://adinserter.pro/documentation#code-block-options" target="_blank">Ad Inserter documentation page</a>.
+Use your own tracking id! Please note `[adinserter data='smart_tag']` as default search phrase. This makes this widget contextual. It will show products related to the tags for this post.
+You can also try with `[adinserter data='tag']', `[adinserter data='short-title']`, `[adinserter data='category']` or `[adinserter data='short-category']`. For more options check <a href="http://adinserter.pro/documentation#code-block-options" target="_blank">Ad Inserter documentation page</a>.
 
 
 = Settings for ... =
 
-Check <a href="http://adinserter.pro/settings" target="_blank">common settings</a>
+Check <a href="http://adinserter.pro/settings" target="_blank">common Ad Inserter settings</a>
 
 
 = I wish to show ads side by side but not in the same block. How do I do this? =
@@ -472,7 +475,7 @@ Use block 3 to insert ads and make sure all 3 blocks are enabled for the same pa
 
 This happens because Ad Inserter processes posts last and therefore "sees" also content added by other plugins.
 
-Try to set Ad Inserter plugin priority to 10 (early processing, Ad Inserter settings - tab *).
+Try to set Ad Inserter plugin priority to 10 (early processing, Ad Inserter settings - tab * / tab General).
 
 
 = How can I replace deprecated tags {adinserter n} for manual insertion with new ones [adinserter block="n"] in all posts? =
@@ -488,35 +491,40 @@ If this is a sidebar widget then you can simply name the widget. In other cases 
 
 AD_CODE`
 
-Change title tag according to the theme style.
+Change the title tag according to the theme style.
 
 
 = I like the plugin. How can I support it? =
 
 *   Write a nice <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">review</a>
 *   <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4">Donate</a>
-*   Buy license for <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro</a>
+*   Buy the license for <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro</a>
 
 
 = How can I enable/disable ads on specific posts/pages? =
 
 There are two possible approaches.
 
-*   Approach with page/post exceptions - use this one if there are many exceptions:
+*   Approach with page/post exceptions - use this one if there are many exceptions (more than two):
 
 1. Go to Ad Inserter settings page and define default insertion options for post/page.
-2. Enable automatic insertion on posts/pages and choose default display: **On all**, **On all except selected** or **Only on selected**.
-3. Go to post/page editor and open **Ad Inserter Exceptions** meta box below.
-4. Check default insertion options for wanted code blocks.
-5. Set exceptions for this post or page.
+2. Enable automatic insertion on posts/pages and choose default insertion: **Individually disabled** or **Individually enabled**.
+3. Save settings.
+4. Go to post/page editor and open **Ad Inserter Individual Exceptions** meta box below.
+5. define insertion exceptions for this post or page.
+6. Save post/page.
+
+**Individually disabled** means that insertion will be by default enabled on all posts (according to the settings for this code block), but you will be able to disable insertion on individual posts or pages (in post/page editor).
+
+**Individually enabled** means that insertion will be by default disabled on all posts, but you will be able to enable insertion on individual posts or pages (in post/page editor) - of course, other settings (e.g. lists) for this code block will also apply.
 
 *   Approach with code block settings only - use this one if there are only few exceptions:
 
 1. Go to Ad Inserter settings page and define default insertion options for post/page.
-2. Enable automatic insertion On all Posts/Pages.
+2. Enable automatic insertion for Posts/Pages (use default value after checkbox - blank selection means no individual exceptions).
 3. Click on Lists, enter url (or space separated urls) for Urls, e.g. `/permalink-url`, and white-list or black-list it.
 
-For details check <a href="https://adinserter.pro/exceptions" target="_blank">Ad Inserter Post/Page Exceptions</a>.
+For details check <a href="https://adinserter.pro/exceptions" target="_blank">Individual Post/Page Exceptions</a>.
 
 
 = I'm using responsive theme. How can I show or hide some ads on mobile devices? =
@@ -538,7 +546,7 @@ To blacklist both enter `yourdomain.com, #`
 
 = How can I disable ads on error 404 page? =
 
-This is disabled by default. Uncheck Error 404 Page checkbox.
+This is disabled by default. Uncheck Error 404 Page checkbox (button Misc).
 
 
 = Is there a way to display country flag of the visitor? =
@@ -549,9 +557,9 @@ Possible if you are using Ad Inserter Pro. In the header put the following code:
 
 In the code block use the following code for flag
 
-`<span class="flag-icon flag-icon-{country_iso2}" style="width: 400px; height: 300px;"></span>`
+`<span class="flag-icon flag-icon-[adinserter data='country-iso2']" style="width: 400px; height: 300px;"></span>`
 
-Adjust width and height according to your needs. Please not that `{country_iso2}` tag works only server-side - it won't work on cached pages.
+Adjust width and height according to your needs. Please not that `[adinserter data='country_iso2']` tag works only server-side - it won't work on cached pages.
 Of course, you can also use static code for flags. For example, for United States:
 
 `<span class="flag-icon flag-icon-us" style="width: 400px; height: 300px;"></span>`
@@ -606,24 +614,25 @@ Some HTML/Javascript code
 
 = How can I insert post category name into my ad code? =
 
-1. Use {category} in the ad. This will be replaced with the post category name.
+1. Use `[adinserter data='category']` in the ad. This will be replaced with the post category name.
 2. You can also use
 
-*   {title} - Title of the post
-*   {short_title} - Short title (first 3 words) of the post title
-*   {category} - Category of the post (or short title if there is no category)
-*   {short_category} - First words before "," or "and" of the category of the post (or short title if there is no category)
-*   {tag} - The first tag or general tag if the post has no tags (**works only inside posts**)
-*   {smart_tag} - Smart selection of post tag in the following order:
+*   `[adinserter data='title']` - Title of the post
+*   `[adinserter data='short-title']` - Short title (first 3 words) of the post title
+*   `[adinserter data='category']` - Category of the post (or short title if there is no category)
+*   `[adinserter data='short-category']` - First words before "," or "and" of the category of the post (or short title if there is no category)
+*   `[adinserter data='tag']` - The first tag or general tag (button Misc / tab General) if the post has no tags (**works only inside posts**)
+*   `[adinserter data='smart-tag']` - Smart selection of post tag in the following order:
   *   If there is no tag then the category is used;
   *   If there is a two-word tag then it is used;
   *   If the first tag is a substring of the second (or vice versa) then the first tag is not taken into account
   *   If the first and second tags are single words then both words are used
   *   First three words of the first tag
-  *   General tag
-*   {search_query} - Search engine query that brought visitor to your website (supports Google, Yahoo, Bing and Ask search engines), {smart_tag} is used when there is no search query. You need to disable caching to use this tag. Please note that most search queries are now encrypted.
-*   {author} - Post author username (**works only inside posts**)
-*   {author_name} Post author name (**works only inside posts**)
+  *   General tag (button Misc / tab General)
+*   `[adinserter data='search-query']` - Search engine query that brought visitor to your website (supports Google, Yahoo, Bing and Ask search engines), [adinserter data='smart_tag} is used when there is no search query. You need to disable caching to use this tag. Please note that most search queries are now encrypted.
+*   `[adinserter data='author']` - Post author username (**works only inside posts**)
+*   `[adinserter data='author-name']` Post author name (**works only inside posts**)
+*   `[adinserter custom-field='CUSTOM_FIELD_NAME']` - Custom fields as <a href="https://codex.wordpress.org/Custom_Fields">defined in posts</a>
 
 For all options check <a href="http://adinserter.pro/documentation#code-block-options" target="_blank">Ad Inserter documentation page</a>.
 
@@ -644,8 +653,14 @@ ad_code_3`
 
 Normally the code will not be inserted on AMP pages. There are two settings that can be used to insert code on AMP pages:
 
-1. **AMP pages** checkbox in **Misc / Insertion** section - If checked it enables insertion also on AMP pages. Use this approach only if you need to insert the same code on normal and AMP pages. To insert different codes on AMP pages use **[ADINSERTER AMP]** separator as described below.
+1. **AMP pages** checkbox in **Misc / Insertion** section - If checked it enables insertion also on AMP pages. **Use this approach only if you need to insert the same code on normal and AMP pages.** To insert different codes on AMP pages use **[ADINSERTER AMP]** separator as described below.
 2. Separate the codes with **[ADINSERTER AMP]** separator - the code above the separator will be inserted on normal pages, the code below the separator will be inserted on AMP pages. This separator can be used also for **Header** and **Footer** code.
+
+The following AMP plugins have been tested with Ad Inserter:
+*   <a href="https://wordpress.org/plugins/accelerated-mobile-pages/" target="_blank">AMP for WP - Accelerated Mobile Pages</a> (free)
+*   <a href="https://wordpress.org/plugins/amp/" target="_blank">AMP</a> (free)
+*   <a href="https://wordpress.org/plugins/wp-amp-ninja/" target="_blank">WP AMP Ninja</a> (free)
+*   WP AMP - Accelerated Mobile Pages for WordPress (paid - you need to uncheck *Remove third-party the_content hooks for better compatibility*)
 
 For details check <a href="https://adinserter.pro/settings#amp" target="_blank">settings for ads on AMP pages</a>.
 
@@ -668,15 +683,14 @@ Example for block 3:
 
 `<?php if (function_exists ('adinserter')) echo adinserter (3); ?>`
 
-This would generate code as defined for the code block number 3.
+This would generate code as defined for the code block number 3. Before you modifu theme files it makes sense to create a <a href="https://codex.wordpress.org/Child_Themes" target="_blank">child theme</a> first.
 
 
 = Center alignment does not work for some ads! =
 
-Some ads can not be centered using standard approach so some different CSS code is needed to put them in the middle.
-Try to use the following custom CSS:
+Some ads can not be centered using the standard approach so some different CSS code is needed to put them in the middle.
 
-`margin: 8px 0; text-align: center; display: flex; justify-content: center;`
+In Preview window you can try alternative CSS code for centering the ad. Double-click on the icon for Center alignment and the code will toggle. The current code version is displayed next to Alignment and Style selection.
 
 
 = How can I rotate between different alignments so I can test an ad aligned to the right against an ad aligned to the left? =
@@ -716,6 +730,16 @@ AD CODE RIGHT
 
 
 == Changelog ==
+
+= 2.2.3 =
+- Added support to insert custom fields via shortcode [adinserter custom-field='CUSTOM_FIELD_NAME']
+- Added support for user:USERNAME and user-role:USER_ROLE taxonomy list items
+- Added support for post-type:POST_TYPE taxonomy list items
+- Added support for JavaScript based sticky widgets
+- Added support for ad blocking statistics (Pro only)
+- Added support for WP AMP and WP AMP Ninja plugins
+- Post/Page Word Count moved to Misc section (now works also on widgets)
+- Few minor bug fixes, cosmetic changes and code improvements
 
 = 2.2.2 =
 - Fix for mobile admin layout
@@ -814,6 +838,14 @@ AD CODE RIGHT
 - Bug fix for IP database update cron event (Pro only)
 
 == Upgrade Notice ==
+
+= 2.2.3 =
+Added support to insert custom fields via shortcode;
+Added support for user:USERNAME, user-role:USER_ROLE and post-type:POST_TYPE taxonomy list items;
+Added support for JavaScript based sticky widgets;
+Added support for ad blocking statistics (Pro only);
+Added support for WP AMP and WP AMP Ninja plugins;
+Post/Page Word Count moved to Misc section (now works also on widgets)
 
 = 2.2.2 =
 Fix for mobile admin layout;

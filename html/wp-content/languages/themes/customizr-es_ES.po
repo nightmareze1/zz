@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Themes - Customizr package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-08-04 17:24:29+0000\n"
+"PO-Revision-Date: 2017-09-22 16:49:36+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,11 +19,19 @@ msgstr "Customizr es un tema de WordPress versátil y fácil de personalizar, qu
 msgid "Customizr"
 msgstr "Customizr"
 
+#: core/czr-admin-ccat.php:535
+msgid "Thank you for using"
+msgstr "Gracias por usarlo"
+
+#: core/core-settings-map.php:2475
+msgid "Discover the features and benefits"
+msgstr "Descubre las nuevas características y ventajas"
+
 #: core/core-settings-map.php:546
 msgid "You need to enable your topbar to display social links in your header. Enable the topbar in this option panel, or %s."
 msgstr "Tienes que activar tu barra de navegación superior para mostrar los enlaces sociales en tu cabecera. Activa la barra de navegación superior en este panel de opciones, o %s."
 
-#: core/core-settings-map.php:1064 core/czr-admin-ccat.php:1574
+#: core/core-settings-map.php:1064 core/czr-admin-ccat.php:1556
 msgid "Apply a dark overlay on your slider's images"
 msgstr "Aplica capa oscura a las imágenes de tu carrusel"
 
@@ -281,11 +289,11 @@ msgstr "Cuando tus visitantes usen un teléfono inteligente o una tableta la cab
 msgid "jump to the topbar option"
 msgstr "ir a la opción de la barra de navegación superior"
 
-#: core/class-fire-resources_scripts.php:506
+#: core/class-fire-resources_scripts.php:507
 msgid "Customizr Demo 2"
 msgstr "Customizr Demo 2"
 
-#: core/class-fire-resources_scripts.php:504
+#: core/class-fire-resources_scripts.php:505
 msgid "Customizr Demo 1"
 msgstr "Customizr Demo 1"
 
@@ -305,35 +313,35 @@ msgstr "Mejora la velocidad de tu página cargando imágenes más pequeñas en l
 msgid "Primary color"
 msgstr "Color prinicipal"
 
-#: core/class-fire-resources_scripts.php:514
+#: core/class-fire-resources_scripts.php:515
 msgid "Permanently dismiss"
 msgstr "Descargar permanentemente"
 
-#: core/class-fire-resources_scripts.php:511
+#: core/class-fire-resources_scripts.php:512
 msgid "a short guide here."
 msgstr "aquí una guía breve."
 
-#: core/class-fire-resources_scripts.php:509
+#: core/class-fire-resources_scripts.php:510
 msgid "To help you getting started with Customizr, we have published"
 msgstr "Para ayudarte a empezar con Customizr hemos publicado"
 
-#: core/class-fire-resources_scripts.php:502
+#: core/class-fire-resources_scripts.php:503
 msgid "If you need inspiration, you can visit our online demos"
 msgstr "Si necesitas inspiración puedes visitar nuestras demos online"
 
-#: core/class-fire-resources_scripts.php:499
+#: core/class-fire-resources_scripts.php:500
 msgid "to let you create the best possible websites."
 msgstr "para permitirte crear las mejores webs posibles."
 
-#: core/class-fire-resources_scripts.php:498
+#: core/class-fire-resources_scripts.php:499
 msgid "of customization options"
 msgstr "de opciones de personalización"
 
-#: core/class-fire-resources_scripts.php:496
+#: core/class-fire-resources_scripts.php:497
 msgid "The theme offers a wide range"
 msgstr "El tema ofrece una amplia variedad"
 
-#: core/class-fire-resources_scripts.php:493
+#: core/class-fire-resources_scripts.php:494
 msgid "Welcome in the Customizr theme"
 msgstr "Bienvenido al tema Customizr"
 
@@ -437,67 +445,67 @@ msgstr "Publicado&nbsp;"
 msgid "by&nbsp;"
 msgstr "por&nbsp;"
 
-#: core/czr-admin-ccat.php:1339
+#: core/czr-admin-ccat.php:1321
 msgid "Enter the video url"
 msgstr "Introduce la url del vídeo"
 
-#: core/czr-admin-ccat.php:1335
+#: core/czr-admin-ccat.php:1317
 msgid "Video url"
 msgstr "URL del vídeo"
 
-#: core/czr-admin-ccat.php:1305
+#: core/czr-admin-ccat.php:1287
 msgid "Enter the audio url"
 msgstr "Introduce la url del audio"
 
-#: core/czr-admin-ccat.php:1301
+#: core/czr-admin-ccat.php:1283
 msgid "Audio url"
 msgstr "URL del audio"
 
-#: core/czr-admin-ccat.php:1274
+#: core/czr-admin-ccat.php:1256
 msgid "Enter the author"
 msgstr "Introduce el autor"
 
-#: core/czr-admin-ccat.php:1253
+#: core/czr-admin-ccat.php:1235
 msgid "Enter the text"
 msgstr "Introduce el texto"
 
-#: core/czr-admin-ccat.php:1248
+#: core/czr-admin-ccat.php:1230
 msgid "Quote text"
 msgstr "Texto de la cita"
 
-#: core/czr-admin-ccat.php:1268
+#: core/czr-admin-ccat.php:1250
 msgid "Quote author"
 msgstr "Cita del autor"
 
-#: core/czr-admin-ccat.php:1221
+#: core/czr-admin-ccat.php:1203
 msgid "Enter the URL"
 msgstr "Introduce la URL"
 
-#: core/czr-admin-ccat.php:1216
+#: core/czr-admin-ccat.php:1198
 msgid "Link URL"
 msgstr "URL del enlace"
 
-#: core/czr-admin-ccat.php:1200
+#: core/czr-admin-ccat.php:1182
 msgid "Enter the title"
 msgstr "Introduce el título"
 
-#: core/czr-admin-ccat.php:1195
+#: core/czr-admin-ccat.php:1177
 msgid "Link title"
 msgstr "Título del enlace"
 
-#: core/czr-admin-ccat.php:1163
+#: core/czr-admin-ccat.php:1145
 msgid "Format: audio"
 msgstr "Formato: audio"
 
-#: core/czr-admin-ccat.php:1151
+#: core/czr-admin-ccat.php:1133
 msgid "Format: video"
 msgstr "Formato: vídeo"
 
-#: core/czr-admin-ccat.php:1139
+#: core/czr-admin-ccat.php:1121
 msgid "Format: quote"
 msgstr "Formato: cita"
 
-#: core/czr-admin-ccat.php:1127
+#: core/czr-admin-ccat.php:1109
 msgid "Format: link"
 msgstr "Formato: enlace"
 
@@ -509,7 +517,7 @@ msgstr "Menú de navegación superior (horizontal)"
 msgid "Display in the topbar"
 msgstr "Mostrar en la barra superior"
 
-#: core/czr-admin-ccat.php:655
+#: core/czr-admin-ccat.php:637
 msgid "The Customizr Pro WordPress theme allows anyone to create a beautiful, professional and mobile friendly website in a few minutes. In the Pro version, you'll get all features included in the free version plus many conversion oriented ones, to help you attract and retain more visitors on your websites."
 msgstr "El tema WordPress Customizr Pro permite a cualquier crear una web bonita, profesional y adaptable a móviles en pocos minutos. En la versión Pro tendrás todas las funcionalidades incluidas en la versión gratuita además de muchas otras orientadas a la conversión, para ayudarte a atraer y retener más visitantes en tus webs."
 
@@ -525,7 +533,7 @@ msgstr "Nota: la posición centrada del logo sólo está disponible cuando"
 msgid "Menu centered"
 msgstr "Menú centrado"
 
-#: core/core-settings-map.php:1510 inc/czr-front-ccat.php:4750
+#: core/core-settings-map.php:1510 inc/czr-front-ccat.php:4751
 msgid "Don't know how to set a featured image to a page? Learn how in the %s."
 msgstr "No sabes cómo definir la imagen principal para una página? Aprende cómo en %s."
 
@@ -533,7 +541,7 @@ msgstr "No sabes cómo definir la imagen principal para una página? Aprende có
 msgid "You can display the featured image (also called the post thumbnail) of your pages before their content, when they are displayed individually."
 msgstr "Puedes mostrar la imagen principal (también llamada miniatura) de tus páginas antes del contenido, cuando se muestran individualmente."
 
-#: inc/czr-front-ccat.php:4746
+#: inc/czr-front-ccat.php:4747
 msgid "You can display your page's featured image here if you have set one."
 msgstr "Puedes mostrar la imagen principal de tu página aquí, si has definido una."
 
@@ -541,11 +549,11 @@ msgstr "Puedes mostrar la imagen principal de tu página aquí, si has definido 
 msgid "Single pages"
 msgstr "Páginas individuales"
 
-#: core/czr-customize-ccat.php:1015
+#: core/czr-customize-ccat.php:1017
 msgid "Options for"
 msgstr "Opciones para"
 
-#: core/czr-customize-ccat.php:1014
+#: core/czr-customize-ccat.php:1016
 msgid "Settings"
 msgstr "Ajustes"
 
@@ -553,11 +561,11 @@ msgstr "Ajustes"
 msgid "Use this field to test small chunks of CSS code. For important CSS customizations, it is recommended to modify the style.css file of a child theme."
 msgstr "Usa éste campo para probar pequeños fragmentos de código CSS. Para personalizaciones de CSS importantes, es recomendable modificar el archivo style.css de un tema hijo."
 
-#: core/czr-customize-ccat.php:2106
+#: core/czr-customize-ccat.php:2114
 msgid "default:"
 msgstr "por defecto:"
 
-#: core/core-settings-map.php:2475
+#: core/core-settings-map.php:2477
 msgid "Go Pro"
 msgstr "Actualiza a Pro"
 
@@ -585,23 +593,23 @@ msgstr "Mostrar eslogan en la cabecera"
 msgid "Create and organize your social links"
 msgstr "Crea y organiza tus enlaces sociales"
 
-#: inc/czr-front-ccat.php:9088
+#: inc/czr-front-ccat.php:9133
 msgid "Discover the Customizr WordPress theme &raquo;"
 msgstr "Descubre el tema Customizr WordPress &raquo;"
 
-#: core/czr-customize-ccat.php:2184
+#: core/czr-customize-ccat.php:2192
 msgid "No image selected"
 msgstr "No se ha seleccionado ninguna imagen"
 
-#: core/czr-customize-ccat.php:2183
+#: core/czr-customize-ccat.php:2191
 msgid "Default"
 msgstr "Predeterminado"
 
-#: core/czr-customize-ccat.php:2181
+#: core/czr-customize-ccat.php:2189
 msgid "Change Image"
 msgstr "Cambiar Imagen"
 
-#: core/czr-customize-ccat.php:2180 core/czr-customize-ccat.php:2185
+#: core/czr-customize-ccat.php:2188 core/czr-customize-ccat.php:2193
 msgid "Select Image"
 msgstr "Secciona Imagen"
 
@@ -613,139 +621,139 @@ msgstr "Cuando está activado, CSS e iconos de Font Awesome se cargarán en el f
 msgid "Yoast SEO breadcrumbs settings"
 msgstr "Ajustar migas de pan de Yoast SEO"
 
-#: core/czr-customize-ccat.php:1935
+#: core/czr-customize-ccat.php:1943
 msgid "Are you sure you want to remove : <strong>{{ data.title }} ?</strong>"
 msgstr "¿Seguro que quieres borrar?: <strong>{{ data.title }} ?</strong>"
 
-#: core/czr-customize-ccat.php:1928
+#: core/czr-customize-ccat.php:1936
 msgid "Add it"
 msgstr "Añadir"
 
-#: core/czr-customize-ccat.php:1928
+#: core/czr-customize-ccat.php:1936
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: core/czr-customize-ccat.php:1923
+#: core/czr-customize-ccat.php:1931
 msgid "Add New"
 msgstr "Nuevo"
 
-#: core/czr-customize-ccat.php:1741
+#: core/czr-customize-ccat.php:1743
 msgid "Press return or enter to open this panel"
 msgstr "Pulsa Intro para abrir este panel"
 
-#: core/czr-customize-ccat.php:1597
+#: core/czr-customize-ccat.php:1599
 msgid "Please fill the social link inputs with a valid URLs"
 msgstr "Por favor, rellena los enlaces sociales con URLs válidas"
 
-#: core/czr-customize-ccat.php:1553
+#: core/czr-customize-ccat.php:1555
 msgid "An error occurred: malformed social links"
 msgstr "Ha ocurrido un error: Enlaces sociales erróneos"
 
-#: core/czr-customize-ccat.php:1002
+#: core/czr-customize-ccat.php:1004
 msgid "The side on which the menu is revealed depends on the choosen header layout."
 msgstr "El lugar en el que aparece el menú depende de la elección del diseño del encabezado"
 
-#: core/czr-customize-ccat.php:999
+#: core/czr-customize-ccat.php:1001
 msgid "Slide"
 msgstr "Diapositiva"
 
-#: core/czr-customize-ccat.php:996
+#: core/czr-customize-ccat.php:998
 msgid "Close Editor"
 msgstr "Cerrar Editor"
 
-#: core/czr-customize-ccat.php:993 core/czr-customize-ccat.php:1013
+#: core/czr-customize-ccat.php:995 core/czr-customize-ccat.php:1015
 msgid "Learn more about this in the documentation"
 msgstr "Más información sobre esto en la documentación"
 
-#: core/czr-customize-ccat.php:992
+#: core/czr-customize-ccat.php:994
 msgid "New Social Link created ! Scroll down to edit it."
 msgstr "Se ha creado un nuevo enlace social! Desplaza hacia abajo para editarlo"
 
-#: core/czr-customize-ccat.php:991
+#: core/czr-customize-ccat.php:993
 msgid "Done !"
 msgstr "¡Hecho!"
 
-#: core/czr-customize-ccat.php:990
+#: core/czr-customize-ccat.php:992
 msgid "Follow us on"
 msgstr "Síguenos"
 
-#: core/czr-customize-ccat.php:2120
+#: core/czr-customize-ccat.php:2128
 msgid "Check this option to open the link in a another tab of the browser."
 msgstr "Selecciona esta opción para abrir el enlace en una nueva pestaña del navegador"
 
-#: core/czr-customize-ccat.php:2116
+#: core/czr-customize-ccat.php:2124
 msgid "Link target"
 msgstr "Destino del link"
 
-#: core/czr-customize-ccat.php:2062 core/czr-customize-ccat.php:2095
+#: core/czr-customize-ccat.php:2070 core/czr-customize-ccat.php:2103
 msgid "Enter the full url of your social profile (must be valid url)."
 msgstr "Introduzce la url completa de tu perfil social (debe ser una url válida)"
 
-#: core/czr-customize-ccat.php:2069
+#: core/czr-customize-ccat.php:2077
 msgid "Size in px"
 msgstr "Tamaño en px"
 
-#: core/czr-customize-ccat.php:2078
+#: core/czr-customize-ccat.php:2086
 msgid "Id"
 msgstr "Id"
 
-#: core/czr-customize-ccat.php:2084
+#: core/czr-customize-ccat.php:2092
 msgid "Social icon"
 msgstr "Icono social"
 
-#: core/czr-customize-ccat.php:2091
+#: core/czr-customize-ccat.php:2099
 msgid "Social link"
 msgstr "Enlace social"
 
-#: core/czr-customize-ccat.php:2100
+#: core/czr-customize-ccat.php:2108
 msgid "Enter a title"
 msgstr "Introduce un título"
 
-#: core/czr-customize-ccat.php:2102
+#: core/czr-customize-ccat.php:2110
 msgid "This is the text displayed on mouse over."
 msgstr "Es es el texto mostrado al pasar el ratón"
 
-#: core/czr-customize-ccat.php:2106
+#: core/czr-customize-ccat.php:2114
 msgid "Icon color"
 msgstr "Color del icono"
 
-#: core/czr-customize-ccat.php:2110
+#: core/czr-customize-ccat.php:2118
 msgid "Set a unique color for your icon."
 msgstr "Selecciona un único color para tu icono"
 
-#: core/czr-customize-ccat.php:2060 core/czr-customize-ccat.php:2093
+#: core/czr-customize-ccat.php:2068 core/czr-customize-ccat.php:2101
 msgid "http://...,mailto:...,..."
 msgstr "http://...,mailto:...,..."
 
-#: core/czr-customize-ccat.php:2058
+#: core/czr-customize-ccat.php:2066
 msgid "Social link url"
 msgstr "Dirección del link social"
 
-#: core/czr-customize-ccat.php:987
+#: core/czr-customize-ccat.php:989
 msgid "Not set"
 msgstr "No definido"
 
-#: core/czr-customize-ccat.php:2186
+#: core/czr-customize-ccat.php:2194
 msgid "Choose Image"
 msgstr "Elige una imagen"
 
-#: core/core-settings-map.php:1068 core/czr-customize-ccat.php:1936
+#: core/core-settings-map.php:1068 core/czr-customize-ccat.php:1944
 msgid "Yes"
 msgstr "Sí"
 
-#: core/czr-customize-ccat.php:989
+#: core/czr-customize-ccat.php:991
 msgid "Select a social icon"
 msgstr "Selecciona un icono social"
 
-#: core/czr-customize-ccat.php:988
+#: core/czr-customize-ccat.php:990
 msgid "Rss"
 msgstr "Rss"
 
-#: core/czr-customize-ccat.php:2052
+#: core/czr-customize-ccat.php:2060
 msgid "Select an icon"
 msgstr "Elige un icono"
 
-#: core/czr-customize-ccat.php:998
+#: core/czr-customize-ccat.php:1000
 msgid "New Slide created ! Scroll down to edit it."
 msgstr "¡Nueva diapositiva creada! Desplázate hacia abajo para editarla."
 
@@ -918,15 +926,7 @@ msgstr "Si se activa tus diapositivas se desplazan más lentas que la página (e
 msgid "Sliders : use parallax scrolling"
 msgstr "Diapositivas: usar desplazamiento parallax"
 
-#: core/czr-admin-ccat.php:582
-msgid "Get support"
-msgstr "Obtener soporte"
-
-#: core/czr-admin-ccat.php:578
-msgid "Code snippets for developers"
-msgstr "Fragmentos de código para desarrolladores"
-
-#: core/czr-admin-ccat.php:582
+#: core/czr-admin-ccat.php:564
 msgid "Get help in the free support forum"
 msgstr "Obtenga ayuda en el Forum gratuito"
 
@@ -1003,31 +1003,31 @@ msgstr "Texto del botón del carrusel de entradas"
 msgid "Front page slider name"
 msgstr "Nombre del carrusel de la página principal"
 
-#: inc/czr-front-ccat.php:9746 templates/parts/footer/footer_credits.php:12
+#: inc/czr-front-ccat.php:9759 templates/parts/footer/footer_credits.php:12
 msgid "Powered by WordPress"
 msgstr "Creado con WordPress"
 
-#: inc/czr-front-ccat.php:9745 templates/parts/footer/footer_credits.php:12
+#: inc/czr-front-ccat.php:9758 templates/parts/footer/footer_credits.php:12
 msgid "Powered by"
 msgstr "Creado con"
 
-#: inc/czr-front-ccat.php:8960
+#: inc/czr-front-ccat.php:9005
 msgid "Customize or remove %s"
 msgstr "Personalizar o eliminar %s"
 
-#: inc/czr-init-ccat.php:4794
+#: inc/czr-init-ccat.php:4795
 msgid "%s and check the option 'Load images on scroll' under 'Website Performances' section."
 msgstr "%s y marca la opción \"cargar las imágenes al desplazar el ratón\" en la sección \"optimización del sitio web\"."
 
-#: inc/czr-init-ccat.php:4793
+#: inc/czr-init-ccat.php:4794
 msgid "Did you know you can easily speed up your page load by deferring the loading of the non visible images?"
 msgstr "¿Sabías que puedes mejorar la velocidad de carga de tu página retardando la carga de las imágenes no visibles de tu página?"
 
-#: inc/czr-front-ccat.php:8961
+#: inc/czr-front-ccat.php:9006
 msgid "this slider"
 msgstr "este carrusel"
 
-#: inc/czr-front-ccat.php:8961
+#: inc/czr-front-ccat.php:9006
 msgid "the posts slider"
 msgstr "el carrusel de entradas"
 
@@ -1052,7 +1052,7 @@ msgid "Click inside the above field and pick post categories you want to display
 msgstr "Haz clic dentro del campo situado encima y elige las categorías que quieres mostrar. No se aplicarán filtros si está vacío."
 
 #: core/front/models/modules/slider/class-model-slider_of_posts.php:405
-#: inc/czr-front-ccat.php:9450
+#: inc/czr-front-ccat.php:9495
 msgid "There is no excerpt because this is a protected post."
 msgstr "No hay extracto porque es una entrada protegida."
 
@@ -1065,7 +1065,7 @@ msgid "Call to action button"
 msgstr "Botón de llamada a la acción"
 
 #: core/front/models/modules/slider/class-model-slider_of_posts.php:382
-#: inc/czr-front-ccat.php:9425
+#: inc/czr-front-ccat.php:9470
 msgid "Protected: %s"
 msgstr "Protegido: %s"
 
@@ -1101,7 +1101,7 @@ msgstr "Slide completo y botón de llamada a la acción"
 msgid "Customize or remove this slider"
 msgstr "Personaliza o elimina este carrusel"
 
-#: core/core-functions.php:1274
+#: core/core-functions.php:1289
 msgid "&mdash; Auto-generated slider from your blog posts &mdash;"
 msgstr "&mdash; Carrusel autogenerado con las entradas de tu blog &mdash;"
 
@@ -1121,35 +1121,35 @@ msgstr "Actualizar a Customizr Pro"
 msgid "Only the posts with a featured image or at least an image inside their content will qualify for the slider. The number of post slides displayed won't exceed the number of available posts in your website."
 msgstr "Sólo las entradas con una imagen destacada o al menos una imagen en su contenido aparecerán en el carrusel. El número de diapositivas mostradas no superará el número de entradas disponibles en tu sitio web."
 
-#: core/czr-admin-ccat.php:2442
+#: core/czr-admin-ccat.php:2406
 msgid "Slider documentation"
 msgstr "Documentación del carrusel"
 
-#: core/czr-admin-ccat.php:2440
+#: core/czr-admin-ccat.php:2404
 msgid "For more informations about sliders, check the documentation page :"
 msgstr "Para más información acerca de los carruseles, revisa la página de documentación:"
 
-#: core/czr-admin-ccat.php:2439
+#: core/czr-admin-ccat.php:2403
 msgid "To add another slide : navigate to your media library (click on Media), open the edit screen of an image ( or add a new image ), and add it to your desired slider by using the dedicated option block at the bottom of the page."
 msgstr "Para añadir una nueva diapositiva: dirígete a la biblioteca de medios (haz clic en Medios), abre la ventana de edición de una imagen (o añade una nueva imagen) y añádela al carrusel que desees usando el bloque de opciones del final de la página."
 
-#: core/czr-customize-ccat.php:1000
+#: core/czr-customize-ccat.php:1002
 msgid "This option generates a home page slider based on your last posts, starting from the most recent or the featured (sticky) post(s) if any."
 msgstr "Esta opción genera un carrusel en la página principal basado en tus últimas entradas, comenzando por las entradas más recientes o destacadas (fijas) si se ha marcado alguna como tal."
 
-#: core/czr-customize-ccat.php:629
+#: core/czr-customize-ccat.php:631
 msgid "SITE ICON"
 msgstr "ICONO DEL SITIO"
 
-#: core/czr-customize-ccat.php:1003
+#: core/czr-customize-ccat.php:1005
 msgid "To change the global header layout, %s"
 msgstr "Para modificar la plantilla global de tu cabecera, %s"
 
-#: core/czr-customize-ccat.php:1007
+#: core/czr-customize-ccat.php:1009
 msgid "Change the header layout"
 msgstr "Cambiar el diseño de la cabecera"
 
-#: core/czr-customize-ccat.php:1006
+#: core/czr-customize-ccat.php:1008
 msgid "jump to the Design and Layout section"
 msgstr "Ir a la selección de Diseño y Estructura"
 
@@ -1203,12 +1203,12 @@ msgstr "Ahora puedes mostrar tu menú verticalmente y preparado para dispositivo
 msgid "Menu"
 msgstr "Menu"
 
-#: core/czr-customize-ccat.php:986 inc/czr-front-ccat.php:857
+#: core/czr-customize-ccat.php:988 inc/czr-front-ccat.php:857
 #: inc/czr-front-ccat.php:864
 msgid "Close"
 msgstr "Cerrar"
 
-#: inc/czr-front-ccat.php:8019 inc/czr-front-ccat.php:9656
+#: inc/czr-front-ccat.php:8064 inc/czr-front-ccat.php:9669
 msgid "dismiss this notice"
 msgstr "Ignorar ese aviso"
 
@@ -1228,11 +1228,11 @@ msgstr "modificar el menú por defecto"
 msgid "If you have already created menu(s), you can %s. If you need to create a new menu, jump to the %s."
 msgstr "Si ya has creado uno o varios menús, puedes %s. Si necesitas crear un menú nuevo dirígete a %s."
 
-#: inc/czr-front-ccat.php:4747 inc/czr-front-ccat.php:5079
+#: inc/czr-front-ccat.php:4748 inc/czr-front-ccat.php:5080
 msgid "%s to display a featured image here."
 msgstr "%s para mostrar la imagen destacada aquí."
 
-#: inc/czr-front-ccat.php:5078
+#: inc/czr-front-ccat.php:5079
 msgid "You can display your post's featured image here if you have set one."
 msgstr "Puedes mostrar la imagen destacada de tus entradas aquí si has elegido una."
 
@@ -1244,8 +1244,8 @@ msgstr "Editar ahora."
 msgid "Remove the featured pages"
 msgstr "Borrar las páginas destacadas"
 
-#: inc/czr-front-ccat.php:3596 inc/czr-front-ccat.php:8016
-#: inc/czr-front-ccat.php:9019 inc/czr-front-ccat.php:9654
+#: inc/czr-front-ccat.php:3596 inc/czr-front-ccat.php:8061
+#: inc/czr-front-ccat.php:9064 inc/czr-front-ccat.php:9667
 msgid "now"
 msgstr "ahora"
 
@@ -1261,11 +1261,11 @@ msgstr "Editar esas páginas destacadas %s, o %s (podrás añadir tus páginas d
 msgid "( If you don't have any pages in your website, then this side menu is empty for the moment. )"
 msgstr "(Si no tienes ninguna página en tu sitio web, este menú lateral está, por el momento, vacío.)"
 
-#: inc/czr-front-ccat.php:8828 templates/parts/modules/slider/slide.php:9
+#: inc/czr-front-ccat.php:8873 templates/parts/modules/slider/slide.php:9
 msgid "Go to"
 msgstr "Ir a"
 
-#: inc/czr-front-ccat.php:9653
+#: inc/czr-front-ccat.php:9666
 msgid "Add widgets to the footer %s or %s."
 msgstr "Añadir elementos al pie de página %s o %s"
 
@@ -1273,12 +1273,12 @@ msgstr "Añadir elementos al pie de página %s o %s"
 msgid "Socials in Sidebars"
 msgstr "Redes Sociales en las barras laterales"
 
-#: inc/czr-front-ccat.php:8008
+#: inc/czr-front-ccat.php:8053
 msgid "The %s sidebar has no widgets."
 msgstr "La barra lateral %s no tiene elementos"
 
-#: inc/czr-front-ccat.php:4748 inc/czr-front-ccat.php:5080
-#: inc/czr-init-ccat.php:4795
+#: inc/czr-front-ccat.php:4749 inc/czr-front-ccat.php:5081
+#: inc/czr-init-ccat.php:4796
 msgid "Jump to the customizer now"
 msgstr "Ir al personalizador ahora"
 
@@ -1290,23 +1290,23 @@ msgstr "Este es el menú de página por defecto."
 msgid "remove them"
 msgstr "Eliminarlos"
 
-#: inc/czr-front-ccat.php:8012
+#: inc/czr-front-ccat.php:8057
 msgid "Add widgets to this sidebar %s or %s."
 msgstr "Añade widgets a esta barra lateral %s o %s."
 
-#: inc/czr-front-ccat.php:9018
+#: inc/czr-front-ccat.php:9063
 msgid "Select your own slider %s, or %s (you'll be able to add one back later)."
 msgstr "Selecciona tu propio carrusel %s, o %s (podrás añadir uno de nuevo más tarde)."
 
-#: inc/czr-front-ccat.php:9019
+#: inc/czr-front-ccat.php:9064
 msgid "Select your own slider"
 msgstr "Selecciona tu propio carrusel"
 
-#: inc/czr-front-ccat.php:9020
+#: inc/czr-front-ccat.php:9065
 msgid "Remove the home page slider"
 msgstr "Quitar el carrusel de la página principal"
 
-#: inc/czr-front-ccat.php:9020
+#: inc/czr-front-ccat.php:9065
 msgid "remove this demo slider"
 msgstr "borra este carrusel de demostración"
 
@@ -1355,7 +1355,7 @@ msgstr "Mostrar los avisos de asistencia en el panel de administración para los
 msgid "Stick the footer to the bottom of the page"
 msgstr "Fijar el pie de página al final de la página."
 
-#: core/core-settings-map.php:1451 inc/czr-front-ccat.php:5082
+#: core/core-settings-map.php:1451 inc/czr-front-ccat.php:5083
 msgid "Don't know how to set a featured image to a post? Learn how in the %s."
 msgstr "¿No sabes asignar una imagen destacada a tus entradas? Aprende cómo hacerlo en %s."
 
@@ -1491,58 +1491,42 @@ msgstr "esta opción puede crear conflictos con algunos plugins, asegúrate que 
 msgid "This setting might impact the side on which the menu is revealed."
 msgstr "Este ajuste puede afectar al lugar donde aparece el menú."
 
-#: core/czr-admin-ccat.php:593
+#: core/czr-admin-ccat.php:575
 msgid "Thank you for using %s!"
 msgstr "¡Gracias por usar %s!"
 
-#: core/czr-admin-ccat.php:561
-msgid "home page"
-msgstr "página principal"
-
-#: core/czr-admin-ccat.php:602
+#: core/czr-admin-ccat.php:584
 msgid "demo website"
 msgstr "Página de demostración"
 
-#: core/czr-admin-ccat.php:649
+#: core/czr-admin-ccat.php:631
 msgid "Go Customizr Pro"
 msgstr "Ir a Customizr Pro"
 
-#: core/czr-admin-ccat.php:595
+#: core/czr-admin-ccat.php:577
 msgid "check the changelog"
 msgstr "Ver el historial de cambios"
 
-#: core/czr-admin-ccat.php:599
+#: core/czr-admin-ccat.php:581
 msgid "The best way to start with %s is to read the %s and visit the %s."
 msgstr "La mejor manera de empezar con %s es leer el %s y visitar el %s."
 
-#: core/czr-admin-ccat.php:594
+#: core/czr-admin-ccat.php:576
 msgid "%s %s has more features, is safer and more stable than ever to help you designing an awesome website."
 msgstr "%s %s tiene más funciones, es más seguro y estable que nunca para ayudarte a diseñar un fantástico sitio web"
 
-#: core/czr-admin-ccat.php:560
-msgid "The easiest way to search in the support forums is to use our Google powered search engine on our %s."
-msgstr "La manera mas fácil de buscar en los foros de soporte es usar el motor de búsqueda de Google en nuestro %s"
-
-#: core/czr-admin-ccat.php:559
+#: core/czr-admin-ccat.php:552
 msgid "If you don't find an answer to your issue in the documentation, don't panic! The Customizr theme is used by a growing community of webmasters reporting bugs and making continuous improvements. If you have a problem with the theme, chances are that it's already been reported and fixed in the support forums."
 msgstr "Si no encuentras respuesta a tu problema en la documentación, no te preocupes! El tema Customizr es usado por una creciente comunidad de webmasters, quienes reportan errores y hacen continuas mejoras. Si tienes algún problema con el tema, hay muchas posibilidades que haya sido ya reportado y arreglado en los foros de soporte"
 
-#: core/czr-admin-ccat.php:541
-msgid "Welcome to"
-msgstr "Bienvenido a"
-
-#: core/czr-admin-ccat.php:555 core/czr-admin-ccat.php:601
+#: core/czr-admin-ccat.php:548 core/czr-admin-ccat.php:583
 #: inc/czr-front-ccat.php:1083
 msgid "documentation"
 msgstr "documentación "
 
-#: core/czr-admin-ccat.php:554
+#: core/czr-admin-ccat.php:547
 msgid "The best way to start is to read the %s."
 msgstr "La mejor forma de empezar es leer la %s"
-
-#: core/czr-admin-ccat.php:536
-msgid "Need help with"
-msgstr "Necesitas ayuda con "
 
 #: core/czr-admin-ccat.php:366
 msgid "version"
@@ -1572,24 +1556,24 @@ msgstr "Bien, has actualizado a"
 msgid "We'd like to introduce the new features we've been working on."
 msgstr "Nos gustaría mostrarte las nuevas funciones en las que hemos estado trabajando."
 
-#: core/czr-admin-ccat.php:2357
+#: core/czr-admin-ccat.php:2321
 msgid "Link"
 msgstr "Enlace"
 
-#: core/czr-admin-ccat.php:2160
+#: core/czr-admin-ccat.php:2126
 msgid "Link the whole slide"
 msgstr "Enlazar la diapositiva completa"
 
-#: core/czr-admin-ccat.php:2153
+#: core/czr-admin-ccat.php:2119
 msgid "Open link in a new page/tab"
 msgstr "Abrir el enlace en una nueva página o pestaña"
 
 #: core/core-settings-map.php:1452 core/core-settings-map.php:1511
-#: inc/czr-front-ccat.php:4751 inc/czr-front-ccat.php:5083
+#: inc/czr-front-ccat.php:4752 inc/czr-front-ccat.php:5084
 msgid "WordPress documentation"
 msgstr "Documentación de WordPress"
 
-#: core/czr-admin-ccat.php:2147
+#: core/czr-admin-ccat.php:2113
 msgid "or a custom link (leave this empty if you already selected a page or post above)"
 msgstr "o un enlace personalizado (déjalo en blanco si ya seleccionaste una pagina o post arriba)"
 
@@ -1597,7 +1581,7 @@ msgstr "o un enlace personalizado (déjalo en blanco si ya seleccionaste una pag
 msgid "Custom Page Example"
 msgstr "Ejemplo de página personalizada"
 
-#: inc/czr-front-ccat.php:9770
+#: inc/czr-front-ccat.php:9783
 msgid "Back to top"
 msgstr "Volver arriba"
 
@@ -1606,31 +1590,31 @@ msgstr "Volver arriba"
 msgid "Add a menu"
 msgstr "Añadir un menú"
 
-#: inc/czr-front-ccat.php:8004 inc/czr-front-ccat.php:9645
+#: inc/czr-front-ccat.php:8049 inc/czr-front-ccat.php:9658
 msgid "This block is visible for admin users only."
 msgstr "Este bloque sólo es visible para los usuarios administradores"
 
-#: inc/czr-front-ccat.php:8015 inc/czr-front-ccat.php:9654
+#: inc/czr-front-ccat.php:8060 inc/czr-front-ccat.php:9667
 msgid "Add widgets"
 msgstr "Añadir elementos"
 
-#: inc/czr-front-ccat.php:8028
+#: inc/czr-front-ccat.php:8073
 msgid "See the theme documentation."
 msgstr "Ver la documentación del tema."
 
 #: inc/czr-front-ccat.php:805 inc/czr-front-ccat.php:1060
 #: inc/czr-front-ccat.php:1087 inc/czr-front-ccat.php:3601
-#: inc/czr-front-ccat.php:4755 inc/czr-front-ccat.php:5087
-#: inc/czr-front-ccat.php:8032 inc/czr-front-ccat.php:9024
-#: inc/czr-front-ccat.php:9662 inc/czr-init-ccat.php:4799
+#: inc/czr-front-ccat.php:4756 inc/czr-front-ccat.php:5088
+#: inc/czr-front-ccat.php:8077 inc/czr-front-ccat.php:9069
+#: inc/czr-front-ccat.php:9675 inc/czr-init-ccat.php:4800
 msgid "dismiss notice"
 msgstr "Omitir esta alerta"
 
-#: inc/czr-front-ccat.php:9649
+#: inc/czr-front-ccat.php:9662
 msgid "The footer has no widgets"
 msgstr "El pie de página no tiene elementos"
 
-#: inc/czr-front-ccat.php:8025
+#: inc/czr-front-ccat.php:8070
 msgid "You can also remove this sidebar by changing the current page layout."
 msgstr "También puedes borrar la barra lateral cambiando la plantilla de la página actual."
 
@@ -1639,7 +1623,7 @@ msgid "Back Home"
 msgstr "Volver a la página principal"
 
 #: core/front/models/modules/slider/class-model-slider.php:387
-#: inc/czr-front-ccat.php:9094
+#: inc/czr-front-ccat.php:9139
 msgid "Check the slider doc now &raquo;"
 msgstr "Revisar la documentación del carrusel de la página principal &raquo;"
 
@@ -1652,184 +1636,184 @@ msgid "Check the front page slider doc &raquo;"
 msgstr "Revisar la documentación del carrusel de la página principal &raquo;"
 
 #: core/front/models/modules/slider/class-model-slider.php:379
-#: inc/czr-front-ccat.php:9092
+#: inc/czr-front-ccat.php:9137
 msgid "Discover how to replace or remove this demo slider."
 msgstr "Descubre como eliminar o modificar este carrusel de demostración."
 
-#: inc/czr-front-ccat.php:8027
+#: inc/czr-front-ccat.php:8072
 msgid "Changing the layout in the Customizr theme"
 msgstr "Cambia el diseñe en el tema Customizr"
 
-#: inc/czr-front-ccat.php:7457
+#: inc/czr-front-ccat.php:7502
 msgid "Newer posts <span class=\"meta-nav\">&rarr;</span>"
 msgstr "Entradas siguientes <span class=\"meta-nav\">&rarr;</span>"
 
-#: inc/czr-front-ccat.php:7437
+#: inc/czr-front-ccat.php:7482
 msgid "<span class=\"meta-nav\">&larr;</span> Older posts"
 msgstr "<span class=\"meta-nav\">&larr;</span> Entradas más antiguas"
 
-#: inc/czr-front-ccat.php:7259
+#: inc/czr-front-ccat.php:7304
 msgid "by"
 msgstr "por"
 
-#: inc/czr-front-ccat.php:7369 inc/czr-front-ccat.php:7424
+#: inc/czr-front-ccat.php:7414 inc/czr-front-ccat.php:7469
 #: templates/parts/content/singular/navigation/singular_posts_navigation.php:35
 msgid "Post navigation"
 msgstr "Navegación de la entrada"
 
-#: inc/czr-front-ccat.php:7186
+#: inc/czr-front-ccat.php:7231
 msgid "Open"
 msgstr "Abierto"
 
-#: inc/czr-front-ccat.php:7236
+#: inc/czr-front-ccat.php:7281
 msgid "tagged"
 msgstr "Etiquetado"
 
 #: core/front/models/content/post-metas/class-model-post_metas.php:128
-#: inc/czr-front-ccat.php:7166
+#: inc/czr-front-ccat.php:7211
 msgid "View all posts by %s"
 msgstr "Ver todas las entradas de %s"
 
-#: inc/czr-front-ccat.php:6859
+#: inc/czr-front-ccat.php:6904
 msgid "Return to "
 msgstr "Volver a"
 
 #: core/front/models/content/post-metas/class-model-post_metas.php:176
-#: inc/czr-front-ccat.php:7031
+#: inc/czr-front-ccat.php:7076
 msgid "View all posts in %s"
 msgstr "Ver todas las entradas en %s"
 
-#: inc/czr-front-ccat.php:6950 inc/czr-front-ccat.php:6952
+#: inc/czr-front-ccat.php:6995 inc/czr-front-ccat.php:6997
 msgid "by %1$s"
 msgstr "por %1$s"
 
-#: inc/czr-front-ccat.php:6966
+#: inc/czr-front-ccat.php:7011
 msgid "(updated %s days ago)"
 msgstr "(actualizado hace %s dias)"
 
-#: inc/czr-front-ccat.php:6966
+#: inc/czr-front-ccat.php:7011
 msgid "(updated today)"
 msgstr "(actualizado hoy)"
 
-#: inc/czr-front-ccat.php:6950
+#: inc/czr-front-ccat.php:6995
 msgid "This entry was posted"
 msgstr "Esta entrada ha sido publicada"
 
-#: inc/czr-front-ccat.php:6967
+#: inc/czr-front-ccat.php:7012
 msgid "(updated 1 day ago)"
 msgstr "(actualizada hace 1 día)"
 
-#: inc/czr-front-ccat.php:6970
+#: inc/czr-front-ccat.php:7015
 msgid "(updated on %1$s)"
 msgstr "(actualizado el %1$s)"
 
-#: inc/czr-front-ccat.php:6921
+#: inc/czr-front-ccat.php:6966
 msgid "This entry was posted in %1$s and tagged %2$s"
 msgstr "Esta entrada se publicó en %1$s y se etiquetó como %2$s"
 
-#: inc/czr-front-ccat.php:6923
+#: inc/czr-front-ccat.php:6968
 msgid "This entry was posted in %1$s"
 msgstr "Artículo publicado en %1$s"
 
-#: inc/czr-front-ccat.php:6925
+#: inc/czr-front-ccat.php:6970
 msgid "This entry was tagged %2$s"
 msgstr "Artículo etiquetado como %2$s"
 
-#: inc/czr-front-ccat.php:6934
+#: inc/czr-front-ccat.php:6979
 msgid "This entry was posted on %1$s"
 msgstr "Artículo publicado el %1$s"
 
-#: inc/czr-front-ccat.php:6936
+#: inc/czr-front-ccat.php:6981
 msgid "on %1$s"
 msgstr "en %1$s"
 
-#: inc/czr-front-ccat.php:6938
+#: inc/czr-front-ccat.php:6983
 msgid "and posted on %1$s"
 msgstr "y publicado el %1$s"
 
-#: inc/czr-front-ccat.php:6859 inc/czr-front-ccat.php:7235
+#: inc/czr-front-ccat.php:6904 inc/czr-front-ccat.php:7280
 msgid "in"
 msgstr "en"
 
-#: inc/czr-front-ccat.php:6858
+#: inc/czr-front-ccat.php:6903
 msgid "Link to full-size image"
 msgstr "Enlace a imagen en tamaño completo"
 
-#: inc/czr-front-ccat.php:6858
+#: inc/czr-front-ccat.php:6903
 msgid "at dimensions"
 msgstr "en dimensiones"
 
-#: inc/czr-front-ccat.php:6855
+#: inc/czr-front-ccat.php:6900
 msgid "Published"
 msgstr "Publicada"
 
-#: inc/czr-front-ccat.php:6835
+#: inc/czr-front-ccat.php:6880
 msgid "This entry was posted on %1$s<span class=\"by-author\"> by %2$s</span>."
 msgstr "Artículo publicado el %1$s<span class=\"by-author\"> por %2$s</span>."
 
-#: inc/czr-front-ccat.php:5012
+#: inc/czr-front-ccat.php:5013
 msgid "View all posts by %s <span class=\"meta-nav\">&rarr;</span>"
 msgstr "Ver todas las entradas de %s <span class=\"meta-nav\">&rarr;</span>"
 
-#: inc/czr-front-ccat.php:4667 inc/czr-front-ccat.php:4970
-#: inc/czr-front-ccat.php:5433
+#: inc/czr-front-ccat.php:4668 inc/czr-front-ccat.php:4971
+#: inc/czr-front-ccat.php:5439
 msgid "Pages:"
 msgstr "Páginas:"
 
 #: core/front/models/content/post-lists/item-parts/contents/class-model-post_list_item_content_inner.php:183
-#: inc/czr-front-ccat.php:4665 inc/czr-front-ccat.php:4969
-#: inc/czr-front-ccat.php:5431
+#: inc/czr-front-ccat.php:4666 inc/czr-front-ccat.php:4970
+#: inc/czr-front-ccat.php:5437
 #: templates/parts/content/singular/page_content.php:17
 #: templates/parts/content/singular/post_content.php:18
 msgid "Continue reading <span class=\"meta-nav\">&rarr;</span>"
 msgstr "Sigue leyendo <span class=\"meta-nav\">&rarr;</span>"
 
 #: core/front/models/content/post-lists/headings/class-model-archive_heading.php:71
-#: inc/czr-front-ccat.php:4398
+#: inc/czr-front-ccat.php:4399
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr "A"
 
-#: inc/czr-front-ccat.php:4398
+#: inc/czr-front-ccat.php:4399
 msgid "Yearly Archives: %s"
 msgstr "Archivos anuales: %s"
 
 #: core/front/models/content/post-lists/headings/class-model-archive_heading.php:70
-#: inc/czr-front-ccat.php:4397
+#: inc/czr-front-ccat.php:4398
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr "M A"
 
-#: inc/czr-front-ccat.php:4397
+#: inc/czr-front-ccat.php:4398
 msgid "Monthly Archives: %s"
 msgstr "Archivo por meses: %s"
 
-#: inc/czr-front-ccat.php:4396
+#: inc/czr-front-ccat.php:4397
 msgid "Archives"
 msgstr "Archivo"
 
-#: inc/czr-front-ccat.php:4396
+#: inc/czr-front-ccat.php:4397
 msgid "Daily Archives: %s"
 msgstr "Archivo por días: %s"
 
-#: inc/czr-front-ccat.php:4356 inc/czr-front-ccat.php:5008
+#: inc/czr-front-ccat.php:4357 inc/czr-front-ccat.php:5009
 msgid "About %s"
 msgstr "Acerca de %s"
 
-#: core/core-settings-map.php:1069 core/czr-customize-ccat.php:1936
-#: inc/czr-front-ccat.php:4322
+#: core/core-settings-map.php:1069 core/czr-customize-ccat.php:1944
+#: inc/czr-front-ccat.php:4323
 msgid "No"
 msgstr "No"
 
-#: inc/czr-front-ccat.php:4308 templates/parts/content/no-results/404.php:8
+#: inc/czr-front-ccat.php:4309 templates/parts/content/no-results/404.php:8
 msgid "Ooops, page not found"
 msgstr "¡Uy! página no encontrada"
 
-#: inc/czr-front-ccat.php:4170
+#: inc/czr-front-ccat.php:4171
 msgid "Permalink to %s"
 msgstr "Enlaces permanentes a %s"
 
-#: inc/czr-front-ccat.php:4166 inc/czr-front-ccat.php:4171
+#: inc/czr-front-ccat.php:4167 inc/czr-front-ccat.php:4172
 msgid "{no title} Read the post &raquo;"
 msgstr "{no title} Leer el post &raquo;"
 
@@ -1838,7 +1822,7 @@ msgstr "{no title} Leer el post &raquo;"
 msgid "Featured page"
 msgstr "Página Destacada"
 
-#: inc/czr-front-ccat.php:3953
+#: inc/czr-front-ccat.php:3954
 msgid "Missing Attachment"
 msgstr "Falta el archivo"
 
@@ -2263,7 +2247,7 @@ msgstr "Títulos de las páginas de etiquetas"
 msgid "Author pages titles"
 msgstr "Títulos de las páginas de autor"
 
-#: core/core-settings-map.php:1333 inc/czr-front-ccat.php:4323
+#: core/core-settings-map.php:1333 inc/czr-front-ccat.php:4324
 msgid "Search Results for :"
 msgstr "Resultados de la búsqueda para:"
 
@@ -3189,47 +3173,47 @@ msgstr "Cabecera"
 msgid "Global settings"
 msgstr "Ajustes globales"
 
-#: core/core-functions.php:1273
+#: core/core-functions.php:1288
 msgid "&mdash; Demo Slider &mdash;"
 msgstr "&mdash; Carrusel de demostración &mdash;"
 
-#: core/core-functions.php:1272
+#: core/core-functions.php:1287
 msgid "&mdash; No slider &mdash;"
 msgstr "&mdash; Ningún carrusel &mdash;"
 
-#: core/core-settings-map.php:2555
+#: core/core-settings-map.php:2557
 msgid "Featured text %1$s (200 char. max)"
 msgstr "Texto destacado %1$s (máximo 200 carac.)"
 
-#: core/core-settings-map.php:2539
+#: core/core-settings-map.php:2541
 msgid "Custom featured page %1$s"
 msgstr "Página destacada personalizada %1$s"
 
-#: core/core-settings-map.php:2558
+#: core/core-settings-map.php:2560
 msgid "You need to select a page first. Leave this field empty if you want to use the page excerpt."
 msgstr "Tienes que selecciona primero una página. Deja este campo vacío si quieres usar el extracto de página."
 
-#: core/core-settings-map.php:2515
+#: core/core-settings-map.php:2517
 msgid "Home featured page one"
 msgstr "Página principal destacada uno"
 
-#: core/core-settings-map.php:2516
+#: core/core-settings-map.php:2518
 msgid "Home featured page two"
 msgstr "Página principal destacada dos"
 
-#: core/core-settings-map.php:2517
+#: core/core-settings-map.php:2519
 msgid "Home featured page three"
 msgstr "Página principal destacada tres"
 
-#: core/core-settings-map.php:2522
+#: core/core-settings-map.php:2524
 msgid "Featured text three (200 char. max)"
 msgstr "Texto destacado 3 (200 caracteres como máximo)"
 
-#: core/core-settings-map.php:2521
+#: core/core-settings-map.php:2523
 msgid "Featured text two (200 char. max)"
 msgstr "Texto destacado 2 (200 caracteres como máximo)"
 
-#: core/core-settings-map.php:2520
+#: core/core-settings-map.php:2522
 msgid "Featured text one (200 char. max)"
 msgstr "Texto destacado 1 (200 caracteres como máximo)"
 
@@ -3240,10 +3224,6 @@ msgstr "Página %s"
 #: core/init-base.php:436
 msgid "Need help with Customizr? Click here!"
 msgstr "¿Necesitas ayuda con Customizr? ¡Haz clic aquí!"
-
-#: core/init-base.php:433
-msgid "Help"
-msgstr "Ayuda"
 
 #: core/core-settings-map.php:665 core/init-base.php:390
 msgid "Main Menu"
@@ -3258,11 +3238,11 @@ msgstr "Muchas opciones de diseño y estructura están disponibles en la pantall
 msgid "Customizr is a clean responsive theme"
 msgstr "Customizr es un tema limpio y adaptable"
 
-#: core/class-fire-init.php:94 inc/czr-init-ccat.php:370
+#: core/class-fire-init.php:116 inc/czr-init-ccat.php:370
 msgid "Footer Widget Area Two"
 msgstr "Área de widgets a pie de página Dos"
 
-#: core/class-fire-init.php:100 inc/czr-init-ccat.php:374
+#: core/class-fire-init.php:122 inc/czr-init-ccat.php:374
 msgid "Footer Widget Area Three"
 msgstr "Área de widgets a pie de página Tres"
 
@@ -3291,12 +3271,12 @@ msgstr "Lo siento, pero la página solicitada no está. Deberías probar a hacer
 msgid "Speaking the Truth in times of universal deceit is a revolutionary act."
 msgstr "Decir la verdad en tiempos de engaño universal es un acto revolucionario."
 
-#: core/class-fire-init.php:88 inc/czr-init-ccat.php:366
+#: core/class-fire-init.php:110 inc/czr-init-ccat.php:366
 msgid "Footer Widget Area One"
 msgstr "Área de widgets a pie de página Uno"
 
-#: core/class-fire-init.php:89 core/class-fire-init.php:95
-#: core/class-fire-init.php:101 inc/czr-init-ccat.php:367
+#: core/class-fire-init.php:111 core/class-fire-init.php:117
+#: core/class-fire-init.php:123 inc/czr-init-ccat.php:367
 #: inc/czr-init-ccat.php:371 inc/czr-init-ccat.php:375
 msgid "Just use it as you want !"
 msgstr "¡Úsalo como quieras!"
@@ -3441,7 +3421,7 @@ msgstr "Morado plano"
 msgid "Black"
 msgstr "Negro"
 
-#: core/class-fire-init.php:60 core/class-fire-init.php:61
+#: core/class-fire-init.php:64 core/class-fire-init.php:65
 #: inc/czr-init-ccat.php:319 inc/czr-init-ccat.php:320
 msgid "Left sidebar"
 msgstr "Barra lateral izquierda"
@@ -3450,91 +3430,87 @@ msgstr "Barra lateral izquierda"
 msgid "Blue"
 msgstr "Azul"
 
-#: core/class-fire-init.php:74 core/class-fire-init.php:75
+#: core/class-fire-init.php:78 core/class-fire-init.php:79
 #: inc/czr-init-ccat.php:331 inc/czr-init-ccat.php:332
 msgid "No sidebars : full width layout"
 msgstr "Sin barras laterales: diseño de ancho completo"
 
-#: core/class-fire-init.php:67 core/class-fire-init.php:68
+#: core/class-fire-init.php:71 core/class-fire-init.php:72
 #: inc/czr-init-ccat.php:325 inc/czr-init-ccat.php:326
 msgid "2 sidebars : Right and Left"
 msgstr "2 barras laterales: izquierda y derecha"
 
-#: core/class-fire-init.php:53 core/class-fire-init.php:54
+#: core/class-fire-init.php:57 core/class-fire-init.php:58
 #: inc/czr-init-ccat.php:313 inc/czr-init-ccat.php:314
 msgid "Right sidebar"
 msgstr "Barra lateral derecha"
 
-#: core/czr-customize-ccat.php:1668 core/czr-customize-ccat.php:1944
-#: core/czr-customize-ccat.php:2015 core/czr-customize-ccat.php:2182
+#: core/czr-customize-ccat.php:1670 core/czr-customize-ccat.php:1952
+#: core/czr-customize-ccat.php:2023 core/czr-customize-ccat.php:2190
 msgid "Remove"
 msgstr "Eliminar"
 
-#: core/czr-customize-ccat.php:1667
+#: core/czr-customize-ccat.php:1669
 msgid "Upload"
 msgstr "Subir"
 
-#: core/czr-customize-ccat.php:1095
+#: core/czr-customize-ccat.php:1097
 msgid "Check the documentation"
 msgstr "Revisar la documentación"
 
-#: core/czr-customize-ccat.php:1093
+#: core/czr-customize-ccat.php:1095
 msgid "Need help to create a slider ?"
 msgstr "¿Necesitas ayuda para crear un carrusel?"
 
-#: core/czr-customize-ccat.php:1092
+#: core/czr-customize-ccat.php:1094
 msgid "Create a slider"
 msgstr "Crear un carrusel"
 
-#: core/czr-admin-ccat.php:739
+#: core/czr-admin-ccat.php:721
 msgid "To copy the system infos, click below then press Ctrl + C (PC) or Cmd + C (Mac)."
 msgstr "Para copiar la información del sistema haz clic abajo y a continuación pulsa Ctrl + C (PC) o Cmd + C (Mac)."
 
-#: core/czr-admin-ccat.php:738
+#: core/czr-admin-ccat.php:720
 msgid "Please include the following informations when posting support requests"
 msgstr "Por favor, incluye esta información cuando publiques una petición de soporte"
 
-#: core/czr-admin-ccat.php:737
+#: core/czr-admin-ccat.php:719
 msgid "System Informations"
 msgstr "Información del sistema"
 
-#: core/czr-admin-ccat.php:668
+#: core/czr-admin-ccat.php:650
 msgid "Go to Dashboard"
 msgstr "Ir al Escritorio"
 
-#: core/czr-admin-ccat.php:639
+#: core/czr-admin-ccat.php:621
 msgid "Follow us"
 msgstr "S&iacute;guenos"
 
-#: core/czr-admin-ccat.php:668
+#: core/czr-admin-ccat.php:650
 msgid "Go to Dashboard &rarr; Home"
 msgstr "Ve a Escritorio &rarr; Inicio"
 
-#: core/czr-admin-ccat.php:569
+#: core/czr-admin-ccat.php:560
 msgid "Read the documentation"
 msgstr "Leer la documentación"
 
-#: core/czr-admin-ccat.php:573
-msgid "Check the FAQ"
-msgstr "Revisar las FAQ "
-
-#: core/czr-admin-ccat.php:633
+#: core/czr-admin-ccat.php:615
 msgid "Happy user of Customizr?"
 msgstr "¿Estás contento usando Customizr?"
 
-#: core/czr-admin-ccat.php:720
+#: core/czr-admin-ccat.php:702
 msgid "Changelog in version %1$s"
 msgstr "Changelog en la versión %1$s"
 
-#: core/czr-admin-ccat.php:653
+#: core/czr-admin-ccat.php:635
 msgid "Easily take your web design one step further"
 msgstr "Lleva fácilmente el diseño de tu web un paso más allá"
 
-#: core/czr-admin-ccat.php:634
+#: core/czr-admin-ccat.php:616
 msgid "If you are happy with the theme, say it on wordpress.org and give Customizr a nice review! <br />(We are addicted to your feedbacks...)"
 msgstr "¡Si estás contento con el tema, cuéntalo en wordpress.org y haz una reseña positiva de Customizr!<br>(Somos adictos a vuestras opiniones...)"
 
-#: core/czr-admin-ccat.php:616
+#: core/czr-admin-ccat.php:598
 msgid "You are using a child theme of Customizr %1$s : always check the %2$s after upgrading to see if a function or a template has been deprecated."
 msgstr "Estás usando un tema hijo de Customizr %1$s: comprueba siempre el %2$s después de las actualizaciones para ver si una función o una plantilla se ha quedado obsoleta."
 
@@ -3542,25 +3518,25 @@ msgstr "Estás usando un tema hijo de Customizr %1$s: comprueba siempre el %2$s 
 msgid "About Customizr"
 msgstr "Acerca de Customizr"
 
-#: core/czr-admin-ccat.php:2400
+#: core/czr-admin-ccat.php:2364
 msgid "No Image Selected"
 msgstr "No se ha seleccionado ninguna imagen"
 
-#: core/czr-admin-ccat.php:2426
+#: core/czr-admin-ccat.php:2390
 msgid "Edit this slide"
 msgstr "Editar esta diapositiva"
 
-#: core/czr-admin-ccat.php:2428
+#: core/czr-admin-ccat.php:2392
 msgid "Current slide"
 msgstr "Diapositiva actual"
 
-#: core/czr-admin-ccat.php:2356
+#: core/czr-admin-ccat.php:2320
 msgid "Button Text"
 msgstr "Texto del Botón"
 
-#: core/czr-admin-ccat.php:2358 core/czr-customize-ccat.php:985
-#: core/czr-customize-ccat.php:995 core/czr-customize-ccat.php:1944
-#: core/czr-customize-ccat.php:1957 core/czr-customize-ccat.php:2015
+#: core/czr-admin-ccat.php:2322 core/czr-customize-ccat.php:987
+#: core/czr-customize-ccat.php:997 core/czr-customize-ccat.php:1952
+#: core/czr-customize-ccat.php:1965 core/czr-customize-ccat.php:2023
 #: core/front/models/modules/common/class-model-breadcrumb.php:625
 #: core/front/models/modules/common/class-model-breadcrumb.php:658
 #: core/front/models/modules/common/class-model-breadcrumb.php:673
@@ -3569,166 +3545,166 @@ msgstr "Texto del Botón"
 #: core/front/template-tags/template-tags.php:163 inc/czr-front-ccat.php:2641
 #: inc/czr-front-ccat.php:2674 inc/czr-front-ccat.php:2689
 #: inc/czr-front-ccat.php:2717 inc/czr-front-ccat.php:3232
-#: inc/czr-front-ccat.php:3820 inc/czr-front-ccat.php:4225
-#: inc/czr-front-ccat.php:8921
+#: inc/czr-front-ccat.php:3821 inc/czr-front-ccat.php:4226
+#: inc/czr-front-ccat.php:8966
 msgid "Edit"
 msgstr "Editar"
 
-#: core/czr-admin-ccat.php:2355
+#: core/czr-admin-ccat.php:2319
 msgid "Slide Text"
 msgstr "Texto de la diapositiva"
 
-#: core/czr-admin-ccat.php:2354 core/czr-customize-ccat.php:2098
+#: core/czr-admin-ccat.php:2318 core/czr-customize-ccat.php:2106
 msgid "Title"
 msgstr "Título"
 
-#: core/czr-admin-ccat.php:2118
+#: core/czr-admin-ccat.php:2084
 msgid "Title and text color"
 msgstr "Color del título y el texto"
 
-#: core/czr-admin-ccat.php:2126
+#: core/czr-admin-ccat.php:2092
 msgid "Button text (80 char. max length)"
 msgstr "Texto del botón (80 caracteres como máximo)"
 
-#: core/czr-admin-ccat.php:2353
+#: core/czr-admin-ccat.php:2317
 msgid "Slide Image"
 msgstr "Imagen de diapositiva "
 
-#: core/czr-admin-ccat.php:2343
+#: core/czr-admin-ccat.php:2307
 msgid "This slider has not slides to show. Go to the media library and start adding images to it."
 msgstr "Este carrusel no tiene diapositivas para mostrar. Ve a la biblioteca de medios y comienza a añadir imágenes."
 
-#: core/czr-admin-ccat.php:2215
+#: core/czr-admin-ccat.php:2181
 msgid "You haven't create any slider yet. Write a slider name and click on the button to add you first slider."
 msgstr "Aún no has creado ningún carrusel. Escribe un nombre y haz clic en el botón para añadir tu primer slider."
 
-#: core/czr-admin-ccat.php:2188 core/czr-admin-ccat.php:2217
+#: core/czr-admin-ccat.php:2154 core/czr-admin-ccat.php:2183
 msgid "Add a slider"
 msgstr "Añadir un carrusel"
 
-#: core/czr-admin-ccat.php:2138
+#: core/czr-admin-ccat.php:2104
 msgid "No link"
 msgstr "Sin enlace"
 
-#: core/czr-admin-ccat.php:2133
+#: core/czr-admin-ccat.php:2099
 msgid "Choose a linked page or post (among the last 100)."
 msgstr "Elige una entrada o página enlazada (de entre las últimas 100)."
 
-#: core/czr-admin-ccat.php:1389 core/czr-admin-ccat.php:1394
+#: core/czr-admin-ccat.php:1371 core/czr-admin-ccat.php:1376
 msgid "this post"
 msgstr "Esta publicación"
 
-#: core/czr-admin-ccat.php:2104
+#: core/czr-admin-ccat.php:2070
 msgid "Title text (80 char. max length)"
 msgstr "Texto del título (80 caracteres como máximo)"
 
-#: core/czr-admin-ccat.php:2111
+#: core/czr-admin-ccat.php:2077
 msgid "Description text (below the title, 250 char. max length)"
 msgstr "Texto de la descripción (debajo del título, 250 caracteres como máximo)"
 
 #: core/core-settings-map.php:875 core/core-settings-map.php:880
-#: core/core-settings-map.php:2045 core/czr-admin-ccat.php:1390
+#: core/core-settings-map.php:2045 core/czr-admin-ccat.php:1372
 msgid "here"
 msgstr "aquí"
 
-#: core/czr-admin-ccat.php:1393
+#: core/czr-admin-ccat.php:1375
 msgid "Select a specific layout for %1$s"
 msgstr "Seleccionar una plantilla específica para %1$s"
 
-#: core/czr-admin-ccat.php:1550
+#: core/czr-admin-ccat.php:1532
 msgid "Delay between each slides in milliseconds (default : 5000 ms)"
 msgstr "Tiempo de retardo entre cada diapositiva en milisegundos (5000 ms por defecto)"
 
-#: core/czr-admin-ccat.php:1389 core/czr-admin-ccat.php:1394
+#: core/czr-admin-ccat.php:1371 core/czr-admin-ccat.php:1376
 msgid "this page"
 msgstr "esta página"
 
-#: core/czr-admin-ccat.php:1955
+#: core/czr-admin-ccat.php:1937
 msgid "Add to a slider (create one if needed)"
 msgstr "Añadir a un carrusel (crear uno si es necesario)"
 
-#: core/czr-admin-ccat.php:1953
+#: core/czr-admin-ccat.php:1935
 msgid "Add to a slider"
 msgstr "Añadir a un carrusel"
 
-#: core/czr-admin-ccat.php:1611 core/czr-customize-ccat.php:1090
+#: core/czr-admin-ccat.php:1593 core/czr-customize-ccat.php:1092
 msgid "You haven't create any slider yet. Go to the media library, edit your images and add them to your sliders."
 msgstr "Aún no has creado ningún carrusel. Ve a la biblioteca de medios, edita tus imágenes y añádelas a tus carruseles."
 
-#: core/czr-admin-ccat.php:1600 core/czr-admin-ccat.php:2198
+#: core/czr-admin-ccat.php:1582 core/czr-admin-ccat.php:2164
 msgid "Delete slider"
 msgstr "Borrar carrusel"
 
-#: core/czr-admin-ccat.php:1597 core/czr-admin-ccat.php:2195
+#: core/czr-admin-ccat.php:1579 core/czr-admin-ccat.php:2161
 msgid "The slider will be deleted permanently (images, call to actions and link will be kept)."
 msgstr "El carrusel se borrará para siempre (imágenes, llamadas a la acción y enlaces se conservarán)."
 
-#: core/czr-admin-ccat.php:1592 core/czr-admin-ccat.php:2191
+#: core/czr-admin-ccat.php:1574 core/czr-admin-ccat.php:2157
 msgid "Delete this slider"
 msgstr "Borrar este carrusel"
 
-#: core/czr-admin-ccat.php:1546
+#: core/czr-admin-ccat.php:1528
 msgid "To create a new slider : open the media library, edit your images and add them to your new slider."
 msgstr "Para crear un nuevo carrusel: abre la biblioteca de medios, edita tus imágenes y añádelas a tu nuevo carrusel."
 
-#: core/czr-admin-ccat.php:1523 core/czr-admin-ccat.php:2182
+#: core/czr-admin-ccat.php:1505 core/czr-admin-ccat.php:2148
 msgid "&mdash; Select a slider &mdash; "
 msgstr "&mdash; Seleccionar un carrusel &mdash; "
 
-#: core/czr-admin-ccat.php:1517 core/czr-admin-ccat.php:2167
+#: core/czr-admin-ccat.php:1499 core/czr-admin-ccat.php:2133
 msgid "Choose a slider"
 msgstr "Elegir un carrusel"
 
-#: core/czr-admin-ccat.php:1443
+#: core/czr-admin-ccat.php:1425
 msgid "Add a slider to this post/page"
 msgstr "Añadir un carrusel a esta entrada o página"
 
-#: core/czr-admin-ccat.php:1397
+#: core/czr-admin-ccat.php:1379
 msgid "Default layout %1s"
 msgstr "Estructura predeterminada %1s"
 
-#: core/czr-admin-ccat.php:1557
+#: core/czr-admin-ccat.php:1539
 msgid "Slider Layout : set the slider in full width"
 msgstr "Diseño del slider: mostrar slider de ancho completo"
 
-#: core/czr-admin-ccat.php:1388
+#: core/czr-admin-ccat.php:1370
 msgid "You can define a specific layout for %1$s by using the pre-defined left and right sidebars. The default layouts can be defined in the WordPress customizer screen %2$s.<br />"
 msgstr "Puedes definir una estructura específica para %1$s usando las barras laterales izquierda y derecha predefinidas. Las estructuras por defecto se pueden definir en la pantalla del personalizador de WordPress %2$s.<br />"
 
-#: core/czr-admin-ccat.php:1385
+#: core/czr-admin-ccat.php:1367
 #: templates/parts/content/singular/authors/author_info.php:15
 msgid "posts"
 msgstr "entradas"
 
-#: core/czr-admin-ccat.php:1385
+#: core/czr-admin-ccat.php:1367
 msgid "pages"
 msgstr "Páginas"
 
-#: core/czr-admin-ccat.php:1115 core/czr-admin-ccat.php:1926
+#: core/czr-admin-ccat.php:1097 core/czr-admin-ccat.php:1908
 msgid "Slider Options"
 msgstr "Opciones del carrusel"
 
-#: core/czr-admin-ccat.php:1385
+#: core/czr-admin-ccat.php:1367
 msgid "Default %1$s layout is set to : %2$s"
 msgstr "La estructura predeterminada de %1$s está configurada como: %2$s"
 
-#: core/czr-admin-ccat.php:1102
+#: core/czr-admin-ccat.php:1084
 msgid "Layout Options"
 msgstr "Opciones de diseño"
 
-#: core/czr-customize-ccat.php:663 core/czr-customize-ccat.php:664
+#: core/czr-customize-ccat.php:665 core/czr-customize-ccat.php:666
 msgid "Upgrade Wordpress Now"
 msgstr "Actualizar WordPress ahora"
 
-#: core/czr-customize-ccat.php:660
+#: core/czr-customize-ccat.php:662
 msgid "This theme requires WordPress 3.4+"
 msgstr "Este tema requiere una versión de WordPress posterior a la 3.4"
 
-#: core/czr-customize-ccat.php:640 core/czr-customize-ccat.php:641
+#: core/czr-customize-ccat.php:642 core/czr-customize-ccat.php:643
 msgid "Upgrade WP"
 msgstr "Actualizar WP"
 
-#: core/czr-admin-ccat.php:658
+#: core/czr-admin-ccat.php:640
 msgid "Discover Customizr Pro"
 msgstr "Descubrir la versión Pro de Customizr"
 
@@ -3736,18 +3712,18 @@ msgstr "Descubrir la versión Pro de Customizr"
 msgid "Jump to the blog design options"
 msgstr "Ir a las opciones de diseño del blog"
 
-#: core/czr-customize-ccat.php:618
+#: core/czr-customize-ccat.php:620
 msgid "More grid design options"
 msgstr "Más opciones de diseño de la rejilla"
-
-#. Author URI of the plugin/theme
-msgid "http://presscustomizr.com/"
-msgstr "http://presscustomizr.com/"
 
 #. Author of the plugin/theme
 msgid "nikeo"
 msgstr "nikeo"
 
+#. Author URI of the plugin/theme
+msgid "https://presscustomizr.com/"
+msgstr "https://presscustomizr.com/"
+
 #. Theme URI of the plugin/theme
-msgid "http://presscustomizr.com/customizr"
-msgstr "http://presscustomizr.com/customizr"
+msgid "https://presscustomizr.com/customizr"
+msgstr "https://presscustomizr.com/customizr"

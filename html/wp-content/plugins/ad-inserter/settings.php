@@ -297,7 +297,12 @@ function generate_settings_form (){
 
     $obj = $block_object [$ad_number];
 
-    $show_devices = $obj->get_detection_client_side () == AI_ENABLED || $obj->get_detection_server_side () == AI_ENABLED;
+    $client_side_devices = $obj->get_detection_client_side () == AI_ENABLED;
+    $server_side_devices = $obj->get_detection_server_side () == AI_ENABLED;
+    if ($client_side_devices) $client_side_style = "font-weight: bold; color: #66f;"; else $client_side_style = "";
+    if ($server_side_devices) $server_side_style = "font-weight: bold; color: #66f;"; else $server_side_style = "";
+
+    $show_devices = $client_side_devices || $server_side_devices == AI_ENABLED;
     if ($show_devices) $devices_style = "font-weight: bold; color: #66f;"; else $devices_style = "";
 
     $cat_list       = $obj->get_ad_block_cat();
@@ -322,6 +327,10 @@ function generate_settings_form (){
       $obj->get_enable_404 () == AI_ENABLED ||
       $obj->get_enable_feed () == AI_ENABLED;
 
+    $word_count_options =
+      intval ($obj->get_minimum_words()) != 0 ||
+      intval ($obj->get_maximum_words()) != 0;
+
     $scheduling_active = $obj->get_scheduling() != AI_SCHEDULING_OFF;
 
     $filter_active = $obj->get_call_filter() || $obj->get_inverted_filter() != 0;
@@ -330,6 +339,7 @@ function generate_settings_form (){
 
     $show_misc =
       $insertion_options ||
+      $word_count_options ||
       $scheduling_active ||
       $filter_active ||
       $adb_block_action_active;
@@ -337,6 +347,7 @@ function generate_settings_form (){
     if ($show_misc) $misc_style = "font-weight: bold; color: #66f;"; else $misc_style = "";
 
     if ($insertion_options)       $insertion_style  = "font-weight: bold; color: #66f;"; else $insertion_style = "";
+    if ($word_count_options)      $word_count_style = "font-weight: bold; color: #66f;"; else $word_count_style = "";
     if ($scheduling_active)       $scheduling_style = "font-weight: bold; color: #66f;"; else $scheduling_style = "";
     if ($filter_active)           $filter_style     = "font-weight: bold; color: #66f;"; else $filter_style = "";
     if ($adb_block_action_active) $adb_style        = "font-weight: bold; color: #66f;"; else $adb_style = "";
@@ -346,12 +357,6 @@ function generate_settings_form (){
     $paragraph_settings =
       $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_PARAGRAPH ||
       $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_PARAGRAPH;
-
-    $content_settings   =
-      $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_PARAGRAPH ||
-      $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_PARAGRAPH ||
-      $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_CONTENT ||
-      $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_CONTENT;
 
     $paragraph_counting =
       $obj->get_direction_type()            != $default->get_direction_type() ||
@@ -582,7 +587,7 @@ function generate_settings_form (){
   <div id="paragraph-settings-<?php echo $ad_number; ?>" class="rounded" style="<?php echo $paragraph_settings ? "" : " display: none;" ?>">
 <!--    <div>-->
       <div style="float: left; margin-top: 1px;">
-        Paragraph number(s)
+        Paragraph(s)
         <input
           type="text"
           name="<?php echo AI_OPTION_PARAGRAPH_NUMBER, WP_FORM_FIELD_POSTFIX, $ad_number; ?>"
@@ -781,14 +786,6 @@ function generate_settings_form (){
     </div>
   </div>
 
-  <div id="content-settings-<?php echo $ad_number; ?>" class="rounded" style="<?php echo $content_settings ? "" : "display: none;" ?>">
-    Post/Static page must have between
-    <input type="text" name="<?php echo AI_OPTION_MIN_WORDS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_minimum_words(); ?>" value="<?php echo $obj->get_minimum_words() ?>" size="4" maxlength="6" />
-    and
-    <input type="text" name="<?php echo AI_OPTION_MAX_WORDS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" title="Maximum number of post/static page words, leave empty for no limit" default="<?php echo $default->get_maximum_words(); ?>" value="<?php echo $obj->get_maximum_words() ?>" size="4" maxlength="6" />
-    words
-  </div>
-
   <div class="responsive-table rounded" id="list-settings-<?php echo $ad_number; ?>" style="<?php if (!$show_lists) echo ' display: none;'; ?>">
     <table>
       <tbody>
@@ -952,58 +949,94 @@ function generate_settings_form (){
     </table>
   </div>
 
-  <div id="device-detection-settings-<?php echo $ad_number; ?>" class="rounded" style="<?php if (!$show_devices) echo 'display: none;'; ?>">
-    <table>
-      <tr>
-        <td>
-          <div style="margin-bottom: 5px;">
-            <input type="hidden" name="<?php echo AI_OPTION_DETECT_CLIENT_SIDE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-            <input id="client-side-detection-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_DETECT_CLIENT_SIDE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_detection_client_side(); ?>" <?php if ($obj->get_detection_client_side ()==AI_ENABLED) echo 'checked '; ?> />
-            <label for="client-side-detection-<?php echo $ad_number; ?>">Use client-side detection to show only on:</label>
-          </div>
+  <div id="device-detection-settings-<?php echo $ad_number; ?>" style="<?php if (!$show_devices) echo 'display: none;'; ?>">
 
-          <div style="margin: 5px 0 0 40px;">
+    <div id="ai-devices-container-<?php echo $ad_number; ?>" style="padding: 0; margin 8px 0 0 0; border: 0;">
+      <ul id="ai-devices-tabs-<?php echo $ad_number; ?>" style="display: none;">
+        <li id="ai-client-side-detection-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-client-side-<?php echo $ad_number; ?>"><span style="<?php echo $client_side_style; ?>">Client-side device detection</span></a></li>
+        <li id="ai-server-side-detection<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-server-side-<?php echo $ad_number; ?>"><span style="<?php echo $server_side_style; ?>">Server-side device detection</span></a></li>
+      </ul>
 
-      <?php
-        for ($viewport = 1; $viewport <= AD_INSERTER_VIEWPORTS; $viewport ++) {
-          $viewport_name = get_viewport_name ($viewport);
-          if ($viewport_name != '') {
-      ?>
-            <div style="margin: 8px 0;">
-              <input type="hidden" name="<?php echo AI_OPTION_DETECT_VIEWPORT, '_', $viewport, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-              <input type="checkbox" name="<?php echo AI_OPTION_DETECT_VIEWPORT, '_', $viewport, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" id="viewport-<?php echo $viewport, "-", $ad_number; ?>" value="1" default="<?php echo $default->get_detection_viewport ($viewport); ?>" <?php if ($obj->get_detection_viewport ($viewport)==AI_ENABLED) echo 'checked '; ?> />
-              <label for="viewport-<?php echo $viewport, "-", $ad_number; ?>" title="Device min width <?php echo get_viewport_width ($viewport); ?> px"><?php echo $viewport_name; ?></label>
-            </div>
-      <?php
-          }
+      <div id="tab-client-side-<?php echo $ad_number; ?>" class="rounded">
+        <div style="float: left; margin-top: 0px;">
+          <input type="hidden" name="<?php echo AI_OPTION_DETECT_CLIENT_SIDE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
+          <input id="client-side-detection-<?php echo $ad_number; ?>" type="checkbox" name="<?php echo AI_OPTION_DETECT_CLIENT_SIDE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="1" default="<?php echo $default->get_detection_client_side(); ?>" <?php if ($obj->get_detection_client_side ()==AI_ENABLED) echo 'checked '; ?> />
+          <label for="client-side-detection-<?php echo $ad_number; ?>" style="vertical-align: baseline;">Use client-side detection to show only on</label>
+        </div>
+
+        <div style="float: left; margin: -5px 0 -2px 0;">
+<?php
+
+      $viewports = array ();
+      for ($viewport = 1; $viewport <= AD_INSERTER_VIEWPORTS; $viewport ++) {
+        $viewport_name = get_viewport_name ($viewport);
+        if ($viewport_name != '') $viewports [$viewport] = $viewport_name;
+      }
+      $number_of_viewports = count ($viewports);
+      $columns = 3;
+
+?>
+          <table>
+            <tbody>
+<?php
+
+      $column = 0;
+      foreach ($viewports as $viewport => $viewport_name) {
+        if ($column % $columns == 0) {
+?>
+              <tr>
+<?php
         }
-      ?>
-          </div>
-        </td><td style="padding-left: 40px; vertical-align: top;">
-          <input type="hidden" name="<?php echo AI_OPTION_DETECT_SERVER_SIDE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
-          <input type="checkbox" name="<?php echo AI_OPTION_DETECT_SERVER_SIDE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" id="server-side-detection-<?php echo $ad_number; ?>" value="1" default="<?php echo $default->get_detection_server_side(); ?>" <?php if ($obj->get_detection_server_side ()==AI_ENABLED) echo 'checked '; ?> />
-          <label for="server-side-detection-<?php echo $ad_number; ?>">Use server-side detection to insert code only for </label>
+?>
+                <td style='padding: 2px 0 0 20px;'>
+                  <input type="hidden" name="<?php echo AI_OPTION_DETECT_VIEWPORT, '_', $viewport, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
+                  <input type="checkbox" name="<?php echo AI_OPTION_DETECT_VIEWPORT, '_', $viewport, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" id="viewport-<?php echo $viewport, "-", $ad_number; ?>" value="1" default="<?php echo $default->get_detection_viewport ($viewport); ?>" <?php if ($obj->get_detection_viewport ($viewport)==AI_ENABLED) echo 'checked '; ?> />
+                  <label for="viewport-<?php echo $viewport, "-", $ad_number; ?>" title="Device min width <?php echo get_viewport_width ($viewport); ?> px"><?php echo $viewport_name; ?></label>
+                </td>
+<?php
+        $column ++;
+      }
+      if ($column % $columns != 0) {
+        for ($fill = 1; $fill <= $columns - $column % $columns; $fill++) {
+?>
+                <td> </td>
+<?php
+        }
+?>
+              </tr>
+<?php
+      }
+?>
+            </tbody>
+          </table>
+        </div>
+        <div style="clear: both"></div>
+      </div>
 
-          <div style="margin: 10px 0 10px 40px;">
-            <select style="margin-bottom: 3px;" id="display-for-devices-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_DISPLAY_FOR_DEVICES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_display_for_devices(); ?>" style="width:160px">
-              <option value="<?php echo AD_DISPLAY_DESKTOP_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_DESKTOP_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_DESKTOP_DEVICES; ?></option>
-              <option value="<?php echo AD_DISPLAY_MOBILE_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_MOBILE_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_MOBILE_DEVICES; ?></option>
-              <option value="<?php echo AD_DISPLAY_TABLET_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_TABLET_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_TABLET_DEVICES; ?></option>
-              <option value="<?php echo AD_DISPLAY_PHONE_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_PHONE_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_PHONE_DEVICES; ?></option>
-              <option value="<?php echo AD_DISPLAY_DESKTOP_TABLET_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_DESKTOP_TABLET_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_DESKTOP_TABLET_DEVICES; ?></option>
-              <option value="<?php echo AD_DISPLAY_DESKTOP_PHONE_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_DESKTOP_PHONE_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_DESKTOP_PHONE_DEVICES; ?></option>
-            </select>
-            devices
-          </div>
-        </td>
-      </tr>
-    </table>
+      <div id="tab-server-side-<?php echo $ad_number; ?>" class="rounded">
+        <input type="hidden" name="<?php echo AI_OPTION_DETECT_SERVER_SIDE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" value="0" />
+        <input type="checkbox" name="<?php echo AI_OPTION_DETECT_SERVER_SIDE, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" id="server-side-detection-<?php echo $ad_number; ?>" value="1" default="<?php echo $default->get_detection_server_side(); ?>" <?php if ($obj->get_detection_server_side ()==AI_ENABLED) echo 'checked '; ?> />
+        <label for="server-side-detection-<?php echo $ad_number; ?>" style="vertical-align: baseline;">Use server-side detection to insert code only for </label>
+
+          <select id="display-for-devices-<?php echo $ad_number; ?>" name="<?php echo AI_OPTION_DISPLAY_FOR_DEVICES, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" style="margin: -4px 1px -2px 1px;" default="<?php echo $default->get_display_for_devices(); ?>">
+            <option value="<?php echo AD_DISPLAY_DESKTOP_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_DESKTOP_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_DESKTOP_DEVICES; ?></option>
+            <option value="<?php echo AD_DISPLAY_MOBILE_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_MOBILE_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_MOBILE_DEVICES; ?></option>
+            <option value="<?php echo AD_DISPLAY_TABLET_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_TABLET_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_TABLET_DEVICES; ?></option>
+            <option value="<?php echo AD_DISPLAY_PHONE_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_PHONE_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_PHONE_DEVICES; ?></option>
+            <option value="<?php echo AD_DISPLAY_DESKTOP_TABLET_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_DESKTOP_TABLET_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_DESKTOP_TABLET_DEVICES; ?></option>
+            <option value="<?php echo AD_DISPLAY_DESKTOP_PHONE_DEVICES; ?>" <?php echo ($obj->get_display_for_devices() == AD_DISPLAY_DESKTOP_PHONE_DEVICES) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_DESKTOP_PHONE_DEVICES; ?></option>
+          </select>
+          devices
+      </div>
+    </div>
+
   </div>
 
   <div id="misc-settings-<?php echo $ad_number; ?>" style="<?php if (!$show_misc) echo 'display: none;'; ?>">
     <div id="ai-misc-container-<?php echo $ad_number; ?>" style="padding: 0; margin 8px 0 0 0; border: 0;">
       <ul id="ai-misc-tabs-<?php echo $ad_number; ?>" style="display: none;">
         <li id="ai-misc-insertion-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-insertion-<?php echo $ad_number; ?>"><span style="<?php echo $insertion_style; ?>">Insertion</span></a></li>
+        <li id="ai-misc-word-count-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-word-count-<?php echo $ad_number; ?>"><span style="<?php echo $word_count_style; ?>">Word Count</span></a></li>
         <li id="ai-misc-filter-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-filter-<?php echo $ad_number; ?>"><span style="<?php echo $filter_style; ?>">Filter</span></a></li>
         <li id="ai-misc-scheduling-<?php echo $ad_number; ?>" class="ai-plugin-tab"><a href="#tab-scheduling-<?php echo $ad_number; ?>"><span style="<?php echo $scheduling_style; ?>">Scheduling</span></a></li>
         <?php if (function_exists ('ai_adb_action_0')) ai_adb_action_0 ($ad_number, $adb_style); ?>
@@ -1046,6 +1079,14 @@ function generate_settings_form (){
             <label for="enable-404-<?php echo $ad_number; ?>" style="vertical-align: top;" title="Enable or disable insertion on page for Error 404: Page not found">Error page</label>
           </span>
         </div>
+      </div>
+
+      <div id="tab-word-count-<?php echo $ad_number; ?>" class="rounded">
+        Post/Static page must have between
+        <input type="text" name="<?php echo AI_OPTION_MIN_WORDS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_minimum_words(); ?>" value="<?php echo $obj->get_minimum_words() ?>" title="Minimum number of post/static page words, leave empty for no limit" size="4" maxlength="6" />
+        and
+        <input type="text" name="<?php echo AI_OPTION_MAX_WORDS, WP_FORM_FIELD_POSTFIX, $ad_number; ?>" default="<?php echo $default->get_maximum_words(); ?>" value="<?php echo $obj->get_maximum_words() ?>" title="Maximum number of post/static page words, leave empty for no limit" size="4" maxlength="6" />
+        words
       </div>
 
       <div id="tab-filter-<?php echo $ad_number; ?>" class="rounded">
@@ -1139,8 +1180,9 @@ function generate_settings_form (){
       <input style="display: none; font-weight: bold;" name="<?php echo AI_FORM_SAVE; ?>" value="Save Settings" type="submit" style="width:120px; font-weight: bold;" />
     </div>
 
-    <div style="float: left; color: red;">
+    <div style="float: left;">
       <input onclick="if (confirm('Are you sure you want to reset all settings?')) return true; return false;" name="<?php echo AI_FORM_CLEAR; ?>" value="Reset All Settings" type="submit" style="display: none; width:125px; font-weight: bold; color: #e44;" />
+<?php if (function_exists ('ai_settings_global_actions')) ai_settings_global_actions (); ?>
     </div>
 
     <div style="clear: both;"></div>
@@ -1177,7 +1219,7 @@ function generate_settings_form (){
 <?php if (function_exists ('ai_general_settings')) ai_general_settings (); ?>
       <tr>
         <td style="width: 34%;">
-          Syntax Highlighter Theme
+          Syntax highlighter theme
         </td>
         <td>
           <select
@@ -1229,7 +1271,7 @@ function generate_settings_form (){
       </tr>
       <tr>
         <td>
-          Block Class Name
+          Block class name
         </td>
         <td>
           <input style="margin-left: 0px;" title="CSS Class Name for the wrapping div" type="text" id="block-class-name" name="block-class-name" value="<?php echo $block_class_name; ?>" default="<?php echo DEFAULT_BLOCK_CLASS_NAME; ?>" size="15" maxlength="40" />
@@ -1237,7 +1279,7 @@ function generate_settings_form (){
       </tr>
       <tr>
         <td>
-          Min. User Role for Ind. Exceptions Editing
+          Min. user role for ind. exceptions editing
         </td>
         <td>
           <select style="margin-bottom: 3px;" id="minimum-user-role" name="minimum-user-role" selected-value="1" data="<?php echo get_minimum_user_role (); ?>" default="<?php echo DEFAULT_MINIMUM_USER_ROLE; ?>" style="width:300px">
@@ -1259,7 +1301,7 @@ function generate_settings_form (){
       </tr>
       <tr>
         <td>
-        Functions for Paragraph Counting
+        Functions for paragraph counting
         </td>
         <td>
           <select id="paragraph_counting_functions" name="paragraph_counting_functions"  default="<?php echo DEFAULT_PARAGRAPH_COUNTING_FUNCTIONS; ?>" title="Standard PHP functions are faster and work in most cases, use Multibyte functions if paragraphs are not counted properly on non-english pages.">
@@ -1270,7 +1312,7 @@ function generate_settings_form (){
       </tr>
       <tr>
         <td>
-        No Paragraph Counting Inside
+        No paragraph counting inside
         </td>
         <td>
           <input type="text" name="no-paragraph-counting-inside" value="<?php echo get_no_paragraph_counting_inside (); ?>"  default="<?php echo DEFAULT_NO_PARAGRAPH_COUNTING_INSIDE; ?>" size="40" maxlength="80" />
@@ -1278,7 +1320,18 @@ function generate_settings_form (){
       </tr>
       <tr>
         <td>
-        Sticky Widget Top Margin
+        Sticky widget mode
+        </td>
+        <td>
+          <select name="sticky-widget-mode"  default="<?php echo DEFAULT_STICKY_WIDGET_MODE; ?>" title="CSS mode is the best approach but may not work with all themes. JavaScript mode works with most themes but may reload ads on page load.">
+            <option value="<?php echo AI_STICKY_WIDGET_MODE_CSS; ?>" <?php echo get_sticky_widget_mode()  == AI_STICKY_WIDGET_MODE_CSS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CSS; ?></option>
+            <option value="<?php echo AI_STICKY_WIDGET_MODE_JS; ?>" <?php echo get_sticky_widget_mode() == AI_STICKY_WIDGET_MODE_JS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_JS; ?></option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Sticky widget top margin
         </td>
         <td>
           <input type="text" name="sticky-widget-margin" value="<?php echo get_sticky_widget_margin (); ?>"  default="<?php echo DEFAULT_STICKY_WIDGET_MARGIN; ?>" size="6" maxlength="4" /> px
@@ -1625,13 +1678,14 @@ function generate_settings_form (){
             Age
           </td>
           <td>
-           <?php if (isset ($ai_wp_data [AI_INSTALL_TIME_DIFFERENCE])) printf ('%04d-%02d-%02d %02d:%02d:%02d',
+           <?php if (isset ($ai_wp_data [AI_INSTALL_TIME_DIFFERENCE])) printf ('%04d-%02d-%02d %02d:%02d:%02d (%d days)',
                                                                                       $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->y,
                                                                                       $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->m,
                                                                                       $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->d,
                                                                                       $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->h,
                                                                                       $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->i,
-                                                                                      $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->s); ?>
+                                                                                      $ai_wp_data [AI_INSTALL_TIME_DIFFERENCE]->s,
+                                                                                      isset ($ai_wp_data [AI_DAYS_SINCE_INSTAL]) ? $ai_wp_data [AI_DAYS_SINCE_INSTAL] : null); ?>
           </td>
         </tr>
         <tr class="system-debugging" style="display: none;">
@@ -1655,20 +1709,26 @@ function generate_settings_form (){
 
   $sidebar = 0;
   if (isset ($ai_wp_data [AI_DAYS_SINCE_INSTAL])) {
-    if (                                                         $ai_wp_data [AI_DAYS_SINCE_INSTAL] >  5) $sidebar = 1;
+    if ($ai_wp_data [AI_DAYS_SINCE_INSTAL] >  2)
+      $sidebar = 1;
 
-    if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >=  4 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 10 || $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 20) $sidebar = 2;
+    if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >=  4 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 5 ||
+                                                                 $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 10)
+      $sidebar = 2;
 
-    if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >= 12 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 20 || $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 25) $sidebar = 3;
-    if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >=  8 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 25 || $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 35) $sidebar = 3;
+    if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >= 12 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] >  7 ||
+        $ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >=  8 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 10 ||
+                                                                 $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 15)
+      $sidebar = 3;
 
-    if (                                                         $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 40) $sidebar = 4;
+    if ($ai_wp_data [AI_DAYS_SINCE_INSTAL] > 20)
+      $sidebar = 4;
+
   } else {
-      if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >= 4) $sidebar = 4;
+      if ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS] >= 3) $sidebar = 4;
     }
 
 //  $sidebar = 4;
-
 
   if (!function_exists ('ai_settings_side') && $sidebar >= 2)  {
 
@@ -1678,9 +1738,11 @@ function generate_settings_form (){
       case 1:
         break;
       case 2:
+        sidebar_addense_alternative ();
         break;
       case 3:
-        sidebar_ratings ();
+        sidebar_support_review ();
+        sidebar_addense_alternative ();
         break;
       case 4:
         sidebar_addense_alternative ();
@@ -1708,21 +1770,28 @@ function generate_settings_form (){
 <?php
       switch ($sidebar) {
         case 0:
+          sidebar_help ();
+          sidebar_pro ();
           break;
         case 1:
-          sidebar_support ();
+          sidebar_support_plugin ();
+          sidebar_help ();
+          sidebar_pro ();
           break;
         case 2:
-          sidebar_support ();
-          sidebar_addense_alternative ();
+          sidebar_support_plugin ();
+          sidebar_help ();
+          sidebar_pro ();
           break;
         case 3:
-          sidebar_support ();
-          sidebar_addense_alternative ();
+          sidebar_support_plugin ();
+          sidebar_help ();
+          sidebar_pro ();
           break;
         case 4:
-          sidebar_support ();
-          sidebar_ratings ();
+          sidebar_support_plugin ();
+          sidebar_support_review ();
+          sidebar_help ();
           sidebar_pro ();
           break;
       }
@@ -1746,7 +1815,6 @@ function generate_settings_form (){
       if (!jQuery(image_selector + ":visible").length) {
         var image = jQuery(image_selector);
         image.hide ().after (image.clone ().attr ('class', '').attr ("id", image_id + '-ajax').
-//        attr ('src', '<?php echo wp_make_link_relative (get_site_url()); ?>/wp-admin/admin-ajax.php?action=ai_ajax_backend&image=' + image_src + '&ai_check=<?php echo wp_create_nonce ('adinserter_data'); ?>').
         attr ('src', ajaxurl+'?action=ai_ajax_backend&image=' + image_src + '&ai_check=<?php echo wp_create_nonce ('adinserter_data'); ?>').
         css ('display', css_display));
       }
@@ -1763,6 +1831,7 @@ function generate_settings_form (){
     replace_blocked_image ('ai-media-1',    'contextual-1.gif');
     replace_blocked_image ('ai-media-2',    'contextual-2.jpg');
     replace_blocked_image ('ai-pro-1',      'icon-256x256.jpg');
+    replace_blocked_image ('ai-pro-2',      'ai-charts-250.png');
     replace_blocked_image ('ai-stars-img',  'stars.png', 'inline');
     replace_blocked_image ('ai-tw',         'twitter.png', 'inline');
     replace_blocked_image ('ai-fb',         'facebook.png', 'inline');
@@ -1788,32 +1857,21 @@ function sidebar_addense_alternative () { ?>
 <?php
 }
 
-function sidebar_ratings () {
+function sidebar_support_review () {
   if (!wp_is_mobile () && is_super_admin ()) {
 ?>
-
-      <div class="ai-form header no-select rounded" style="position: relative;">
-        <ul style="margin: 0;">
-          <li>
-            Ads are not showing? Check <a href="https://adinserter.pro/documentation#ads-not-displayed" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">troubleshooting guide</a> to find out how to fix the problem.
-          </li>
-          <li>
-            If you need any kind of help or support, please do not hesitate to open a thread on the <a href="https://wordpress.org/support/plugin/ad-inserter/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">support forum</a>.
-          </li>
-        </ul>
-
-        <p style="text-align: justify;">
-          You've been using <strong>Ad Inserter</strong> for a while now, and I hope you're happy with it.
-          Positive <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">reviews</a> are a great way to show your appreciation for my work.
-          Besides being an incredible boost to my morale, they are also a great incentive to fix bugs and to add new features for better monetization of your website.
-          Thank you! Igor <img draggable="false" class="emoji" alt="happy" src="https://s.w.org/images/core/emoji/2.3/svg/1f642.svg" style="margin-left: 5px!important;"></p>
+      <div class="ai-form header no-select rounded" style="position: relative; text-align: justify;">
+        You've been using <strong>Ad Inserter</strong> for a while now, and I hope you're happy with it.
+        Positive <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">reviews</a> are a great way to show your appreciation for my work.
+        Besides being an incredible boost to my morale, they are also a great incentive to fix bugs and to add new features for better monetization of your website.
+        Thank you! Igor <img draggable="false" class="emoji" alt="happy" src="https://s.w.org/images/core/emoji/2.3/svg/1f642.svg" style="margin-left: 5px!important;">
       </div>
 
 <?php
   }
 }
 
-function sidebar_support () {
+function sidebar_support_plugin () {
   global $rating_value, $rating_string, $rating_css;
 ?>
 
@@ -1848,12 +1906,30 @@ function sidebar_support () {
 <?php
 }
 
+function sidebar_help () { ?>
+
+      <div class="ai-form header rounded">
+        <div style="float: left;">
+          <h2 style="display: inline-block; margin: 5px 0;">Need help with settings? Check plugin features with documentation links below.</h2>
+          <div style="margin-bottom: 10px;">Most of these features are available in the free Ad Inserter you are using. Check <a href="https://adinserter.pro/documentation" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">feature list</a> for details.</div>
+          <div>Ads are not showing? Check <a href="https://adinserter.pro/documentation#ads-not-displayed" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">troubleshooting guide</a> to find out how to fix the problem.</div>
+          <div>If you need any kind of help or support, please do not hesitate to open a thread on the <a href="https://wordpress.org/support/plugin/ad-inserter/" style="text-decoration: none; box-shadow: 0 0 0;" target="_blank">support forum</a>.</div>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+
+<?php
+}
+
 function sidebar_pro () { ?>
 
-      <div class="ai-form rounded no-select" style="background: #fff;">
+      <div class="ai-form rounded no-select feature-list" style="background: #fff;">
         <div style="float: right;" >
           <div>
-            <a href="http://adinserter.pro/" style="text-decoration: none; box-shadow: 0 0 0;" title="Automate ad placement on posts and pages" target="_blank"><img id="ai-pro-1" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>icon-256x256.jpg" style="margin-top: 10px;" /></a>
+            <a href="http://adinserter.pro/" class="clear-link" title="Automate ad placement on posts and pages" target="_blank"><img id="ai-pro-1" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>icon-256x256.jpg" style="margin-top: 10px;" /></a>
+          </div>
+          <div>
+            <a href="https://adinserter.pro/tracking" class="clear-link" title="A/B testing - Track ad impressions and clicks" target="_blank"><img id="ai-pro-2" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>ai-charts-250.png" style="margin-top: 10px;" /></a>
           </div>
           <div>
             <a href='http://bit.ly/2oF81Oh' class="clear-link" title="Looking for AdSense alternative?" target="_blank"><img id="ai-media-2" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>contextual-2.jpg" style="margin-top: 10px;" /></a>
@@ -1867,17 +1943,17 @@ function sidebar_pro () { ?>
           <li>64 code (ad) blocks</li>
           <li>Syntax highlighting editor</li>
           <li><a href="http://adinserter.pro/documentation#code-preview" class="simple-link" target="_blank">Code preview</a> with visual CSS editor</li>
-          <li>Automatic insertion before or after post / content / <a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">paragraph</a> / excerpt</li>
-          <li>Automatic insertion between posts on blog pages</li>
-          <li>Automatic insertion before, between and after comments</li>
-          <li>Insertion exceptions for posts and pages</li>
-          <li><a href="http://adinserter.pro/documentation#manual" class="simple-link" target="_blank">Manual insertion</a>: widgets, shortcodes, PHP function call</li>
-          <li>Sticky positions (left, top, right, bottom - ads stay fixed when the page scrolls)</li>
-          <li>Sticky (fixed) widgets (sidebar does not move when the page scrolls)</li>
+          <li><a href="http://adinserter.pro/documentation#automatic-insertion" class="simple-link" target="_blank">Automatic insertion</a> before or after post / content / <a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">paragraph</a> / excerpt</li>
+          <li><a href="http://adinserter.pro/documentation#automatic-insertion" class="simple-link" target="_blank">Automatic insertion</a> between posts on blog pages</li>
+          <li><a href="http://adinserter.pro/documentation#automatic-insertion" class="simple-link" target="_blank">Automatic insertion</a> before, between and after comments</li>
+          <li><a href="https://adinserter.pro/exceptions" class="simple-link" target="_blank">Insertion exceptions</a> for individual posts and pages</li>
+          <li><a href="http://adinserter.pro/documentation#manual-insertion" class="simple-link" target="_blank">Manual insertion</a>: widgets, shortcodes, PHP function call</li>
+          <li><a href="https://adinserter.pro/alignments-and-styles" class="simple-link" target="_blank">Sticky positions</a> (left, top, right, bottom - ads stay fixed when the page scrolls)</li>
+          <li><a href="http://adinserter.pro/documentation#manual-insertion" class="simple-link" target="_blank">Sticky (fixed) widgets</a> (sidebar does not move when the page scrolls)</li>
           <li>Block <a href="https://adinserter.pro/alignments-and-styles" class="simple-link" target="_blank">alignment and style</a> customizations</li>
           <li><a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">Clearance</a> options to avoid insertion near images or headers (AdSense TOS)</li>
-          <li>Options to disable insertion on Ajax calls, 404 error pages or in feeds</li>
-          <li>Ad rotation (works also with caching)</li>
+          <li>Options to <a href="http://adinserter.pro/documentation#misc" class="simple-link" target="_blank">disable insertion</a> on Ajax calls, 404 error pages or in RSS feeds</li>
+          <li><a href="http://adinserter.pro/documentation#ad-rotation" class="simple-link" target="_blank">Ad rotation</a> (works also with caching)</li>
           <li>Ad impression and click <a href="https://adinserter.pro/tracking" class="simple-link" target="_blank">tracking</a> (works also with Javascript ads like AdSense)</li>
           <li>Support for <a href="https://adinserter.pro/tracking#ab-testing" class="simple-link" target="_blank">A/B testing</a></li>
           <li>Support for ads on <a href="http://adinserter.pro/settings#amp" class="simple-link" target="_blank">AMP pages</a></li>
@@ -1887,8 +1963,10 @@ function sidebar_pro () { ?>
           <li>Support for <a href="http://adinserter.pro/documentation#header-footer" class="simple-link" target="_blank">header and footer</a> code</li>
           <li>Support for Google Analytics, Piwik or any other web analytics code</li>
           <li>Desktop, tablet and phone server-side <a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">device detection</a></li>
-          <li>Client-side <a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">device detection</a> (works with caching, 6 custom viewports)</li>
-          <li><a href="http://adinserter.pro/documentation#lists" class="simple-link" target="_blank">Black/White-list</a> categories, tags, taxonomies, post IDs, urls, referers</li>
+          <li>Client-side <a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">mobile device detection</a> (works with caching, 6 custom viewports)</li>
+          <li><a href="https://adinserter.pro/ad-blocking-detection" class="simple-link" target="_blank">Ad blocking detection</a> - popup message, ad replacement, content protection</li>
+          <li><a href="https://adinserter.pro/tracking" class="simple-link" target="_blank">Ad blocking statistics</a></li>
+          <li><a href="http://adinserter.pro/documentation#lists" class="simple-link" target="_blank">Black/White-list</a> categories, tags, taxonomies, users, post IDs, urls, referers</li>
           <li><a href="http://adinserter.pro/documentation#lists" class="simple-link" target="_blank">Black/White-list</a> IP addresses or countries (works also with caching)</li>
           <li><a href="http://adinserter.pro/documentation#multisite" class="simple-link" target="_blank">Multisite options</a> to limit settings on the sites</li>
           <li>Import/Export block or plugin settings</li>
@@ -1903,10 +1981,71 @@ function sidebar_pro () { ?>
 
         <p style="text-align: justify;">Ad Inserter Pro is a complete all-in-one ad management plugin for WordPress website with many advertising features to automatically insert adverts on posts and pages.
            With Ad Inserter Pro you also get <strong>one year of free updates and support via email</strong>. If you find Ad Inserter useful and need more code blocks, GEO targeting,
-           impression and click tracking or multisite support then you can simply upgrade to <a href="http://adinserter.pro/" style="text-decoration: none;" target="_blank">Ad Inserter Pro</a> (existing settings will be preserved).</p>
+           impression and click tracking, ad blocking detection actions or multisite support then you can simply upgrade to <a href="http://adinserter.pro/" style="text-decoration: none;" target="_blank">Ad Inserter Pro</a> (existing settings will be preserved).</p>
       </div>
 
 <?php
 }
+
+function sidebar_pro_small () { ?>
+
+      <div class="ai-form header rounded" style="padding-bottom: 0;">
+        <div style="float: left;">
+          <a href="https://adinserter.pro/" class="simple-link" target="_blank"><img src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>icon-256x256.jpg" style="width: 100px;" /></a>
+        </div>
+        <div class="feature-list" style="float: right;">
+          <h3 style="text-align: center; margin: 0;">Looking for <a href="https://adinserter.pro/" class="simple-link" target="_blank">Pro Ad Management plugin</a>?</h3>
+          <hr style="margin-bottom: 0;" />
+
+          <div style="float: right; margin-left: 15px;">
+            <ul>
+              <li>Ads between posts</li>
+              <li>Ads between comments</li>
+              <li>Support via email</li>
+            </ul>
+          </div>
+
+          <div style="float: right; margin-left: 15px;">
+            <ul>
+              <li><a href="https://adinserter.pro/alignments-and-styles" class="simple-link" target="_blank">Sticky positions</a></li>
+              <li><a href="http://adinserter.pro/documentation#lists" class="simple-link" target="_blank">Limit insertions</a></li>
+              <li><a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">Clearance</a> options</li>
+            </ul>
+          </div>
+
+          <div style="float: right; margin-left: 15px;">
+            <ul>
+              <li>Ad rotation</li>
+              <li><a href="https://adinserter.pro/tracking#ab-testing" class="simple-link" target="_blank">A/B testing</a></li>
+              <li><a href="https://adinserter.pro/tracking" class="simple-link" target="_blank">Ad tracking</a></li>
+            </ul>
+          </div>
+
+          <div style="float: right; margin-left: 15px;">
+            <ul>
+              <li>Support for <a href="http://adinserter.pro/settings#amp" class="simple-link" target="_blank">AMP pages</a></li>
+              <li><a href="https://adinserter.pro/ad-blocking-detection" class="simple-link" target="_blank">Ad blocking detection</a></li>
+              <li><a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">Mobile device detection</a></li>
+
+            </ul>
+          </div>
+
+          <div style="float: right; margin-left: 15px;">
+            <ul>
+              <li>64 code blocks</li>
+              <li><a href="http://adinserter.pro/documentation#geo-targeting" class="simple-link" target="_blank">GEO targeting</a></li>
+              <li><a href="http://adinserter.pro/documentation#scheduling" class="simple-link" target="_blank">Scheduling</a></li>
+            </ul>
+          </div>
+
+          <div style="clear: both;"></div>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+
+<?php
+}
+
+
 
 

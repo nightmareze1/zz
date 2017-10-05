@@ -1,3 +1,5 @@
+var ai_adb = false;
+var ai_adb_wrapping_div_selector = ".AI_BLOCK_CLASS_NAME";
 var ai_adb_debugging = AI_DATAB_AI_JS_DEBUGGING;
 var ai_adb_active = false;
 var ai_adb_counter = 0;
@@ -113,8 +115,26 @@ var ai_adb_detected = function(n) {
 
         $(".ai-adb-show").each (function () {
           $(this).css ({"display": "block", "visibility": "visible"});
+
+          var tracking_data = $(this).data ('ai-tracking');
+          if (typeof tracking_data != 'undefined') {
+            var wrapping_div = $(this).closest (ai_adb_wrapping_div_selector);
+            if (typeof wrapping_div.data ("ai") != "undefined") {
+
+              if ($(this).hasClass ('ai-no-tracking')) {
+                var data = JSON.parse (atob (wrapping_div.data ("ai")));
+                if (typeof data !== "undefined" && data.constructor === Array) {
+                  data [1] = "";
+                  tracking_data = btoa (JSON.stringify (data));
+                }
+              }
+
+              wrapping_div.data ("ai", tracking_data);
+            }
+          }
+
           if (ai_adb_debugging) {
-            var debug_info = $(this).attr ("data");
+            var debug_info = $(this).data ("ai-debug");
             console.log ("AI ad blocking SHOW", typeof debug_info != "undefined" ? debug_info : "");
           }
         });
@@ -122,7 +142,7 @@ var ai_adb_detected = function(n) {
         $(".ai-adb-hide").each (function () {
           $(this).css ({"display": "none", "visibility": "hidden"});
           if (ai_adb_debugging) {
-            var debug_info = $(this).attr ("data");
+            var debug_info = $(this).data ("ai-debug");
             console.log ("AI ad blocking HIDE", typeof debug_info != "undefined" ? debug_info : "");
           }
         });
@@ -225,6 +245,7 @@ var ai_adb_detected = function(n) {
 
     }(jQuery));
 
+    ai_adb = true;
   }
 }
 
@@ -237,8 +258,7 @@ var ai_adb_undetected = function(n) {
   if (!ai_adb_active && ai_adb_counter == 3) {
     if (ai_adb_debugging) console.log ("AI ad blocking NOT DETECTED");
 
-      var AI_ADB_STATUS_MESSAGE=4;
-
+      var AI_ADB_STATUS_MESSAGE=4; // Check replacement code {}
 
 //      var redirected_page = false;
 //      if (ai_adb_redirection_url.toLowerCase().substring (0, 4) == "http") {
