@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
  * @since 1.0
  */
 function _imagify_display_options_page() {
-	global $_wp_additional_image_sizes, $wp_version;
+	global $wp_version;
 
 	if ( isset( $_POST['submit-goto-bulk'] ) ) { // WPCS: CSRF ok.
 		wp_safe_redirect( get_admin_url( get_current_blog_id(), 'upload.php?page=imagify-bulk-optimization' ) );
@@ -61,7 +61,12 @@ function _imagify_display_options_page() {
 		<div class="imagify-col imagify-main">
 			<?php $heading_tag = version_compare( $wp_version, '4.3' ) >= 0 ? 'h1' : 'h2'; ?>
 			<div class="imagify-title">
-				<img width="225" height="26" alt="Imagify" src="<?php echo IMAGIFY_ASSETS_IMG_URL; ?>imagify-logo.png" class="imagify-logo" /> <small><sup><?php echo IMAGIFY_VERSION; ?></sup></small>
+				<div class="imagify-logo-block">
+					<img width="225" height="26" alt="Imagify" src="<?php echo IMAGIFY_ASSETS_IMG_URL; ?>imagify-logo.png" class="imagify-logo" />
+					<small>
+						<sup><?php echo IMAGIFY_VERSION; ?></sup>
+					</small>
+				</div>
 
 				<?php $imagify_rate_url = 'https://wordpress.org/support/view/plugin-reviews/imagify?rate=5#postform'; ?>
 				<p class="imagify-rate-us">
@@ -126,7 +131,7 @@ function _imagify_display_options_page() {
 											printf(
 												/* translators: 1 is a link tag start, 2 is the link tag end. */
 												__( 'Don\'t have an API Key yet? %1$sCreate one, it\'s FREE%2$s.', 'imagify' ),
-												'<a id="imagify-signup" href="' . IMAGIFY_APP_MAIN . '/#/register">',
+												'<a id="imagify-signup" target="_blank" href="' . IMAGIFY_APP_MAIN . '/#/register">',
 												'</a>'
 											);
 											echo '</p>';
@@ -215,7 +220,7 @@ function _imagify_display_options_page() {
 
 									<br/><strong id="backup-dir-is-writable" class="imagify-error<?php echo $backup_error_class; ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'imagify_check_backup_dir_is_writable' ) ); ?>">
 										<?php
-										$backup_path = imagify_make_file_path_replative( get_imagify_backup_dir_path( true ) );
+										$backup_path = imagify_make_file_path_relative( get_imagify_backup_dir_path( true ) );
 										/* translators: %s is a file path. */
 										printf( __( 'The backup folder %s cannot be created or is not writable by the server, original images cannot be saved!', 'imagify' ), "<code>$backup_path</code>" );
 										?>

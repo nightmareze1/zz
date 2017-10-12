@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Plugins - Google Analytics Dashboard for WP (GADWP) - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-07-16 10:20:16+0000\n"
+"PO-Revision-Date: 2017-10-09 18:06:05+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -11,7 +11,15 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: Plugins - Google Analytics Dashboard for WP (GADWP) - Stable (latest release)\n"
 
-#: admin/settings.php:770
+#: admin/settings.php:870
+msgid "enable Google AMP Client Id API"
+msgstr "activar API de id de cliente de Google AMP"
+
+#: admin/settings.php:784
+msgid "enable Force SSL"
+msgstr "activar Forzar SSL"
+
+#: admin/settings.php:772
 msgid "use hitCallback to increase event tracking accuracy"
 msgstr "usa hitCallback para incrementar la precisión de seguimiento de eventos"
 
@@ -19,7 +27,7 @@ msgstr "usa hitCallback para incrementar la precisión de seguimiento de eventos
 msgid "DOM is disabled or libxml PHP extension is missing. Contact your hosting provider. Automatic tracking of events for AMP pages is not possible."
 msgstr "DOM está desactivado o la extensión PHP libxml no está disponible. Contacta con tu proveedor de alojamiento. El seguimiento automático de página AMP no es posible."
 
-#: admin/settings.php:746
+#: admin/settings.php:748
 msgid "exclude events from bounce-rate and time on page calculation"
 msgstr "excluye eventos del cálculo de la tasa de rebote y del tiempo de permanencia en la página"
 
@@ -42,11 +50,11 @@ msgstr "Este método está obsoleto, ¡lee la documentación!"
 msgid "No Data"
 msgstr "No hay datos"
 
-#: admin/settings.php:705
+#: admin/settings.php:707
 msgid "User Sample Rate:"
 msgstr "Tasa de prueba de usuario:"
 
-#: admin/settings.php:695
+#: admin/settings.php:697
 msgid "Speed Sample Rate:"
 msgstr "Tasa de prueba de velocidad:"
 
@@ -58,139 +66,139 @@ msgstr "Google Analytics Dashboard for WP (GADWP)"
 msgid "Precision: "
 msgstr "Precisión:"
 
-#: admin/settings.php:1223 admin/settings.php:1555
+#: admin/settings.php:1249 admin/settings.php:1581
 msgid "developer mode (requires advanced API knowledge)"
 msgstr "modo desarrollador (requiere conocimiento avanzado de la API)"
 
-#: admin/settings.php:1057
+#: admin/settings.php:1083
 msgid "Sessions ratio: %s."
 msgstr "Ratio de sesiones: %s."
 
-#: admin/settings.php:1055
+#: admin/settings.php:1081
 msgid "The report was based on %s of sessions."
 msgstr "El informe está basado en el %s de las sesiones."
 
-#: admin/settings.php:1053
+#: admin/settings.php:1079
 msgid "Last Detected on %s."
 msgstr "Último detectado en %s"
 
-#: admin/settings.php:1046
+#: admin/settings.php:1072
 msgid "Sampled Data"
 msgstr "Datos muestreados"
 
-#: admin/settings.php:1039
+#: admin/settings.php:1065
 msgid "Error Details: "
 msgstr "Detalles del error:"
 
-#: admin/settings.php:1030
+#: admin/settings.php:1056
 msgid "Last Error: "
 msgstr "Último error:"
 
-#: admin/settings.php:920
+#: admin/settings.php:946
 msgid "AMP Container ID:"
 msgstr "ID del contenedor AMP:"
 
-#: admin/settings.php:892
+#: admin/settings.php:918
 msgid "Container ID:"
 msgstr "ID del contenedor:"
 
-#: admin/settings.php:887
+#: admin/settings.php:913
 msgid "enable Page Hiding support"
 msgstr "activa la compatibilidad con ocultación de página"
 
-#: admin/settings.php:875
+#: admin/settings.php:901
 msgid "enable Optimize tracking"
 msgstr "activa la optimización de seguimiento"
 
-#: admin/settings.php:864
+#: admin/settings.php:890
 msgid "Optimize"
 msgstr "Optimizar"
 
-#: admin/settings.php:859
+#: admin/settings.php:885
 msgid "Enhanced Ecommerce Plugin"
 msgstr "Plugin de ecommerce mejorado"
 
-#: admin/settings.php:858
+#: admin/settings.php:884
 msgid "Ecommerce Plugin"
 msgstr "Plugin de ecommerce"
 
-#: admin/settings.php:852
+#: admin/settings.php:878
 msgid "Ecommerce Tracking:"
 msgstr "Seguimiento de ecommerce:"
 
-#: admin/settings.php:848
+#: admin/settings.php:874
 msgid "Ecommerce"
 msgstr "Ecommerce"
 
-#: admin/settings.php:844 admin/settings.php:915
+#: admin/settings.php:858 admin/settings.php:941
 msgid "enable tracking for Accelerated Mobile Pages (AMP)"
 msgstr "activa el seguimiento de páginas móviles aceleradas (AMP)"
 
-#: admin/settings.php:833 admin/settings.php:904
+#: admin/settings.php:847 admin/settings.php:930
 msgid "Accelerated Mobile Pages (AMP)"
 msgstr "Páginas móviles aceleradas (AMP)"
 
-#: admin/settings.php:825
+#: admin/settings.php:839
 msgid "seconds"
 msgstr "segundos"
 
-#: admin/settings.php:683
+#: admin/settings.php:685
 msgid "enable page scrolling depth variables: "
 msgstr "activar variables de profundidad de navegación de página:"
 
-#: admin/settings.php:672
+#: admin/settings.php:674
 msgid "Page Scrolling Depth Variables"
 msgstr "Variables de profundidad de navegación de página"
 
-#: admin/settings.php:597
+#: admin/settings.php:599
 msgid "Main Variables"
 msgstr "Variables principales"
 
-#: admin/settings.php:512
+#: admin/settings.php:514
 msgid "Custom Dimensions"
 msgstr "Dimensiones personalizadas"
 
-#: admin/settings.php:474
+#: admin/settings.php:476
 msgid "track page scrolling depth"
 msgstr "seguimiento de profundidad de navegación página"
 
-#: admin/settings.php:462
+#: admin/settings.php:464
 msgid "track form submit actions"
 msgstr "seguimiento de acciones de envío de formularios"
 
-#: admin/settings.php:438
+#: admin/settings.php:440
 msgid "track affiliate links"
 msgstr "seguimiento de enlaces de afiliado"
 
-#: admin/settings.php:426
+#: admin/settings.php:428
 msgid "track downloads, mailto, telephone and outbound links"
 msgstr "seguimiento de descargas, mailto, teléfono y enlaces salientes"
 
-#: admin/settings.php:406 admin/settings.php:503
+#: admin/settings.php:408 admin/settings.php:505
 msgid "HTML Body"
 msgstr "Cuerpo HTML"
 
-#: admin/settings.php:405 admin/settings.php:502
+#: admin/settings.php:407 admin/settings.php:504
 msgid "HTML Head"
 msgstr "Cabecera HTML"
 
-#: admin/settings.php:400 admin/settings.php:497
+#: admin/settings.php:402 admin/settings.php:499
 msgid "Code Placement:"
 msgstr "Ubicación del código:"
 
-#: admin/settings.php:390
+#: admin/settings.php:392
 msgid "Web Container ID:"
 msgstr "ID del contenedor web:"
 
-#: admin/settings.php:374
+#: admin/settings.php:376
 msgid "Tag Manager"
 msgstr "Tag Manager"
 
-#: admin/settings.php:353
+#: admin/settings.php:355
 msgid "DataLayer Variables"
 msgstr "Variables de DataLayer"
 
-#: admin/settings.php:351 admin/settings.php:353
+#: admin/settings.php:353 admin/settings.php:355
 msgid "Integration"
 msgstr "Integración"
 
@@ -217,31 +225,31 @@ msgstr "Tiempo de carga de página"
 msgid "Time on Page"
 msgstr "Tiempo en la página"
 
-#: tools/gapi.php:498
+#: tools/gapi.php:500
 msgid "Source:"
 msgstr "Origen:"
 
-#: tools/gapi.php:498
+#: tools/gapi.php:500
 msgid "URI:"
 msgstr "URI:"
 
-#: admin/setup.php:178 tools/gapi.php:494
+#: admin/setup.php:178 tools/gapi.php:496
 msgid "404 Errors"
 msgstr "Errores 404"
 
-#: admin/settings.php:542 admin/settings.php:625
+#: admin/settings.php:544 admin/settings.php:627
 msgid "Publication Month:"
 msgstr "Mes de publicación:"
 
-#: admin/settings.php:302
+#: admin/settings.php:304
 msgid "404 Page Title contains:"
 msgstr "El título de la página 404 contiene:"
 
-#: admin/settings.php:298
+#: admin/settings.php:300
 msgid "404 Errors Report"
 msgstr "Informe de errores 404"
 
-#: admin/settings.php:292
+#: admin/settings.php:294
 msgid "Maps API Key:"
 msgstr "Clave API de Maps:"
 
@@ -249,15 +257,15 @@ msgstr "Clave API de Maps:"
 msgid "Invalid response"
 msgstr "Respuesta no válida"
 
-#: admin/settings.php:581 admin/settings.php:661
+#: admin/settings.php:583 admin/settings.php:663
 msgid "Tags:"
 msgstr "Etiquetas:"
 
-#: tools/gapi.php:723
+#: tools/gapi.php:725
 msgid "Other"
 msgstr "Otro"
 
-#: tools/gapi.php:660
+#: tools/gapi.php:662
 msgid "Devices"
 msgstr "Dispositivos"
 
@@ -288,33 +296,33 @@ msgstr "Tráfico"
 #. translators: Example: 'l, F j, Y' will become 'Thusday, November 17, 2015'
 #. For details see:
 #. http://php.net/manual/en/function.date.php#refsect1-function.date-parameters
-#: tools/gapi.php:385 tools/gapi.php:760
+#: tools/gapi.php:387 tools/gapi.php:762
 msgid "l, F j, Y"
 msgstr "l, j \\d\\e F \\d\\e Y"
 
 #. translators: Example: 'F, Y' will become 'November, 2015' For details see:
 #. http://php.net/manual/en/function.date.php#refsect1-function.date-parameters
-#: tools/gapi.php:376
+#: tools/gapi.php:378
 msgid "F, Y"
 msgstr "j F Y"
 
-#: admin/settings.php:774
+#: admin/settings.php:788
 msgid "Cross-domain Tracking"
 msgstr "Seguimiento multidominio"
 
-#: admin/settings.php:798
+#: admin/settings.php:812
 msgid "Cookie Customization"
 msgstr "Personalización de la cookie"
 
-#: admin/settings.php:820
+#: admin/settings.php:834
 msgid "Cookie Expires:"
 msgstr "Expiración de la cookie:"
 
-#: admin/settings.php:811
+#: admin/settings.php:825
 msgid "Cookie Name:"
 msgstr "Nombre de la cookie:"
 
-#: admin/settings.php:802
+#: admin/settings.php:816
 msgid "Cookie Domain:"
 msgstr "Dominio de la cookie:"
 
@@ -327,43 +335,43 @@ msgid "Displays Google Analytics Reports and Real-Time Statistics in your Dashbo
 msgstr "Muestra informes de Google Analytics y estadísticas en tiempo real en tu escritorio. Inserta automáticamente el código de seguimiento en cada página de tu web."
 
 #. #-#-#-#-#  google-analytics-dashboard-for-wp-code.pot (Google Analytics
-#. Dashboard for WP (GADWP) 5.1.1.1)  #-#-#-#-#
+#. Dashboard for WP (GADWP) 5.1.2)  #-#-#-#-#
 #. Plugin URI of the plugin/theme
 #. #-#-#-#-#  google-analytics-dashboard-for-wp-code.pot (Google Analytics
-#. Dashboard for WP (GADWP) 5.1.1.1)  #-#-#-#-#
+#. Dashboard for WP (GADWP) 5.1.2)  #-#-#-#-#
 #. Author URI of the plugin/theme
 msgid "https://deconf.com"
 msgstr "https://deconf.com"
 
-#: tools/gapi.php:708
+#: tools/gapi.php:710
 msgid "Type"
 msgstr "Tipo"
 
-#: tools/gapi.php:660
+#: tools/gapi.php:662
 msgid "Channels"
 msgstr "Canales"
 
-#: tools/gapi.php:598
+#: tools/gapi.php:600
 msgid "Cities from"
 msgstr "Ciudades de origen"
 
-#: tools/gapi.php:588
+#: tools/gapi.php:590
 msgid "Countries"
 msgstr "Paises"
 
-#: tools/gapi.php:346 tools/gapi.php:349 tools/gapi.php:751
+#: tools/gapi.php:348 tools/gapi.php:351 tools/gapi.php:753
 msgid "Date"
 msgstr "Fecha"
 
-#: tools/gapi.php:343
+#: tools/gapi.php:345
 msgid "Hour"
 msgstr "Hora"
 
-#: tools/gapi.php:335
+#: tools/gapi.php:337
 msgid "Unique Page Views"
 msgstr "Páginas vistas únicas"
 
-#: tools/gapi.php:332
+#: tools/gapi.php:334
 msgid "Organic Searches"
 msgstr "Búsquedas orgánicas"
 
@@ -467,12 +475,12 @@ msgstr "CAMPAÑA"
 msgid "SOCIAL"
 msgstr "SOCIAL"
 
-#: admin/setup.php:173 tools/gapi.php:466
+#: admin/setup.php:173 tools/gapi.php:468
 msgid "Pages"
 msgstr "Páginas"
 
 #: admin/setup.php:167 admin/setup.php:186 front/widgets.php:40
-#: tools/gapi.php:338 tools/gapi.php:751
+#: tools/gapi.php:340 tools/gapi.php:753
 msgid "Sessions"
 msgstr "Sesiones"
 
@@ -563,12 +571,12 @@ msgid "A JavaScript Error is blocking plugin resources!"
 msgstr "¡Un error de JavaScript está bloqueando los recursos del plugin!"
 
 #: admin/setup.php:175 admin/setup.php:276 front/setup.php:84
-#: tools/gapi.php:565
+#: tools/gapi.php:567
 msgid "Searches"
 msgstr "Búsquedas"
 
 #: admin/setup.php:174 admin/setup.php:275 front/setup.php:83
-#: tools/gapi.php:530
+#: tools/gapi.php:532
 msgid "Referrers"
 msgstr "Referencias"
 
@@ -577,12 +585,12 @@ msgid "Location"
 msgstr "Ubicación"
 
 #: admin/setup.php:171 admin/setup.php:189 admin/setup.php:273
-#: admin/setup.php:289 front/setup.php:81 front/setup.php:97 tools/gapi.php:329
+#: admin/setup.php:289 front/setup.php:81 front/setup.php:97 tools/gapi.php:331
 msgid "Bounce Rate"
 msgstr "Tasa de rebote"
 
 #: admin/setup.php:170 admin/setup.php:188 admin/setup.php:272
-#: admin/setup.php:288 front/setup.php:80 front/setup.php:96 tools/gapi.php:326
+#: admin/setup.php:288 front/setup.php:80 front/setup.php:96 tools/gapi.php:328
 msgid "Page Views"
 msgstr "Páginas vistas"
 
@@ -591,7 +599,7 @@ msgid "Organic"
 msgstr "Búsquedas orgánicas"
 
 #: admin/setup.php:168 admin/setup.php:187 admin/setup.php:270
-#: admin/setup.php:287 front/setup.php:78 front/setup.php:95 tools/gapi.php:323
+#: admin/setup.php:287 front/setup.php:78 front/setup.php:95 tools/gapi.php:325
 msgid "Users"
 msgstr "Usuarios"
 
@@ -648,406 +656,406 @@ msgstr "Ajustes del escritorio"
 msgid "Google Analytics"
 msgstr "Google Analytics"
 
-#: admin/settings.php:1760
+#: admin/settings.php:1786
 msgid "Web Analytics"
 msgstr "Analítica web"
 
-#: admin/settings.php:1760
+#: admin/settings.php:1786
 msgid "%s service with users tracking at IP level."
 msgstr "%s servicio con seguimiento de usuarios a nivel IP."
 
-#: admin/settings.php:1774
+#: admin/settings.php:1800
 msgid "WordPress Plugins"
 msgstr "Plugins de WordPress"
 
-#: admin/settings.php:1774
+#: admin/settings.php:1800
 msgid "Other %s written by the same author"
 msgstr "Otros %s escritos por el mismo autor"
 
-#: admin/settings.php:1767
+#: admin/settings.php:1793
 msgid "Improve search rankings"
 msgstr "Mejora los rankings en los buscadores"
 
-#: admin/settings.php:1767
+#: admin/settings.php:1793
 msgid "%s by moving your website to HTTPS/SSL."
 msgstr "%s moviendo tu sitio web a HTTPS/SSL."
 
-#: admin/settings.php:1753
+#: admin/settings.php:1779
 msgid "Further Reading"
 msgstr "Lecturas adicionales"
 
-#: admin/settings.php:1747
+#: admin/settings.php:1773
 msgid "rate this plugin"
 msgstr "valora este plugin"
 
-#: admin/settings.php:1747
+#: admin/settings.php:1773
 msgid "Your feedback and review are both important, %s!"
 msgstr "¡Tu opinión es importante, %s!"
 
-#: admin/settings.php:1722
+#: admin/settings.php:1748
 msgid "Follow & Review"
 msgstr "Seguir y valorar"
 
-#: admin/settings.php:1714
+#: admin/settings.php:1740
 msgid "Setup Tutorial & Demo"
 msgstr "Tutorial de configuración y demostración"
 
-#: admin/settings.php:1658
+#: admin/settings.php:1684
 msgid "exclude Super Admin tracking for the entire network"
 msgstr "excluir del seguimiento al Super Admin en toda la red"
 
-#: admin/settings.php:1596
+#: admin/settings.php:1622
 msgid "Properties/Views Settings"
 msgstr "Ajustes de propiedades/vistas"
 
-#: admin/settings.php:1586
+#: admin/settings.php:1612
 msgid "Refresh Properties"
 msgstr "Actualizar propiedades"
 
-#: admin/settings.php:1535
+#: admin/settings.php:1561
 msgid "use a single Google Analytics account for the entire network"
 msgstr "utilizar una única cuenta de Google Analytics para toda la red"
 
-#: admin/settings.php:1523
+#: admin/settings.php:1549
 msgid "Network Setup"
 msgstr "Configuración de la red"
 
-#: admin/settings.php:1437
+#: admin/settings.php:1463
 msgid "Properties refreshed."
 msgstr "Propiedades actualizadas."
 
-#: admin/settings.php:1343 admin/settings.php:1679 admin/widgets.php:35
+#: admin/settings.php:1369 admin/settings.php:1705 admin/widgets.php:35
 msgid "Authorize Plugin"
 msgstr "Autorizar plugin"
 
-#: admin/settings.php:1321 admin/settings.php:1642
+#: admin/settings.php:1347 admin/settings.php:1668
 msgid "automatic updates for minor versions (security and maintenance releases only)"
 msgstr "actualizaciones automáticas para las versiones menores (sólo versiones de seguridad y mantenimiento)"
 
-#: admin/settings.php:1310 admin/settings.php:1630
+#: admin/settings.php:1336 admin/settings.php:1656
 msgid "Automatic Updates"
 msgstr "Actualizaciones automáticas"
 
-#: admin/settings.php:1297
+#: admin/settings.php:1323
 msgid "Theme Color:"
 msgstr "Color del tema:"
 
-#: admin/settings.php:1282
+#: admin/settings.php:1308
 msgid "Lock Selection"
 msgstr "Bloquear selección"
 
-#: admin/settings.php:1278 admin/settings.php:1620
+#: admin/settings.php:1304 admin/settings.php:1646
 msgid "Property not found"
 msgstr "Propiedad no encontrada"
 
-#: admin/settings.php:1265
+#: admin/settings.php:1291
 msgid "Select View:"
 msgstr "Seleccionar vista:"
 
-#: admin/settings.php:1261 admin/setup.php:43 admin/setup.php:59
+#: admin/settings.php:1287 admin/setup.php:43 admin/setup.php:59
 msgid "General Settings"
 msgstr "Ajustes generales"
 
-#: admin/settings.php:1252
+#: admin/settings.php:1278
 msgid "Reset Errors"
 msgstr "Restablecer errores"
 
-#: admin/settings.php:1251 admin/settings.php:1344 admin/settings.php:1585
-#: admin/settings.php:1680
+#: admin/settings.php:1277 admin/settings.php:1370 admin/settings.php:1611
+#: admin/settings.php:1706
 msgid "Clear Cache"
 msgstr "Borrar caché"
 
-#: admin/settings.php:1250 admin/settings.php:1584
+#: admin/settings.php:1276 admin/settings.php:1610
 msgid "Clear Authorization"
 msgstr "Borrar autorización"
 
-#: admin/settings.php:1238 admin/settings.php:1571
+#: admin/settings.php:1264 admin/settings.php:1597
 msgid "Client Secret:"
 msgstr "Client Secret:"
 
-#: admin/settings.php:1230 admin/settings.php:1562
+#: admin/settings.php:1256 admin/settings.php:1588
 msgid "Client ID:"
 msgstr "Client ID:"
 
-#: admin/settings.php:1217 admin/settings.php:1549
+#: admin/settings.php:1243 admin/settings.php:1575
 msgid "tutorial"
 msgstr "tutorial"
 
-#: admin/settings.php:1217 admin/settings.php:1549
+#: admin/settings.php:1243 admin/settings.php:1575
 msgid "video"
 msgstr "vídeo"
 
-#: admin/settings.php:1217 admin/settings.php:1549
+#: admin/settings.php:1243 admin/settings.php:1575
 msgid "You should watch the %1$s and read this %2$s before proceeding to authorization. This plugin requires a properly configured Google Analytics account!"
 msgstr "Deberías ver este %1$s y leer este %2$s antes de continuar con la autorización. ¡Este plugin requiere una cuenta de Google Analytics correctamente configurada!"
 
-#: admin/settings.php:1212 admin/settings.php:1545
+#: admin/settings.php:1238 admin/settings.php:1571
 msgid "Plugin Authorization"
 msgstr "Autorización del plugin"
 
-#: admin/settings.php:1200 admin/settings.php:1511
+#: admin/settings.php:1226 admin/settings.php:1537
 msgid "Use the red link (see below) to generate and get your access code!"
 msgstr "¡Utiliza el enlace rojo (ver debajo) para generar y obtener tu código de acceso!"
 
-#: admin/settings.php:1185 admin/settings.php:1496
+#: admin/settings.php:1211 admin/settings.php:1522
 msgid "Google Analytics Settings"
 msgstr "Ajustes de Google Analytics"
 
-#: admin/settings.php:1175 admin/settings.php:1486
+#: admin/settings.php:1201 admin/settings.php:1512
 msgid "All other domains/properties were removed."
 msgstr "Se eliminaron todos los demás dominios/propiedades."
 
-#: admin/settings.php:1162
+#: admin/settings.php:1188
 msgid "All errors reseted."
 msgstr "Restablecidos todos los errores."
 
-#: admin/settings.php:1152 admin/settings.php:1472
+#: admin/settings.php:1178 admin/settings.php:1498
 msgid "Token Reseted and Revoked."
 msgstr "Token restablecido y revocado."
 
-#: admin/settings.php:1143 admin/settings.php:1463
+#: admin/settings.php:1169 admin/settings.php:1489
 msgid "Cleared Cache."
 msgstr "Caché borrada."
 
-#: admin/settings.php:1137 admin/settings.php:1431
+#: admin/settings.php:1163 admin/settings.php:1457
 msgid "The access code is <strong>NOT</strong> your <strong>Tracking ID</strong> (UA-XXXXX-X). Try again, and use the red link to get your access code"
 msgstr "El código de acceso <strong>NO</strong> es tu <strong>ID de seguimiento</strong> (UA-XXXXX-X). Vuelve a intentarlo y utiliza el enlace rojo para obtener tu código de acceso"
 
-#: admin/settings.php:1105 admin/settings.php:1392
+#: admin/settings.php:1131 admin/settings.php:1418
 msgid "Plugin authorization succeeded."
 msgstr "La autorización del plugin se realizó con éxito."
 
-#: admin/settings.php:1092
+#: admin/settings.php:1118
 msgid "Library conflicts between WordPress plugins"
 msgstr "Conflictos de bibliotecas entre plugins de WordPress"
 
-#: admin/settings.php:1092 admin/settings.php:1377
+#: admin/settings.php:1118 admin/settings.php:1403
 msgid "Loading the required libraries. If this results in a blank screen or a fatal error, try this solution:"
 msgstr "Cargando las bibliotecas necesarias. Si esto resulta en una pantalla en blanco o un error fatal, prueba esta solución:"
 
-#: admin/settings.php:1068
+#: admin/settings.php:1094
 msgid "Plugin Configuration"
 msgstr "Configuración del plugin"
 
-#: admin/settings.php:1035
+#: admin/settings.php:1061
 msgid "Error Details"
 msgstr "Detalle de errores"
 
-#: admin/settings.php:1029 admin/settings.php:1039 admin/settings.php:1059
+#: admin/settings.php:1055 admin/settings.php:1065 admin/settings.php:1085
 msgid "None"
 msgstr "Ninguno"
 
-#: admin/settings.php:1024
+#: admin/settings.php:1050
 msgid "Last Error detected"
 msgstr "Último error detectado"
 
-#: admin/settings.php:1018
+#: admin/settings.php:1044
 msgid "Plugin Settings"
 msgstr "Ajustes del plugin"
 
-#: admin/settings.php:1018
+#: admin/settings.php:1044
 msgid "Errors & Details"
 msgstr "Errores y detalles"
 
-#: admin/settings.php:1010
+#: admin/settings.php:1036
 msgid "Google Analytics Errors & Debugging"
 msgstr "Errores y registro de depuración de Google Analytics"
 
-#: admin/settings.php:936
+#: admin/settings.php:962
 msgid "Exclude tracking for:"
 msgstr "Excluir seguimiento para:"
 
-#: admin/settings.php:790
+#: admin/settings.php:804
 msgid "Cross Domains:"
 msgstr "Multidominio:"
 
-#: admin/settings.php:785
+#: admin/settings.php:799
 msgid "enable cross domain tracking"
 msgstr "activar seguimiento multidominio"
 
-#: admin/settings.php:758
+#: admin/settings.php:760
 msgid "enable enhanced link attribution"
 msgstr "activar atribución de enlace mejorada"
 
-#: admin/settings.php:691
+#: admin/settings.php:693
 msgid "Advanced Tracking"
 msgstr "Seguimiento avanzado"
 
-#: admin/settings.php:568 admin/settings.php:649
+#: admin/settings.php:570 admin/settings.php:651
 msgid "User Type:"
 msgstr "Tipo de usuario:"
 
-#: admin/settings.php:555 admin/settings.php:637
+#: admin/settings.php:557 admin/settings.php:639
 msgid "Categories:"
 msgstr "Categorías:"
 
-#: admin/settings.php:529 admin/settings.php:613
+#: admin/settings.php:531 admin/settings.php:615
 msgid "Publication Year:"
 msgstr "Año de publicación:"
 
-#: admin/settings.php:516 admin/settings.php:601
+#: admin/settings.php:518 admin/settings.php:603
 msgid "Authors:"
 msgstr "Autores:"
 
-#: admin/settings.php:450
+#: admin/settings.php:452
 msgid "track fragment identifiers, hashmarks (#) in URI links"
 msgstr "rastrear identificadores de fragmentos, hashmarks (#) en enlaces URI"
 
-#: admin/settings.php:488
+#: admin/settings.php:490
 msgid "Affiliates Regex:"
 msgstr "Afiliados Regex:"
 
-#: admin/settings.php:479
+#: admin/settings.php:481
 msgid "Downloads Regex:"
 msgstr "Descargas Regex:"
 
-#: admin/settings.php:734
+#: admin/settings.php:736
 msgid "enable remarketing, demographics and interests reports"
 msgstr "activar informes de remarketing, datos demográficos e intereses"
 
-#: admin/settings.php:722
+#: admin/settings.php:724
 msgid "anonymize IPs while tracking"
 msgstr "anonimizar IPs durante el seguimiento"
 
-#: admin/settings.php:368
+#: admin/settings.php:370
 msgid "Tracking Type:"
 msgstr "Tipo de seguimiento:"
 
-#: admin/settings.php:384 admin/settings.php:1291
+#: admin/settings.php:386 admin/settings.php:1317
 msgid "Time Zone:"
 msgstr "Zona horaria:"
 
-#: admin/settings.php:384 admin/settings.php:1291
+#: admin/settings.php:386 admin/settings.php:1317
 msgid "Default URL:"
 msgstr "URL predeterminada:"
 
-#: admin/settings.php:384 admin/settings.php:1291
+#: admin/settings.php:386 admin/settings.php:1317
 msgid "Tracking ID:"
 msgstr "ID de seguimiento:"
 
-#: admin/settings.php:384 admin/settings.php:1272 admin/settings.php:1291
-#: admin/settings.php:1613
+#: admin/settings.php:386 admin/settings.php:1298 admin/settings.php:1317
+#: admin/settings.php:1639
 msgid "View Name:"
 msgstr "Nombre de vista:"
 
-#: admin/settings.php:375 admin/settings.php:607 admin/settings.php:619
-#: admin/settings.php:631 admin/settings.php:643 admin/settings.php:655
-#: admin/settings.php:667 admin/settings.php:857
+#: admin/settings.php:377 admin/settings.php:609 admin/settings.php:621
+#: admin/settings.php:633 admin/settings.php:645 admin/settings.php:657
+#: admin/settings.php:669 admin/settings.php:883
 msgid "Disabled"
 msgstr "Desactivado"
 
-#: admin/settings.php:364
+#: admin/settings.php:366
 msgid "Tracking Settings"
 msgstr "Ajustes de seguimiento"
 
-#: admin/settings.php:351
+#: admin/settings.php:353
 msgid "Advanced Settings"
 msgstr "Ajustes avanzados"
 
-#: admin/settings.php:351 admin/settings.php:353 admin/settings.php:932
-#: admin/settings.php:1647
+#: admin/settings.php:353 admin/settings.php:355 admin/settings.php:958
+#: admin/settings.php:1673
 msgid "Exclude Tracking"
 msgstr "Excluir seguimiento"
 
-#: admin/settings.php:351
+#: admin/settings.php:353
 msgid "Custom Definitions"
 msgstr "Definiciones personalizadas"
 
-#: admin/settings.php:351 admin/settings.php:415
+#: admin/settings.php:353 admin/settings.php:417
 msgid "Events Tracking"
 msgstr "Seguimiento de eventos"
 
-#: admin/settings.php:351 admin/settings.php:353 admin/settings.php:355
+#: admin/settings.php:353 admin/settings.php:355 admin/settings.php:357
 msgid "Basic Settings"
 msgstr "Ajustes básicos"
 
-#: admin/settings.php:343
+#: admin/settings.php:345
 msgid "Google Analytics Tracking Code"
 msgstr "Código de seguimiento de Google Analytics"
 
-#: admin/settings.php:286
+#: admin/settings.php:288
 msgid "Target Geo Map to country:"
 msgstr "Centrar el mapa geográfico en el país:"
 
-#: admin/settings.php:282
+#: admin/settings.php:284
 msgid "Location Settings"
 msgstr "Ajustes de ubicación"
 
-#: admin/settings.php:276
+#: admin/settings.php:278
 msgid "Maximum number of pages to display on real-time tab:"
 msgstr "Número máximo de páginas a mostrar en la pestaña de tiempo real:"
 
-#: admin/settings.php:273
+#: admin/settings.php:275
 msgid "Real-Time Settings"
 msgstr "Ajustes de tiempo real"
 
-#: admin/settings.php:268
+#: admin/settings.php:270
 msgid "enable the main Dashboard Widget"
 msgstr "activar el widget del escritorio principal"
 
-#: admin/settings.php:256
+#: admin/settings.php:258
 msgid "enable reports on Posts List and Pages List"
 msgstr "activar informes en los listados de entradas y páginas"
 
-#: admin/settings.php:244
+#: admin/settings.php:246
 msgid "enable Switch View functionality"
 msgstr "activar la funcionalidad de cambio de vista"
 
-#: admin/settings.php:194
+#: admin/settings.php:196
 msgid "Google Analytics Backend Settings"
 msgstr "Ajustes de escritorio de Google Analytics"
 
-#: admin/settings.php:165 admin/settings.php:313 admin/settings.php:972
-#: admin/settings.php:1332 admin/settings.php:1668
+#: admin/settings.php:167 admin/settings.php:315 admin/settings.php:998
+#: admin/settings.php:1358 admin/settings.php:1694
 msgid "Save Changes"
 msgstr "Guardar cambios"
 
-#: admin/settings.php:155
+#: admin/settings.php:157
 msgid "enable web page reports on frontend"
 msgstr "activar informes de la web en portada"
 
-#: admin/settings.php:119 admin/settings.php:208
+#: admin/settings.php:121 admin/settings.php:210
 msgid "Show stats to:"
 msgstr "Mostrar estadísticas a:"
 
-#: admin/settings.php:115 admin/settings.php:204
+#: admin/settings.php:117 admin/settings.php:206
 msgid "Permissions"
 msgstr "Permisos"
 
-#: admin/settings.php:105
+#: admin/settings.php:107
 msgid "Google Analytics Frontend Settings"
 msgstr "Ajustes de portada de Google Analytics"
 
-#: admin/settings.php:100 admin/settings.php:189 admin/settings.php:338
-#: admin/settings.php:1006 admin/settings.php:1194 admin/settings.php:1505
+#: admin/settings.php:102 admin/settings.php:191 admin/settings.php:340
+#: admin/settings.php:1032 admin/settings.php:1220 admin/settings.php:1531
 #: admin/setup.php:196 admin/setup.php:296 front/setup.php:104
 msgid "authorize the plugin"
 msgstr "autorizar el plugin"
 
-#: admin/settings.php:100 admin/settings.php:189 admin/settings.php:338
-#: admin/settings.php:1006 admin/settings.php:1194 admin/settings.php:1505
+#: admin/settings.php:102 admin/settings.php:191 admin/settings.php:340
+#: admin/settings.php:1032 admin/settings.php:1220 admin/settings.php:1531
 #: admin/setup.php:47 admin/setup.php:60
 msgid "Errors & Debug"
 msgstr "Errores y depuración"
 
-#: admin/settings.php:100 admin/settings.php:189 admin/settings.php:338
-#: admin/settings.php:1006 admin/settings.php:1194 admin/settings.php:1505
+#: admin/settings.php:102 admin/settings.php:191 admin/settings.php:340
+#: admin/settings.php:1032 admin/settings.php:1220 admin/settings.php:1531
 msgid "Something went wrong, check %1$s or %2$s."
 msgstr "Algo salió mal, comprueba %1$s o %2$s."
 
-#: admin/settings.php:96 admin/settings.php:185 admin/settings.php:334
-#: admin/settings.php:1145 admin/settings.php:1155 admin/settings.php:1164
-#: admin/settings.php:1170 admin/settings.php:1180 admin/settings.php:1457
-#: admin/settings.php:1465 admin/settings.php:1475 admin/settings.php:1481
-#: admin/settings.php:1491
+#: admin/settings.php:98 admin/settings.php:187 admin/settings.php:336
+#: admin/settings.php:1171 admin/settings.php:1181 admin/settings.php:1190
+#: admin/settings.php:1196 admin/settings.php:1206 admin/settings.php:1483
+#: admin/settings.php:1491 admin/settings.php:1501 admin/settings.php:1507
+#: admin/settings.php:1517
 msgid "Cheating Huh?"
 msgstr "¿Haciendo trampas, eh?"
 
-#: admin/settings.php:94 admin/settings.php:183 admin/settings.php:332
-#: admin/settings.php:1168 admin/settings.php:1479
+#: admin/settings.php:96 admin/settings.php:185 admin/settings.php:334
+#: admin/settings.php:1194 admin/settings.php:1505
 msgid "Settings saved."
 msgstr "Ajustes guardados."
 
-#: admin/item-reports.php:53 admin/settings.php:373 front/item-reports.php:30
+#: admin/item-reports.php:53 admin/settings.php:375 front/item-reports.php:30
 msgid "Analytics"
 msgstr "Analytics"

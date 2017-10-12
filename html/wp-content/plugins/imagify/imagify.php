@@ -3,7 +3,7 @@
  * Plugin Name: Imagify
  * Plugin URI: https://wordpress.org/plugins/imagify/
  * Description: Dramaticaly reduce image file sizes without losing quality, make your website load faster, boost your SEO and save money on your bandwidth using Imagify, the new most advanced image optimization tool.
- * Version: 1.6.9.1
+ * Version: 1.6.10
  * Author: WP Media
  * Author URI: https://wp-media.me/
  * Licence: GPLv2
@@ -17,7 +17,7 @@
 defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
 
 // Imagify defines.
-define( 'IMAGIFY_VERSION'                , '1.6.9.1' );
+define( 'IMAGIFY_VERSION'                , '1.6.10' );
 define( 'IMAGIFY_SLUG'                   , 'imagify' );
 define( 'IMAGIFY_SETTINGS_SLUG'          , IMAGIFY_SLUG . '_settings' );
 define( 'IMAGIFY_WEB_MAIN'               , 'https://imagify.io' );
@@ -26,7 +26,6 @@ define( 'IMAGIFY_PAYMENT_URL'            , IMAGIFY_APP_MAIN . '/#/plugin/' );
 define( 'IMAGIFY_FILE'                   , __FILE__ );
 define( 'IMAGIFY_PATH'                   , realpath( plugin_dir_path( IMAGIFY_FILE ) ) . '/' );
 define( 'IMAGIFY_INC_PATH'               , realpath( IMAGIFY_PATH . 'inc/' ) . '/' );
-define( 'IMAGIFY_API_PATH'               , realpath( IMAGIFY_INC_PATH . 'api/' ) . '/' );
 define( 'IMAGIFY_ADMIN_PATH'             , realpath( IMAGIFY_INC_PATH . 'admin' ) . '/' );
 define( 'IMAGIFY_ADMIN_UI_PATH'          , realpath( IMAGIFY_ADMIN_PATH . 'ui' ) . '/' );
 define( 'IMAGIFY_COMMON_PATH'            , realpath( IMAGIFY_INC_PATH . 'common' ) . '/' );
@@ -59,15 +58,13 @@ function _imagify_init() {
 		return;
 	}
 
-	require( IMAGIFY_INC_PATH . 'compat.php' );
-	require( IMAGIFY_API_PATH . 'imagify.php' );
+	require( IMAGIFY_FUNCTIONS_PATH . 'compat.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'deprecated.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'common.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'options.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'formatting.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'files.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'admin.php' );
-	require( IMAGIFY_FUNCTIONS_PATH . 'notices.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'api.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'attachments.php' );
 	require( IMAGIFY_FUNCTIONS_PATH . 'process.php' );
@@ -79,6 +76,8 @@ function _imagify_init() {
 	require( IMAGIFY_CLASSES_PATH . 'class-imagify.php' );
 	require( IMAGIFY_CLASSES_PATH . 'class-imagify-user.php' );
 	require( IMAGIFY_CLASSES_PATH . 'class-imagify-attachment.php' );
+	require( IMAGIFY_CLASSES_PATH . 'class-imagify-notices.php' );
+	require( IMAGIFY_CLASSES_PATH . 'class-imagify-assets.php' );
 	require( IMAGIFY_COMMON_PATH . 'attachments.php' );
 	require( IMAGIFY_COMMON_PATH . 'admin-bar.php' );
 	require( IMAGIFY_COMMON_PATH . 'cron.php' );
@@ -93,12 +92,14 @@ function _imagify_init() {
 		require( IMAGIFY_ADMIN_PATH . 'plugins.php' );
 		require( IMAGIFY_ADMIN_PATH . 'upload.php' );
 		require( IMAGIFY_ADMIN_PATH . 'media.php' );
-		require( IMAGIFY_ADMIN_PATH . 'enqueue.php' );
 		require( IMAGIFY_ADMIN_PATH . 'meta-boxes.php' );
 		require( IMAGIFY_ADMIN_UI_PATH . 'options.php' );
 		require( IMAGIFY_ADMIN_UI_PATH . 'bulk.php' );
-		require( IMAGIFY_ADMIN_UI_PATH . 'notices.php' );
+
+		Imagify_Notices::get_instance()->init();
 	}
+
+	Imagify_Assets::get_instance()->init();
 
 	/**
 	* Fires when Imagify is correctly loaded.
