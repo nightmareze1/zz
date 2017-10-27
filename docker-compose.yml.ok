@@ -22,6 +22,17 @@ services:
        - ./html:/var/www/html 
      links:
        - mysql-test11:itshelldb
-     ports:
-       - "443:443"
-       - "80:80"
+     environment:
+       - VIRTUAL_HOST=www.itshellws.org,www.itshellweb.org,ELB-114930116.us-west-2.elb.amazonaws.com
+
+  nginx-proxy:
+      image: jwilder/nginx-proxy
+      container_name: nginx-proxy1
+      volumes:
+        - /var/run/docker.sock:/tmp/docker.sock
+        - ./certs:/etc/nginx/certs
+      ports:
+        - "443:443"
+        - "80:80"
+      security_opt:
+        - label:type:docker_t
