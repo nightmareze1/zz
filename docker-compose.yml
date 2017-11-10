@@ -20,6 +20,7 @@ services:
      container_name: wordpress-itshellws1
      volumes:
        - ./html:/var/www/html 
+       - ./apache2/apache2.conf:/etc/apache2/apache2.conf
      links:
        - mysql-test11:itshelldb
      ports:
