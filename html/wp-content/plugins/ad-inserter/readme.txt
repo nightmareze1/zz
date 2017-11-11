@@ -4,9 +4,9 @@ Contributors: spacetime
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4
 Tags: ads, adsense, ad management, advertising manager, advanced contextual ads, ad rotation, ad injection, adverts, sticky widgets, sticky sidebar, hook, amazon, banners, automatic insertion, amp, geo targeting, multisite, shortcodes, PHP, Javascript, HTML, header, footer, tracking, ad blocking, custom fields
 Requires at least: 4.0
-Tested up to: 4.8.2
+Tested up to: 4.9
 Requires PHP: 5.2.4
-Stable tag: 2.2.4
+Stable tag: 2.2.6
 License: GPLv3
 
 Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
@@ -35,7 +35,7 @@ Ad Inserter is more than just ad manager plugin. It provides many advanced optio
 > *   Insert between posts on blog pages (in-feed AdSense ads)
 > *   Insert between excerpts on blog pages
 > *   Insert between comments
-> *   Insert at custom hook positions (e.g. using <a href="https://genesistutorials.com/visual-hook-guide/" target="_blank">Genesis Theme Framework Hook Guide</a>)
+> *   Insert at custom hook positions
 > *   Clearance options to avoid insertion near images or headers
 > *   Insertion exceptions for posts and pages
 > *   Insert header and footer code
@@ -77,7 +77,7 @@ And Ad Inserter Pro - all-in-one <a href="http://adinserter.pro/" target="_blank
 > *   Export and import of settings
 > *   Support via email
 
-Ad Inserter Wordpress plugin is and advanced advertising manager - it has many features and options to automate ad insertion and to optimally monetize your website on desktop, tablet and phone displays. It provides many simple ways to insert any Javascript, HTML, PHP or advert code anywhere on the page. For best ad placement and to use optimal advertising positions please read the user manual to get the most of the plugin.
+Ad Inserter Wordpress plugin is an advanced advertising manager - it has many features and options to automate ad insertion and to optimally monetize your website on desktop, tablet and phone displays. It provides many simple ways to insert any Javascript, HTML, PHP or advert code anywhere on the page. For best ad placement and to use optimal advertising positions please read the user manual to get the most of the plugin.
 
 > *   Check <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation page</a> for detailed description of all the features and some <a href="http://adinserter.pro/settings" target="_blank">common settings</a> for quick start
 > *   Download **PDF user guide** for Ad Inserter: go to <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro plugin</a> page and below you can find button for free download of Ad Inserter User Guide
@@ -116,6 +116,14 @@ Ad Inserter is not just another plugin for WordPress ads. Do you enjoy finding t
 Maintaining several plugins (often from different vendors) is not easy. And each plugin is slowing down the speed of your website.
 
 **Speed Up Your WordPress: Replace them all with free Ad Inserter!**
+
+**Insert Any Code Anywhere on the Page**
+
+*   Automatic insertion using standard WP hooks (the_content, the_excerpt, loop_start, loop_end, the_post,...)
+*   Automatic insertion using custom WP hooks (e.g. using <a href="https://genesistutorials.com/visual-hook-guide/" target="_blank">Genesis Theme Framework Hook Guide</a>)
+*   Manual insertion with shortcodes
+*   Manual insertion with widgets
+*   Manual insertion by placing PHP function calls in your theme files
 
 **Quick Start**
 
@@ -267,18 +275,16 @@ Block Alignment and Style:
 
 Ad Inserter has a very useful function that can help you to check if the ad code is working and to see how it will look like when it will be inserted. Click on the **Preview** button to open Preview window.
 WARNING: Some adblockers may block code on the Ad Inserter preview window. If you see warning PAGE BLOCKED or you don't see your code and the widow elements are distorted, make sure you have disabled ad blockers.
-On the top of the window there is visual CSS editor and four buttons and below there is CSS code of the wrapping div (which can be edited manually) and 'Block Alignment and Style' selection.
+On the top of the window there is visual CSS editor and four buttons and below there is CSS code of the wrapping div (which can be edited manually) and 'Alignment and Style' selection.
 
-Below the settings there is a **preview of the saved code** between two dummy paragraphs. Here you can test various block alignments, visually edit margin and padding values of the wrapping div or write CSS code directly
+Below the settings there is a preview of the code between two dummy paragraphs. Here you can test various block alignments, visually edit margin and padding values of the wrapping div or write CSS code directly
 and watch live preview. Highlight button highlights background, wrapping div margin and code area, while Reset button restores all the values to those of the current block.
 You can resize the window (and refresh the page to reload ads) to check display with different screen widths. Once you are satisfied with alignment click on the Use button and the settings will be copied to the active block.
-
-**Please note** that the code displayed here is the code that is saved for this block, while block name, alignment and style are taken from the current block settings (may not be saved).
 No Wrapping style inserts the code as it is so margin and padding can't be set. However, you can use own HTML code for the block.
 
 **Please note** that Preview window uses also Header and Footer code.
 
-Check <a href="https://wordpress.org/plugins/ad-inserter/screenshots/">screenshots</a> for explanation on alignment.
+Check <a href="https://adinserter.pro/alignments-and-styles">Ad Inserter Alignments and Styles</a> for explanation on available alignments and styles of code blocks.
 
 **CACHING**
 
@@ -741,6 +747,17 @@ AD CODE RIGHT
 
 == Changelog ==
 
+= 2.2.7 =
+- Fix for duplicate amp-custom tag on AMP pages
+
+= 2.2.6 =
+- Fix for posts filter counter not counting
+- Added list with short overview of all code blocks
+- Added support for word count on blog pages
+- Added support for client code preview (no need to save it for preview)
+- Improved compatibility on AMP pages
+- Few minor bug fixes, cosmetic changes and code improvements
+
 = 2.2.5 =
 - Fix for issue with Ajax requests
 
@@ -860,6 +877,17 @@ AD CODE RIGHT
 - Bug fix for IP database update cron event (Pro only)
 
 == Upgrade Notice ==
+
+= 2.2.7 =
+Fix for duplicate amp-custom tag on AMP pages
+
+= 2.2.6 =
+Fix for posts filter counter not counting;
+Added list with short overview of all code blocks;
+Added support for word count on blog pages;
+Added support for client code preview (no need to save it for preview);
+Improved compatibility on AMP pages;
+Few minor bug fixes, cosmetic changes and code improvements
 
 = 2.2.5 =
 Fix for issue with Ajax requests

@@ -1,4 +1,4 @@
-var javascript_version = "2.2.5";
+var javascript_version = "2.2.7";
 var ignore_key = true;
 var start = 1;
 var end = 16;
@@ -13,6 +13,8 @@ var syntax_highlighting = false;
 var settings_page = "";
 
 var dateFormat = "yy-mm-dd";
+
+var search_reload = false;
 
 var AI_DISABLED         = 0;
 var AI_BEFORE_POST      = 1;
@@ -51,6 +53,159 @@ var AI_ADB_BLOCK_ACTION_REPLACE     = 1;
 var AI_ADB_BLOCK_ACTION_SHOW        = 2;
 var AI_ADB_BLOCK_ACTION_HIDE        = 3;
 
+var AI_CODE_UNKNOWN  = 0;
+var AI_CODE_BANNER   = 1;
+var AI_CODE_ADSENSE  = 2;
+
+var AI_ADSENSE_STANDARD         = 0;
+var AI_ADSENSE_LINK             = 1;
+var AI_ADSENSE_IN_ARTICLE       = 2;
+var AI_ADSENSE_IN_FEED          = 3;
+var AI_ADSENSE_MATCHED_CONTENT  = 4;
+
+
+/**
+   * jQuery BASE64 functions
+   *
+   *  <code>
+   *    Encodes the given data with base64.
+   *    String $.base64Encode ( String str )
+   *    <br />
+   *    Decodes a base64 encoded data.
+   *    String $.base64Decode ( String str )
+   *  </code>
+   *
+   * Encodes and Decodes the given data in base64.
+   * This encoding is designed to make binary data survive transport through transport layers that are not 8-bit clean, such as mail bodies.
+   * Base64-encoded data takes about 33% more space than the original data.
+   * This javascript code is used to encode / decode data using base64 (this encoding is designed to make binary data survive transport through transport layers that are not 8-bit clean). Script is fully compatible with UTF-8 encoding. You can use base64 encoded data as simple encryption mechanism.
+   * If you plan using UTF-8 encoding in your project don't forget to set the page encoding to UTF-8 (Content-Type meta tag).
+   * This function orginally get from the WebToolkit and rewrite for using as the jQuery plugin.
+   *
+   * Example
+   *  Code
+   *    <code>
+   *      $.base64Encode("I'm Persian.");
+   *    </code>
+   *  Result
+   *    <code>
+   *      "SSdtIFBlcnNpYW4u"
+   *    </code>
+   *  Code
+   *    <code>
+   *      $.base64Decode("SSdtIFBlcnNpYW4u");
+   *    </code>
+   *  Result
+   *    <code>
+   *      "I'm Persian."
+   *    </code>
+   *
+   * @alias Muhammad Hussein Fattahizadeh < muhammad [AT] semnanweb [DOT] com >
+   * @link http://www.semnanweb.com/jquery-plugin/base64.html (no longer available?)
+   * @link https://gist.github.com/gists/1602210
+   * @see http://www.webtoolkit.info/
+   * @license http://www.gnu.org/licenses/gpl.html [GNU General Public License]
+   * @param {jQuery} {base64Encode:function(input))
+   * @param {jQuery} {base64Decode:function(input))
+   * @return string
+   */
+
+  (function($){
+
+    var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+    var uTF8Encode = function(string) {
+      string = string.replace(/\x0d\x0a/g, "\x0a");
+      var output = "";
+      for (var n = 0; n < string.length; n++) {
+        var c = string.charCodeAt(n);
+        if (c < 128) {
+          output += String.fromCharCode(c);
+        } else if ((c > 127) && (c < 2048)) {
+          output += String.fromCharCode((c >> 6) | 192);
+          output += String.fromCharCode((c & 63) | 128);
+        } else {
+          output += String.fromCharCode((c >> 12) | 224);
+          output += String.fromCharCode(((c >> 6) & 63) | 128);
+          output += String.fromCharCode((c & 63) | 128);
+        }
+      }
+      return output;
+    };
+
+    var uTF8Decode = function(input) {
+      var string = "";
+      var i = 0;
+      var c = c1 = c2 = 0;
+      while ( i < input.length ) {
+        c = input.charCodeAt(i);
+        if (c < 128) {
+          string += String.fromCharCode(c);
+          i++;
+        } else if ((c > 191) && (c < 224)) {
+          c2 = input.charCodeAt(i+1);
+          string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+          i += 2;
+        } else {
+          c2 = input.charCodeAt(i+1);
+          c3 = input.charCodeAt(i+2);
+          string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+          i += 3;
+        }
+      }
+      return string;
+    }
+
+    $.extend({
+      base64Encode: function(input) {
+        var output = "";
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        var i = 0;
+        input = uTF8Encode(input);
+        while (i < input.length) {
+          chr1 = input.charCodeAt(i++);
+          chr2 = input.charCodeAt(i++);
+          chr3 = input.charCodeAt(i++);
+          enc1 = chr1 >> 2;
+          enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+          enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+          enc4 = chr3 & 63;
+          if (isNaN(chr2)) {
+            enc3 = enc4 = 64;
+          } else if (isNaN(chr3)) {
+            enc4 = 64;
+          }
+          output = output + keyString.charAt(enc1) + keyString.charAt(enc2) + keyString.charAt(enc3) + keyString.charAt(enc4);
+        }
+        return output;
+      },
+      base64Decode: function(input) {
+        var output = "";
+        var chr1, chr2, chr3;
+        var enc1, enc2, enc3, enc4;
+        var i = 0;
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+        while (i < input.length) {
+          enc1 = keyString.indexOf(input.charAt(i++));
+          enc2 = keyString.indexOf(input.charAt(i++));
+          enc3 = keyString.indexOf(input.charAt(i++));
+          enc4 = keyString.indexOf(input.charAt(i++));
+          chr1 = (enc1 << 2) | (enc2 >> 4);
+          chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+          chr3 = ((enc3 & 3) << 6) | enc4;
+          output = output + String.fromCharCode(chr1);
+          if (enc3 != 64) {
+            output = output + String.fromCharCode(chr2);
+          }
+          if (enc4 != 64) {
+            output = output + String.fromCharCode(chr3);
+          }
+        }
+        output = uTF8Decode(output);
+        return output;
+      }
+    });
+  })(jQuery);
 
 var shSettings = {
   "tab_size":"4",
@@ -97,6 +252,7 @@ function SyntaxHighlight (id, block, settings) {
     if (textarea.val () == "") {
       textarea.removeAttr ("name");
     }
+//    else textarea.val (jQuery.base64Encode (textarea.val ()));
 
     jQuery("#ai-active-tab").attr ("value", '[' + active_tab + ',' + active_tab_0 + ']');
   });
@@ -138,6 +294,21 @@ function change_block_alignment (block) {
 }(jQuery));
 
 
+serialize_object = function (obj) {
+  var str = [];
+  for(var p in obj)
+    if (obj.hasOwnProperty (p)) {
+      str.push(encodeURIComponent (p) + "=" + encodeURIComponent (obj[p]));
+    }
+  return str.join ("&");
+}
+
+Number.isInteger = Number.isInteger || function (value) {
+  return typeof value === "number" &&
+         isFinite (value) &&
+         Math.floor (value) === value;
+};
+
 function get_editor_text (block) {
   var editor = ace.edit ("editor-" + block);
   var textarea = jQuery ("#block-" + block);
@@ -177,6 +348,7 @@ function window_open_post (url, windowoption, name, params) {
    form.submit();
    document.body.removeChild(form);
 }
+
 
 jQuery(document).ready(function($) {
 
@@ -811,6 +983,33 @@ jQuery(document).ready(function($) {
     if (syntax_highlighting) configure_editor_language (block);
   }
 
+  function process_adsense_elements (block) {
+    var adsense_type = parseInt ($("select#adsense-type-" + block +" option:selected").attr ('value'));
+    var adsense_responsive = $("#adsense-responsive-" + block).is(":checked");
+
+    $('#tab-adsense-' + block + ' .adsense-layout').css ('visibility', 'hidden');
+    $('#tab-adsense-' + block + ' .adsense-size').css ('visibility', 'hidden');
+    $('#tab-adsense-' + block + ' .adsense-responsive').css ('visibility', 'hidden');
+
+    switch (adsense_type) {
+      case AI_ADSENSE_STANDARD:
+        $('#tab-adsense-' + block + ' .adsense-responsive').css ('visibility', 'visible');
+        if (!adsense_responsive) $('#tab-adsense-' + block + ' .adsense-size').css ('visibility', 'visible');
+        break;
+      case AI_ADSENSE_LINK:
+        $('#tab-adsense-' + block + ' .adsense-responsive').css ('visibility', 'visible');
+        if (!adsense_responsive) $('#tab-adsense-' + block + ' .adsense-size').css ('visibility', 'visible');
+        break;
+      case AI_ADSENSE_IN_ARTICLE:
+        break;
+      case AI_ADSENSE_IN_FEED:
+        $('#tab-adsense-' + block + ' .adsense-layout').css ('visibility', 'visible');
+        break;
+      case AI_ADSENSE_MATCHED_CONTENT:
+        break;
+    }
+  }
+
   function configure_editor (block) {
 
     if (debug) console.log ("configure_editor:", block);
@@ -1029,8 +1228,6 @@ jQuery(document).ready(function($) {
 
       if ($("#export-container-0").is(':visible') && !$(this).hasClass ("loaded")) {
         var nonce = $(this).attr ('nonce');
-//        var site_url = $(this).attr ('site-url');
-//        $("#export_settings_0").load (site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&export=0&ai_check=" + nonce, function() {
         $("#export_settings_0").load (ajaxurl+"?action=ai_ajax_backend&export=0&ai_check=" + nonce, function() {
           $("#export_settings_0").attr ("name", "export_settings_0");
           $("#export-switch-0").addClass ("loaded");
@@ -1100,12 +1297,16 @@ jQuery(document).ready(function($) {
 
       $(this).blur ();
 
+      var code = get_editor_text ('a');
+//      var code = $.base64Encode (get_editor_text ('a'));
+      var php =  $("input#process-php-a").is(":checked") ? 1 : 0;
+
       var window_width = 820;
       var window_height = 870;
       var window_left  = 120;
       var window_top   = (screen.height / 2) - (870 / 2);
       var nonce = $(this).attr ('nonce');
-      var param = {'action': 'ai_ajax_backend', 'preview': 'adb', 'ai_check': nonce};
+      var param = {'action': 'ai_ajax_backend', 'preview': 'adb', 'ai_check': nonce, 'code': code, 'php': php};
       window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
     });
   }
@@ -1491,17 +1692,16 @@ jQuery(document).ready(function($) {
 
       var name = $("#name-label-"+block).text ();
 
+      var code = $.base64Encode (get_editor_text (block));
+      var php =  $("input#process-php-"+block).is(":checked") ? 1 : 0;
+
       var window_width = 820;
       var window_height = 820;
       var window_left  = 120;
       var window_top   = (screen.height / 2) - (820 / 2);
       var nonce = $(this).attr ('nonce');
-//      var site_url = $(this).attr ('site-url');
-//      var page = site_url+"/wp-admin/admin-ajax.php?action=ai_ajax_backend&preview=" + block + "&ai_check=" + nonce + "&alignment=" + alignment + "&css=" + encodeURI (alignment_css) + "&name=" + encodeURI (name);
-//      var page = ajaxurl+"?action=ai_ajax_backend&preview=" + block + "&ai_check=" + nonce + "&alignment=" + alignment + "&css=" + encodeURI (alignment_css) + "&name=" + encodeURI (name);
-//      var preview_window = window.open (page, 'preview','width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no');
 
-      var param = {'action': 'ai_ajax_backend', 'preview': block, 'ai_check': nonce, 'name': name, 'alignment': alignment, 'alignment_css': alignment_css, 'custom_css': custom_css};
+      var param = {'action': 'ai_ajax_backend', 'preview': block, 'ai_check': nonce, 'name': name, 'alignment': alignment, 'alignment_css': alignment_css, 'custom_css': custom_css, 'code': code, 'php': php};
       window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
     });
 
@@ -1516,6 +1716,167 @@ jQuery(document).ready(function($) {
 
     $('#ai-devices-container-' + tab).tabs();
     $('#ai-devices-tabs-' + tab).show();
+
+
+
+    $('#ai-code-generator-container-' + tab).tabs();
+    $('#ai-code-generator-tabs-' + tab).show();
+
+    $("select#adsense-type-"+tab).change (function() {
+      var block = $(this).attr('id').replace ("adsense-type-", "");
+      process_adsense_elements (block);
+    });
+
+    $("input#adsense-responsive-"+tab).change (function() {
+      var block = $(this).attr('id').replace ("adsense-responsive-", "");
+      process_adsense_elements (block);
+    });
+
+    process_adsense_elements (tab);
+
+    $("#code-generator-"+tab).click (function () {
+      var block = $(this).attr('id').replace ("code-generator-", "");
+      $('#ai-code-generator-container-' + block).toggle();
+      $(this).next ("label").find ('.checkbox-icon').toggleClass("on");
+    });
+
+    $("#open-image-button-"+tab).click (function (event) {
+      var block = $(this).attr('id').replace ("open-image-button-", "");
+      var frame;
+
+      event.preventDefault();
+
+      if (frame) {
+        frame.open();
+        return;
+      }
+
+      frame = wp.media({
+        title: 'Select or upload banner image',
+        button: {
+          text: 'Use this image'
+        },
+        multiple: false  // Set to true to allow multiple files to be selected
+      });
+
+      frame.on ('open', function(){
+        var selection = frame.state().get ('selection');
+        var selected = $('#banner-image-' + block).val();
+        if (selected) {
+          selection.add (wp.media.attachment (selected));
+        }
+      });
+
+      frame.on ('select', function() {
+        var attachment = frame.state().get('selection').first().toJSON();
+        $('#banner-image-' + block).attr ('src', attachment.url);
+        $('#banner-image-url-' + block).val (attachment.url);
+
+      });
+
+      frame.open();
+    });
+
+    $("#banner-image-url-" + tab).on ('input', function() {
+      var block = $(this).attr('id').replace ("banner-image-url-", "");
+      $('#banner-image-' + block).attr ('src', $(this).val ());
+    });
+
+    $("#banner-url-" + tab).on ('input', function() {
+      var block = $(this).attr('id').replace ("banner-url-", "");
+      $('#banner-link-' + block).attr ('href', $(this).val ());
+    });
+
+    $("#import-button-"+tab).click (function () {
+      var block = $(this).attr('id').replace ("import-button-", "");
+
+      var nonce = $("#ai-form").attr ('nonce');
+      var code_data = "&import-code=" + encodeURI (get_editor_text (block));
+
+      $.ajax ({
+        url: ajaxurl + "?action=ai_ajax_backend&ai_check=" + nonce + code_data
+      }).done (function (data) {
+        if (data != '') {
+          var code_data = JSON.parse (data);
+          if (typeof code_data !== "undefined" && typeof code_data ['type'] !== "undefined") {
+
+            if (debug) console.log ("AI IMPORT CODE:", code_data);
+
+            var code_type = code_data ['type'];
+
+            $("#ai-code-generator-container-" + block).tabs ({active: code_type});
+
+            switch (code_type) {
+              case AI_CODE_BANNER:
+                $("#banner-image-url-" + block).val (code_data ['image']).trigger('input');
+                $("#banner-url-" + block).val (code_data ['link']).trigger('input');
+                $("#open-new-window-" + block).attr('checked', code_data ['target'] == '_blank');
+                break;
+              case AI_CODE_ADSENSE:
+                $("#adsense-publisher-id-" + block).val (code_data ['data-ad-client']);
+                $("#adsense-ad-slot-id-" + block).val (code_data ['data-ad-slot']);
+
+                $("#adsense-type-" + block).val (code_data ['adsense-type']);
+                $("#adsense-responsive-" + block).prop ('checked', code_data ['adsense-responsive']);
+                $("#adsense-width-" + block).val (code_data ['adsense-width']);
+                $("#adsense-height-" + block).val (code_data ['adsense-height']);
+
+                $("#adsense-layout-" + block).val (code_data ['adsense-layout']);
+                $("#adsense-layout-key-" + block).val (code_data ['adsense-layout-key']);
+
+                process_adsense_elements (block);
+                break;
+              case AI_CODE_UNKNOWN:
+                break;
+            }
+          }
+        }
+      });
+    });
+
+    $("#generate-button-"+tab).click (function () {
+      var block = $(this).attr('id').replace ("generate-button-", "");
+
+      var nonce = $("#ai-form").attr ('nonce');
+      var code_type = $("#ai-code-generator-container-" + block).tabs('option', 'active');
+      var code_data = "&generate-code=" + code_type;
+
+      switch (code_type) {
+        case AI_CODE_BANNER:
+          code_data = code_data + "&" + serialize_object ({'image': $("#banner-image-url-" + block).val (), 'link': $("#banner-url-" + block).val ()});
+          if ($("#open-new-window-" + block).is(":checked")) code_data = code_data + "&target=_blank";
+          break;
+        case AI_CODE_ADSENSE:
+          code_data = code_data + "&" + serialize_object ({
+            'adsense-publisher-id': $("#adsense-publisher-id-" + block).val (),
+            'adsense-ad-slot-id':   $("#adsense-ad-slot-id-"   + block).val (),
+            'adsense-type':         parseInt ($("select#adsense-type-" + block +" option:selected").attr ('value')),
+            'adsense-responsive':   $("#adsense-responsive-"   + block).is(":checked") ? 1 : 0,
+            'adsense-width':        $("#adsense-width-"        + block).val (),
+            'adsense-height':       $("#adsense-height-"       + block).val (),
+            'adsense-layout':       $("#adsense-layout-"       + block).val (),
+            'adsense-layout-key':   $("#adsense-layout-key-"   + block).val ()
+            });
+          break;
+        case AI_CODE_UNKNOWN:
+          break;
+      }
+
+      if (debug) {
+        console.log ("AI GENERATE CODE:", code_type);
+        code_data.split ("&").splice (1).forEach (function (element) {
+          console.log ('  ', decodeURIComponent (element));
+        });
+      }
+
+      $.ajax ({
+        url: ajaxurl + "?action=ai_ajax_backend&ai_check=" + nonce + code_data
+      }).done (function (code) {
+        if (code != '') {
+          set_editor_text (block, code);
+        }
+      });
+    });
   }
 
   function generate_country_list (element_name_prefix, index) {
@@ -1720,6 +2081,27 @@ jQuery(document).ready(function($) {
     });
   }
 
+  function reload_list () {
+    search_reload = false;
+    var list = encodeURIComponent ($("#ai-list-search").val());
+    var all = + !$("#ai-load-all").parent ().find ('.checkbox-icon').hasClass ('on');
+    var nonce = $("#ai-list").attr ('nonce');
+
+    var data_container = $("#ai-list-data");
+
+    data_container.load (ajaxurl+"?action=ai_ajax_backend&list=" + list + "&all=" + all + "&start=" + start + "&end=" + end + "&ai_check=" + nonce, function (response, status, xhr) {
+      if (status == "error") {
+        var message = "Error downloading list data: " + xhr.status + " " + xhr.statusText;
+        data_container.html (message);
+        if (debug) console.log (message);
+      } else {
+          $(".ai-tab-link").click (function () {
+            var tab = $(this).data ('tab') - start;
+            $("#ai-tab-container").tabs ({active: tab});
+          });
+        }
+    });
+  }
 
   if (debug) console.log ("READY");
   if (debug_title) $("#plugin_name").css ("color", "#f00");
@@ -1892,6 +2274,29 @@ jQuery(document).ready(function($) {
     $('#ai-stars').show ();
   });
 
+
+  $("#ai-list").click (function () {
+    $('#ai-list-container').toggle ();
+
+    var container = $("#ai-list-container");
+
+    if (container.is(':visible')) {
+      reload_list ();
+    }
+  });
+
+  $("#ai-list-search").keyup (function (event) {
+    if (!search_reload) {
+      search_reload = true;
+      setTimeout (reload_list, 200);
+    }
+  });
+
+  $("#ai-load-all").click (function () {
+    $(this).parent ().find ('.checkbox-icon').toggleClass ('on');
+    reload_list ();
+  });
+
   setTimeout (update_rating, 1000);
 
   if (debug) console.log ("");
@@ -1901,3 +2306,5 @@ jQuery(document).ready(function($) {
     console.log ("main time: " + ((current_time - current_time_ready) / 1000).toFixed (3));
   }
 });
+
+

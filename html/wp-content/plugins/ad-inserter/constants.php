@@ -6,6 +6,7 @@
 define ('AI_OPTION_NAME',                'ad_inserter');
 define ('AI_INSTALL_NAME',               'ai-install');
 define ('AI_OPTION_GLOBAL',              'global');
+define ('AI_OPTION_EXTRACT',             'extract');
 
 if (!defined ('AD_INSERTER_PLUGIN_DIR'))
   define ('AD_INSERTER_PLUGIN_DIR', plugin_dir_path (__FILE__));
@@ -18,7 +19,7 @@ if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.2.5');
+  define ('AD_INSERTER_VERSION', '2.2.7');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -44,7 +45,6 @@ define ('AD_OPTIONS',     'AdInserterOptions');   // general plugin options
 define ('AD_ADx_OPTIONS', 'AdInserter#Options');
 
 // Options
-define ('AI_EXTRACT_OPTION_NAME',                'extract');
 define ('WP_FORM_FIELD_POSTFIX',                 '_block_');
 define ('AI_HEADER_OPTION_NAME',                 'h');
 define ('AI_FOOTER_OPTION_NAME',                 'f');
@@ -191,6 +191,7 @@ define('AI_AUTOMATIC_INSERTION_BEFORE_COMMENTS',     10);
 define('AI_AUTOMATIC_INSERTION_BETWEEN_COMMENTS',    11);
 define('AI_AUTOMATIC_INSERTION_AFTER_COMMENTS',      12);
 define('AI_AUTOMATIC_INSERTION_FOOTER',              13);
+define('AI_AUTOMATIC_INSERTION_ABOVE_HEADER',        14);
 define('AI_AUTOMATIC_INSERTION_CUSTOM_HOOK',        100);
 
 define('AI_TEXT_DISABLED',             'Disabled');
@@ -206,6 +207,7 @@ define('AI_TEXT_BETWEEN_POSTS',        'Between Posts');
 define('AI_TEXT_BEFORE_COMMENTS',      'Before Comments');
 define('AI_TEXT_BETWEEN_COMMENTS',     'Between Comments');
 define('AI_TEXT_AFTER_COMMENTS',       'After Comments');
+define('AI_TEXT_ABOVE_HEADER',         'Above Header');
 define('AI_TEXT_FOOTER',               'Footer');
 
 //Display options
@@ -337,10 +339,10 @@ define ('AI_BLOCK_COUNTER_NAME',                    'AI_BLOCK_COUNTER_');
 define ('AI_PHP_FUNCTION_CALL_COUNTER_NAME',        'AI_PHP_FUNCTION_CALL_COUNTER_');
 define ('AI_CONTENT_COUNTER_NAME',                  'AI_CONTENT_COUNTER');
 define ('AI_EXCERPT_COUNTER_NAME',                  'AI_EXCERPT_COUNTER');
-define ('AI_LOOP_BEFORE_COUNTER_NAME',              'AI_LOOP_BEFORE_COUNTER');
-define ('AI_LOOP_AFTER_COUNTER_NAME',               'AI_LOOP_AFTER_COUNTER');
+define ('AI_LOOP_BEFORE_COUNTER_NAME',              'AI_LOOP_START_COUNTER');
+define ('AI_LOOP_AFTER_COUNTER_NAME',               'AI_LOOP_END_COUNTER');
 define ('AI_WIDGET_COUNTER_NAME',                   'AI_WIDGET_COUNTER_');
-define ('AI_POST_COUNTER_NAME',                     'AI_POST_COUNTER');
+define ('AI_POST_COUNTER_NAME',                     'AI_THE_POST_COUNTER');
 define ('AI_COMMENT_COUNTER_NAME',                  'AI_COMMENT_COUNTER');
 define ('AI_ADB_FALLBACK_DEPTH_NAME',               'AI_ADB_FALLBACK_DEPTH');
 
@@ -469,6 +471,9 @@ define ('DEFAULT_ADB_BLOCK_ACTION',             AI_ADB_BLOCK_ACTION_DO_NOTHING);
 define ('DEFAULT_CUSTOM_HOOK_PRIORITY',         10);
 
 define ('AI_ADBLOCKING_DETECTION',              true);
+define ('AI_AMP_HEADER_STYLES',                 true);
+//define ('AI_CODE_GENERATOR',                    true);
+//define ('AI_BUFFERING',                         true);
 define ('AI_ADB_1_NAME',                        'dqwpediwqswqma');
 define ('AI_ADB_2_DEFAULT_NAME',                'lfoswyekaaslsd');
 define ('AI_ADB_CONTENT_CSS_BEGIN',             'ai-adb-content-begin');
@@ -508,6 +513,7 @@ define ('BEFORE_COMMENTS_HOOK_BLOCKS',  'before_comments_hook');
 define ('BETWEEN_COMMENTS_HOOK_BLOCKS', 'between_comments_hook');
 define ('AFTER_COMMENTS_HOOK_BLOCKS',   'after_comments_hook');
 define ('FOOTER_HOOK_BLOCKS',           'wp_footer_hook');
+define ('ABOVE_HEADER_HOOK_BLOCKS',     'above_header_hook');
 define ('CUSTOM_HOOK_BLOCKS',           '_hook');
 define ('AI_EXTRACT_USED_BLOCKS',       'used_blocks');
 
@@ -655,10 +661,25 @@ if (!defined ('AD_INSERTER_VIEWPORTS'))
 if (!defined ('AD_INSERTER_HOOKS'))
   define ('AD_INSERTER_HOOKS', 2);
 
-define ('AI_DEBUG_TAGS_STYLE',           'font-weight: bold; color: white; padding: 2px;');
-define ('AI_DEBUG_POSITIONS_STYLE',      'text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid blue; color: blue; background: #eef;');
-define ('AI_DEBUG_PAGE_TYPE_STYLE',      'text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid green; color: green; background: #efe;');
-define ('AI_DEBUG_ADB_STYLE',            'text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid red; color: red; background: #fee; opacity: 0.85; cursor: pointer;');
 define ('AI_DEBUG_WIDGET_STYLE',         'margin: 0; padding: 0 5px; font-size: 10px; white-space: pre; overflow-x: auto; overflow-y: hidden;');
 
+define ('AI_DEBUG_TAGS_CLASS',           'ai-debug-tags');
+define ('AI_DEBUG_POSITIONS_CLASS',      'ai-debug-positions');
+define ('AI_DEBUG_PAGE_TYPE_CLASS',      'ai-debug-page-type');
+define ('AI_DEBUG_ADB_CLASS',            'ai-debug-adb');
+
+define ('AI_CODE_UNKNOWN',               0);
+define ('AI_CODE_BANNER',                1);
+define ('AI_CODE_ADSENSE',               2);
+
+define ('AI_ADSENSE_STANDARD',           0);
+define ('AI_ADSENSE_LINK',               1);
+define ('AI_ADSENSE_IN_ARTICLE',         2);
+define ('AI_ADSENSE_IN_FEED',            3);
+define ('AI_ADSENSE_MATCHED_CONTENT',    4);
+
+define ('AI_TEXT_LINK',                 'Link');
+define ('AI_TEXT_IN_ARTICLE',           'In-article');
+define ('AI_TEXT_IN_FEED',              'In-feed');
+define ('AI_TEXT_MATCHED_CONTENT',      'Matched content');
 

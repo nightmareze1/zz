@@ -11,7 +11,7 @@ function alt_styles_data ($alt_styles_text) {
   }
 }
 
-function generate_code_preview ($block, $name = null, $alignment = null, $alignment_css = null, $custom_css = null) {
+function generate_code_preview ($block, $name = null, $alignment = null, $alignment_css = null, $custom_css = null, $client_code = null, $process_php = null) {
   global $block_object, $ai_wp_data;
 
   $ai_wp_data [AI_WP_DEBUGGING] = 0;
@@ -28,7 +28,8 @@ function generate_code_preview ($block, $name = null, $alignment = null, $alignm
   ai_wp_head_hook ();
   $head_code = ob_get_clean ();
 
-  $block_code     = $obj->ai_getProcessedCode (true, true);
+//  $block_code     = $obj->ai_getProcessedCode (true, true);
+  $block_code       = $obj->ai_getProcessedCode (true, true, $client_code, $process_php);
 
   // Fix for relative urls
   $block_code = str_replace ('src="wp-content', 'src="../wp-content', $block_code);

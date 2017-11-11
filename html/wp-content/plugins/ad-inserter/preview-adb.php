@@ -25,13 +25,14 @@ function ai_mce_buttons_2 ($buttons, $id) {
   return $buttons;
 }
 
-function generate_code_preview_adb () {
+function generate_code_preview_adb ($client_code = null, $process_php = null) {
   global $block_object, $ai_wp_data;
 
   $ai_wp_data [AI_WP_DEBUGGING] = 0;
 
   $obj = $block_object [AI_ADB_MESSAGE_OPTION_NAME];
   $adb_message     = $obj->get_ad_data();
+//  $adb_message     = $obj->ai_getCode ($client_code, $process_php);
 
   wp_enqueue_script ('ai-adb-js',   plugins_url ('includes/js/ad-inserter-check.js', __FILE__), array (
     'jquery',

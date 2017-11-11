@@ -1,17 +1,17 @@
 #ai-data {
-  font-family: "2.2.5"; /* Used for version number of the file */
+  font-family: "2.2.7"; /* Used for version number of the file */
 }
 
 #blocked-warning {
   display: none;
 }
 
-.ui-widget, #ai-form td {
+.ui-widget, .ai-form td {
    font-family: sans-serif,Arial,Verdana;
    font-size: 12px!important;
 }
 
-#ai-form .ui-widget {
+.ai-form .ui-widget {
     position: relative;
 }
 
@@ -27,6 +27,16 @@
 
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
   background: #fff url(images/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x!important;
+}
+
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
+  border: 1px solid #d3d3d3;
+  background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x;
+  color: #555;
+}
+
+.ai-top-button.ui-button-text-only .ui-button-text {
+  padding: .4em 0.8em;
 }
 
 .ace_editor {
@@ -64,7 +74,7 @@ a.clear-link, a.clear-link:hover, a.clear-link:focus {
   border-radius: 5px;
 }
 
-#ai-form.rounded input, #ai-form.rounded select {
+.ai-form.rounded input, .ai-form.rounded select {
   border-radius: 5px;
 }
 
@@ -408,6 +418,11 @@ div.automatic-insertion img {
    vertical-align: middle;
 }
 
+/* TEMP */
+img.automatic-insertion.above-header {
+  background: url('images/insertions-alignmets.png') -56px 0;
+}
+
 img.automatic-insertion.disabled {
   background: url('images/insertions-alignmets.png') 0 0;
 }
@@ -654,6 +669,16 @@ img.automatic-insertion.preview {
   background: url('images/icons.png') -120px 0;
 }
 
+.checkbox-icon.icon-enabled-all {
+  width: 16px;
+  height: 16px;
+  background: url('images/icons.png') -142px -22px;
+}
+
+.checkbox-icon.icon-enabled-all.on {
+  background: url('images/icons.png') -142px -2px;
+}
+
 
 .checkbox-icon.icon-loading {
   width: 12px;
@@ -705,6 +730,11 @@ img.automatic-insertion.preview {
   background: 0 0!important;
 }
 
+.ai-form .ai-dot {
+ font-size: 18px!important;
+ line-height: 16px;
+}
+
 @media (max-width: 782px) {
   .auto-fold #wpcontent {
       padding-left: 4px;
@@ -734,6 +764,19 @@ img.automatic-insertion.preview {
    input.ai-date-input {
      width: 90px;
      padding: 3px 3px;
+   }
+   .ai-form .ai-dot {
+     font-size: 12px!important;
+     line-height: 18px;
+   }
+   .checkbox-icon.icon-enabled-all {
+     width: 20px;
+     height: 20px;
+     background: url('images/icons.png') -140px -20px;
+   }
+
+   .checkbox-icon.icon-enabled-all.on {
+     background: url('images/icons.png') -140px -0px;
    }
 }
 

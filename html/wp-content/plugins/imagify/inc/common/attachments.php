@@ -19,6 +19,22 @@ function _imagify_optimize_attachment( $metadata, $attachment_id ) {
 		return $metadata;
 	}
 
+	/**
+	 * Allow to prevent automatic optimization for a specific attachment.
+	 *
+	 * @since  1.6.12
+	 * @author Grégory Viguier
+	 *
+	 * @param bool  $optimize      True to optimize, false otherwise.
+	 * @param int   $attachment_id Attachment ID.
+	 * @param array $metadata      An array of attachment meta data.
+	 */
+	$optimize = apply_filters( 'imagify_auto_optimize_attachment', true, $attachment_id, $metadata );
+
+	if ( ! $optimize ) {
+		return $metadata;
+	}
+
 	$context     = 'wp';
 	$action      = 'imagify_async_optimize_upload_new_media';
 	$_ajax_nonce = wp_create_nonce( 'new_media-' . $attachment_id );
@@ -37,9 +53,7 @@ add_action( 'delete_attachment', '_imagify_delete_backup_file' );
  * @param int $post_id Attachment ID.
  */
 function _imagify_delete_backup_file( $post_id ) {
-	$class_name = get_imagify_attachment_class_name( 'wp', $post_id, 'delete_attachment' );
-	$attachment = new $class_name( $post_id );
-	$attachment->delete_backup();
+	get_imagify_attachment( 'wp', $post_id, 'delete_attachment' )->delete_backup();
 }
 
 add_action( 'shutdown', '_imagify_optimize_save_image_editor_file' );
@@ -62,7 +76,9 @@ function _imagify_optimize_save_image_editor_file() {
 
 	check_ajax_referer( 'image_editor-' . $attachment_id );
 
-	if ( ! get_post_meta( $attachment_id, '_imagify_data', true ) ) {
+	$attachment = get_imagify_attachment( 'wp', $attachment_id, 'save_image_editor_file' );
+
+	if ( ! $attachment->get_data() ) {
 		return;
 	}
 

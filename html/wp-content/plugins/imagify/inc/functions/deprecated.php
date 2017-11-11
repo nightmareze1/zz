@@ -11,7 +11,7 @@ class Imagify_Deprecated {
 	/**
 	 * A shorthand to display a message about a deprecated method.
 	 *
-	 * @since 1.6.5
+	 * @since  1.6.5
 	 * @author Grégory Viguier
 	 *
 	 * @param string $method_name The deprecated method.
@@ -30,8 +30,7 @@ class Imagify_Deprecated {
 	 * @return object Main instance.
 	 */
 	public static function instance() {
-		$class_name = get_class( $this );
-		_deprecated_function( $class_name . '::' . __FUNCTION__ . '()', '1.6.5', 'imagify()' );
+		_deprecated_function( get_class( $this ) . '::' . __FUNCTION__ . '()', '1.6.5', 'Imagify::get_instance()' );
 		return Imagify::get_instance();
 	}
 
@@ -184,7 +183,6 @@ class Imagify_Deprecated {
 	}
 }
 
-
 if ( class_exists( 'WpeCommon' ) ) :
 
 	/**
@@ -221,14 +219,18 @@ if ( function_exists( 'emr_delete_current_files' ) ) :
 
 		$attachment_id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE guid='%s';", $guid ) );
 
-		// Stop if the attachment wasn't optimized yet by Imagify.
-		if ( ! get_post_meta( $attachment_id, '_imagify_data', true ) ) {
+		if ( ! $attachment_id ) {
 			return;
 		}
 
-		$optimization_level = get_post_meta( $attachment_id, '_imagify_optimization_level', true );
-		$class_name         = get_imagify_attachment_class_name( 'wp', $attachment_id, 'enable-media-replace-upload-done' );
-		$attachment         = new $class_name( $attachment_id );
+		$attachment = get_imagify_attachment( 'wp', $attachment_id, 'enable-media-replace-upload-done' );
+
+		// Stop if the attachment wasn't optimized yet by Imagify.
+		if ( ! $attachment->get_data() ) {
+			return;
+		}
+
+		$optimization_level = $attachment->get_optimization_level();
 
 		// Remove old optimization data.
 		$attachment->delete_imagify_data();
@@ -253,7 +255,6 @@ function _imagify_admin_bar_styles() {
 	}
 }
 
-
 /**
  * Make an absolute path relative to WordPress' root folder.
  * Also works for files from registered symlinked plugins.
@@ -270,6 +271,141 @@ function imagify_make_file_path_replative( $file_path ) {
 
 	return imagify_make_file_path_relative( $file_path );
 }
+
+if ( is_admin() && ( function_exists( 'as3cf_init' ) || function_exists( 'as3cf_pro_init' ) ) ) :
+
+	/**
+	 * Returns the main instance of the Imagify_AS3CF class.
+	 *
+	 * @since  1.6.6
+	 * @since  1.6.12 Deprecated.
+	 * @author Grégory Viguier
+	 *
+	 * @return object The Imagify_AS3CF instance.
+	 */
+	function imagify_as3cf() {
+		_deprecated_function( __FUNCTION__ . '()', '1.6.12', 'Imagify_AS3CF::get_instance()' );
+
+		return Imagify_AS3CF::get_instance();
+	}
+
+endif;
+
+if ( function_exists( 'enable_media_replace' ) ) :
+
+	/**
+	 * Returns the main instance of the Imagify_Enable_Media_Replace class.
+	 *
+	 * @since  1.6.9
+	 * @since  1.6.12 Deprecated.
+	 * @author Grégory Viguier
+	 *
+	 * @return object The Imagify_Enable_Media_Replace instance.
+	 */
+	function imagify_enable_media_replace() {
+		_deprecated_function( __FUNCTION__ . '()', '1.6.12', 'Imagify_Enable_Media_Replace::get_instance()' );
+
+		return Imagify_Enable_Media_Replace::get_instance();
+	}
+
+endif;
+
+if ( class_exists( 'C_NextGEN_Bootstrap' ) && class_exists( 'Mixin' ) && get_site_option( 'ngg_options' ) ) :
+
+	/**
+	 * Returns the main instance of the Imagify_NGG class.
+	 *
+	 * @since  1.6.5
+	 * @since  1.6.12 Deprecated.
+	 * @author Grégory Viguier
+	 *
+	 * @return object The Imagify_NGG instance.
+	 */
+	function imagify_ngg() {
+		_deprecated_function( __FUNCTION__ . '()', '1.6.12', 'Imagify_NGG::get_instance()' );
+
+		return Imagify_NGG::get_instance();
+	}
+
+	/**
+	 * Returns the main instance of the Imagify_NGG_DB class.
+	 *
+	 * @since  1.6.5
+	 * @since  1.6.12 Deprecated.
+	 * @author Jonathan Buttigieg
+	 *
+	 * @return object The Imagify_NGG_DB instance.
+	 */
+	function imagify_ngg_db() {
+		_deprecated_function( __FUNCTION__ . '()', '1.6.12', 'Imagify_NGG_DB::get_instance()' );
+
+		return Imagify_NGG_DB::get_instance();
+	}
+
+	/**
+	 * Delete the Imagify data when an image is deleted.
+	 *
+	 * @since  1.5
+	 * @since  1.6.13 Deprecated.
+	 * @author Jonathan Buttigieg
+	 *
+	 * @param int $image_id An image ID.
+	 */
+	function _imagify_ngg_delete_picture( $image_id ) {
+		_deprecated_function( __FUNCTION__ . '()', '1.6.13', 'Imagify_NGG_DB::get_instance()->delete( $image_id )' );
+
+		Imagify_NGG_DB::get_instance()->delete( $image_id );
+	}
+
+	/**
+	 * Combine two arrays with some specific keys.
+	 * We use this function to combine the result of 2 SQL queries.
+	 *
+	 * @since 1.4.5
+	 * @since 1.6.7  Added the $keep_keys_order parameter.
+	 * @since 1.6.13 Deprecated.
+	 *
+	 * @param  array $keys            An array of keys.
+	 * @param  array $values          An array of arrays like array( 'id' => id, 'value' => value ).
+	 * @param  int   $keep_keys_order Set to true to return an array ordered like $keys instead of $values.
+	 * @return array                  The combined arrays.
+	 */
+	function imagify_query_results_combine( $keys, $values, $keep_keys_order = false ) {
+		_deprecated_function( __FUNCTION__ . '()', '1.6.13', 'Imagify_DB::combine_query_results( $keys, $values, $keep_keys_order )' );
+
+		return Imagify_DB::combine_query_results( $keys, $values, $keep_keys_order );
+	}
+
+	/**
+	 * A helper to retrieve all values from one or several post metas, given a list of post IDs.
+	 * The $wpdb cache is flushed to save memory.
+	 *
+	 * @since  1.6.7
+	 * @since  1.6.13 Deprecated.
+	 * @author Grégory Viguier
+	 *
+	 * @param  array $metas An array of meta names like:
+	 *                      array(
+	 *                          'key1' => 'meta_name_1',
+	 *                          'key2' => 'meta_name_2',
+	 *                          'key3' => 'meta_name_3',
+	 *                      )
+	 *                      If a key contains 'data', the results will be unserialized.
+	 * @param  array $ids   An array of post IDs.
+	 * @return array        An array of arrays of results like:
+	 *                      array(
+	 *                          'key1' => array( post_id_1 => 'result_1', post_id_2 => 'result_2', post_id_3 => 'result_3' ),
+	 *                          'key2' => array( post_id_1 => 'result_4', post_id_3 => 'result_5' ),
+	 *                          'key3' => array( post_id_1 => 'result_6', post_id_2 => 'result_7' ),
+	 *                      )
+	 */
+	function imagify_get_wpdb_metas( $metas, $ids ) {
+		_deprecated_function( __FUNCTION__ . '()', '1.6.13', 'Imagify_DB::get_metas( $metas, $ids )' );
+
+		return Imagify_DB::get_metas( $metas, $ids );
+	}
+
+endif;
 
 if ( is_admin() ) :
 

@@ -14,7 +14,7 @@ class Imagify_Admin_Ajax_Post {
 	 *
 	 * @var string
 	 */
-	const VERSION = '1.0';
+	const VERSION = '1.0.1';
 
 	/**
 	 * Actions to be triggered on admin ajax and admin post.
@@ -138,8 +138,7 @@ class Imagify_Admin_Ajax_Post {
 		imagify_check_nonce( 'imagify-manual-upload-' . $attachment_id . '-' . $context );
 		imagify_check_user_capacity( 'manual-optimize', $attachment_id );
 
-		$class_name = get_imagify_attachment_class_name( $context, $attachment_id, 'imagify_manual_upload' );
-		$attachment = new $class_name( $attachment_id );
+		$attachment = get_imagify_attachment( $context, $attachment_id, 'imagify_manual_upload' );
 
 		// Optimize it!!!!!
 		$attachment->optimize();
@@ -168,8 +167,7 @@ class Imagify_Admin_Ajax_Post {
 		imagify_check_nonce( 'imagify-manual-override-upload-' . $attachment_id . '-' . $context );
 		imagify_check_user_capacity( 'manual-optimize', $attachment_id );
 
-		$class_name = get_imagify_attachment_class_name( $context, $attachment_id, 'imagify_manual_override_upload' );
-		$attachment = new $class_name( $attachment_id );
+		$attachment = get_imagify_attachment( $context, $attachment_id, 'imagify_manual_override_upload' );
 
 		// Restore the backup file.
 		$attachment->restore();
@@ -201,8 +199,7 @@ class Imagify_Admin_Ajax_Post {
 		imagify_check_nonce( 'imagify-optimize-missing-sizes-' . $attachment_id . '-' . $context );
 		imagify_check_user_capacity( 'manual-optimize', $attachment_id );
 
-		$class_name = get_imagify_attachment_class_name( $context, $attachment_id, 'imagify_optimize_missing_sizes' );
-		$attachment = new $class_name( $attachment_id );
+		$attachment = get_imagify_attachment( $context, $attachment_id, 'imagify_optimize_missing_sizes' );
 
 		// Optimize the missing thumbnails.
 		$attachment->optimize_missing_thumbnails();
@@ -231,8 +228,7 @@ class Imagify_Admin_Ajax_Post {
 		imagify_check_nonce( 'imagify-restore-upload-' . $attachment_id . '-' . $context );
 		imagify_check_user_capacity( 'manual-optimize', $attachment_id );
 
-		$class_name = get_imagify_attachment_class_name( $context, $attachment_id, 'imagify_restore_upload' );
-		$attachment = new $class_name( $attachment_id );
+		$attachment = get_imagify_attachment( $context, $attachment_id, 'imagify_restore_upload' );
 
 		// Restore the backup file.
 		$attachment->restore();
@@ -262,8 +258,7 @@ class Imagify_Admin_Ajax_Post {
 		imagify_check_nonce( 'imagify-bulk-upload', 'imagifybulkuploadnonce' );
 		imagify_check_user_capacity( 'bulk-optimize', $attachment_id );
 
-		$class_name         = get_imagify_attachment_class_name( $context, $attachment_id, 'imagify_bulk_upload' );
-		$attachment         = new $class_name( $attachment_id );
+		$attachment         = get_imagify_attachment( $context, $attachment_id, 'imagify_bulk_upload' );
 		$optimization_level = get_transient( 'imagify_bulk_optimization_level' );
 
 		// Restore it if the optimization level is updated.
@@ -322,8 +317,7 @@ class Imagify_Admin_Ajax_Post {
 		imagify_check_nonce( 'new_media-' . $attachment_id );
 		imagify_check_user_capacity( 'auto-optimize' );
 
-		$class_name = get_imagify_attachment_class_name( $context, $attachment_id, 'imagify_async_optimize_upload_new_media' );
-		$attachment = new $class_name( $attachment_id );
+		$attachment = get_imagify_attachment( $context, $attachment_id, 'imagify_async_optimize_upload_new_media' );
 
 		// Optimize it!!!!!
 		$attachment->optimize( null, $_POST['metadata'] );
@@ -346,13 +340,13 @@ class Imagify_Admin_Ajax_Post {
 		imagify_check_nonce( 'image_editor-' . $attachment_id );
 		imagify_check_user_capacity( 'edit_post', $attachment_id );
 
-		if ( ! get_post_meta( $attachment_id, '_imagify_data', true ) ) {
+		$attachment = get_imagify_attachment( 'wp', $attachment_id, 'wp_ajax_imagify_async_optimize_save_image_editor_file' );
+
+		if ( ! $attachment->get_data() ) {
 			return;
 		}
 
-		$optimization_level = (int) get_post_meta( $attachment_id, '_imagify_optimization_level', true );
-		$class_name         = get_imagify_attachment_class_name( 'wp', $attachment_id, 'wp_ajax_imagify_async_optimize_save_image_editor_file' );
-		$attachment         = new $class_name( $attachment_id );
+		$optimization_level = $attachment->get_optimization_level();
 		$metadata           = wp_get_attachment_metadata( $attachment_id );
 
 		// Remove old optimization data.
@@ -420,17 +414,20 @@ class Imagify_Admin_Ajax_Post {
 		$unoptimized_attachment_limit = (int) apply_filters( 'imagify_unoptimized_attachment_limit', 10000 );
 		$unoptimized_attachment_limit = -1 === $unoptimized_attachment_limit ? PHP_INT_MAX : $unoptimized_attachment_limit;
 
-		$mime_types = get_imagify_mime_type();
-		$mime_types = esc_sql( $mime_types );
-		$mime_types = "'" . implode( "','", $mime_types ) . "'";
+		Imagify_DB::unlimit_joins();
 
-		$ids = $wpdb->get_col( $wpdb->prepare( // WPCS: unprepared SQL ok.
+		$mime_types = Imagify_DB::get_mime_types();
+		$ids        = $wpdb->get_col( $wpdb->prepare( // WPCS: unprepared SQL ok.
 			"SELECT $wpdb->posts.ID
 			FROM $wpdb->posts
-				LEFT JOIN $wpdb->postmeta
-					ON ( $wpdb->posts.ID = $wpdb->postmeta.post_id AND $wpdb->postmeta.meta_key = '_imagify_optimization_level' )
-				LEFT JOIN $wpdb->postmeta AS mt1
-					ON ( $wpdb->posts.ID = mt1.post_id AND mt1.meta_key = '_imagify_status' )
+			LEFT JOIN $wpdb->postmeta
+				ON ( $wpdb->posts.ID = $wpdb->postmeta.post_id AND $wpdb->postmeta.meta_key = '_imagify_optimization_level' )
+			LEFT JOIN $wpdb->postmeta AS mt1
+				ON ( $wpdb->posts.ID = mt1.post_id AND mt1.meta_key = '_imagify_status' )
+			INNER JOIN $wpdb->postmeta AS mt2
+				ON ( $wpdb->posts.ID = mt2.post_id AND mt2.meta_key = '_wp_attached_file' )
+			INNER JOIN $wpdb->postmeta AS mt3
+				ON ( $wpdb->posts.ID = mt3.post_id AND mt3.meta_key = '_wp_attachment_metadata' )
 			WHERE
 				$wpdb->posts.post_mime_type IN ( $mime_types )
 				AND (
@@ -441,8 +438,7 @@ class Imagify_Admin_Ajax_Post {
 					mt1.meta_value = 'error'
 				)
 				AND $wpdb->posts.post_type = 'attachment'
-				AND $wpdb->posts.post_status <> 'trash'
-				AND $wpdb->posts.post_status <> 'auto-draft'
+				AND $wpdb->posts.post_status = 'inherit'
 			GROUP BY $wpdb->posts.ID
 			ORDER BY
 				CASE mt1.meta_value
@@ -463,7 +459,7 @@ class Imagify_Admin_Ajax_Post {
 			wp_send_json_error( array( 'message' => 'no-images' ) );
 		}
 
-		$results = imagify_get_wpdb_metas( array(
+		$results = Imagify_DB::get_metas( array(
 			// Get attachments filename.
 			'filenames'           => '_wp_attached_file',
 			// Get attachments data.
@@ -528,6 +524,11 @@ class Imagify_Admin_Ajax_Post {
 		$data = array();
 
 		foreach ( $ids as $i => $id ) {
+			if ( empty( $results['filenames'][ $id ] ) ) {
+				// Problem.
+				continue;
+			}
+
 			$file_path = get_imagify_attached_file( $results['filenames'][ $id ] );
 
 			/** This filter is documented in inc/functions/process.php. */
@@ -714,7 +715,7 @@ class Imagify_Admin_Ajax_Post {
 				$message .= '<p><i class="dashicons dashicons-warning" aria-hidden="true"></i><strong>' . __( 'Oops, It\'s almost over!', 'imagify' ) . '</strong></p>';
 				/* translators: %s is a line break. */
 				$message .= '<p>' . sprintf( __( 'You have almost used all your credit.%sDon\'t forget to upgrade your subscription to continue optimizing your images.', 'imagify' ), '<br/><br/>' ) . '</p>';
-				$message .= '<p class="center txt-center text-center"><a class="btn imagify-btn-ghost" href="' . IMAGIFY_APP_MAIN . '/#/subscription" target="_blank">' . __( 'View My Subscription', 'imagify' ) . '</a></p>';
+				$message .= '<p class="center txt-center text-center"><a class="btn imagify-btn-ghost" href="' . esc_url( imagify_get_external_url( 'subscription' ) ) . '" target="_blank">' . __( 'View My Subscription', 'imagify' ) . '</a></p>';
 			$message .= '</div>';
 		}
 
@@ -727,7 +728,7 @@ class Imagify_Admin_Ajax_Post {
 					size_format( $user->quota * 1048576 ),
 					date_i18n( get_option( 'date_format' ), strtotime( $user->next_date_update ) )
 				) . '</p>';
-				$message .= '<p class="center txt-center text-center"><a class="btn imagify-btn-ghost" href="' . IMAGIFY_APP_MAIN . '/#/subscription" target="_blank">' . __( 'Upgrade My Subscription', 'imagify' ) . '</a></p>';
+				$message .= '<p class="center txt-center text-center"><a class="btn imagify-btn-ghost" href="' . esc_url( imagify_get_external_url( 'subscription' ) ) . '" target="_blank">' . __( 'Upgrade My Subscription', 'imagify' ) . '</a></p>';
 			$message .= '</div>';
 		}
 
@@ -758,7 +759,7 @@ class Imagify_Admin_Ajax_Post {
 		}
 
 		$quota_section .= '<p class="imagify-abq-row">';
-			$quota_section .= '<a class="imagify-account-link" href="' . IMAGIFY_APP_MAIN . '/#/subscription" target="_blank">';
+			$quota_section .= '<a class="imagify-account-link" href="' . esc_url( imagify_get_external_url( 'subscription' ) ) . '" target="_blank">';
 				$quota_section .= '<span class="dashicons dashicons-admin-users"></span>';
 				$quota_section .= '<span class="button-text">' . __( 'View my subscription', 'imagify' ) . '</span>';
 			$quota_section .= '</a>'; // .imagify-account-link
