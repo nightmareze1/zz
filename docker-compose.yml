@@ -25,4 +25,10 @@ services:
      links:
        - mysql-test11:itshelldb
      ports:
-       - "80:80"
+       - "8088:80"
+     logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: wordpress-itshellws1.access
+

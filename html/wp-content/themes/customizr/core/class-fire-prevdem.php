@@ -38,6 +38,7 @@ if ( ! class_exists( 'CZR_prevdem' ) ) :
       //adds infos in the caption data of the demo slider
       add_filter( 'czr_slide_caption_data' , array( $this, 'czr_fn_set_demo_slide_data'), 100, 3 );
       add_filter( 'tc_opt_tc_slider_delay', array( $this, 'czr_fn_set_demo_slider_delay') );
+      add_filter( 'tc_opt_tc_slider_img_smart_load', '__return_false' );
 
       //SINGLE POSTS AND PAGES
       add_filter( 'tc_show_single_post_thumbnail', '__return_true');
@@ -46,6 +47,10 @@ if ( ! class_exists( 'CZR_prevdem' ) ) :
       add_filter( 'tc_single_page_thumb_hook', array( $this, 'czr_fn_set_singular_thumb_hook') );
       add_filter( 'tc_single_post_thumb_height', array( $this, 'czr_fn_set_singular_thumb_height') );
       add_filter( 'tc_single_page_thumb_height', array( $this, 'czr_fn_set_singular_thumb_height') );
+      //block locations
+      add_filter( 'tc_opt_tc_single_author_block_location', array( $this, 'czr_fn_set_single_block_location') );
+      add_filter( 'tc_opt_tc_single_related_posts_block_location', array( $this, 'czr_fn_set_single_block_location') );
+      add_filter( 'tc_opt_tc_singular_comments_block_location', array( $this, 'czr_fn_set_single_block_location') );
 
       //SOCIALS
       add_filter( 'option_tc_theme_options', array( $this, 'czr_fn_set_socials'), 100 );
@@ -337,7 +342,9 @@ if ( ! class_exists( 'CZR_prevdem' ) ) :
     function czr_fn_set_singular_thumb_height() {
       return 350;
     }
-
+    function czr_fn_set_single_block_location() {
+      return 'below_post_content';
+    }
 
 
     /* ------------------------------------------------------------------------- *
