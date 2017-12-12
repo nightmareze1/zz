@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: itshell
+  labels:
+    name: itshell
+spec:
+  replicas: 3
+  selector:
+    name: itshell
+  template:
+    metadata:
+      labels:
+        name: itshell
+    spec:
+      containers:
+      - name: itshell
+        image: nightmareze1/zz:v0.0.0.1
+        ports:
+        - containerPort: 80
+          name: itshell
+        env:
+          - name: WORDPRESS_DB_USER
+            value: root
+          - name: WORDPRESS_DB_PASSWORD
+            value: "1"
+          - name: WORDPRESS_DB_NAME
+            value: itshelldb
+          - name: WORDPRESS_DB_HOST
+            value: mariadb01-it
+        volumeMounts:
+          - name: wordpress-1
+            mountPath: /var/www/html
+      volumes:
+        - name: wordpress-1
+          persistentVolumeClaim:
+           claimName: claim-var-itshell
