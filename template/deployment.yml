@@ -54,3 +54,19 @@ spec:
            claimName: claim-var-itshell
       imagePullSecrets:
         - name: myregistrykey
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: itshell
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: itshell
+  minReplicas: 3
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 50
+
