@@ -1,0 +1,14 @@
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: itshell-app-autoscaler
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: itshell-app-deployment
+  minReplicas: 3
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 80
