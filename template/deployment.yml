@@ -26,10 +26,10 @@ spec:
         resources:
           limits:
             cpu: "100m"
-            memory: 512Mi
+            memory: 128Mi
           requests:
             cpu: "30m"
-            memory: 512Mi
+            memory: 128Mi
         livenessProbe:
           httpGet:
             path: /live.php
@@ -51,7 +51,7 @@ spec:
       volumes:
         - name: wordpress-1
           persistentVolumeClaim:
-           claimName: claim-var-itshell
+           claimName: var-efs
       imagePullSecrets:
         - name: myregistrykey
 
