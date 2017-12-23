@@ -32,7 +32,6 @@ deployment:
       - docker images
       - kubectl get cs
       - kubectl apply -f template/deployment.yml
-      - kubectl apply -f template/svc.yml
   dockerhub_release:
     tag: /a[0-9]+(\.[0-9]+)*/
     commands:
@@ -41,4 +40,3 @@ deployment:
       - docker push
       - kubectl get cs
       - kubectl apply -f template/deployment.yml
-      - kubectl apply -f template/svc.yml
