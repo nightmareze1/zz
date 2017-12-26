@@ -16,7 +16,7 @@ services:
        - MYSQL_PASSWORD=1
      
   wordpress-itshellws1:
-     image: nightmareze1/zz:v0.0.0.1
+     image: nightmareze1/zz:v0.0.0.23
      container_name: wordpress-itshellws1
      volumes:
        - ./html:/var/www/html 

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Ad Inserter
-Version: 2.2.7
+Version: 2.2.10
 Description: Ad management plugin with advanced advertising options to automatically insert ad codes on your website
 Author: Igor Funa
 Author URI: http://igorfuna.com/
@@ -11,6 +11,28 @@ Plugin URI: http://adinserter.pro/documentation
 /*
 
 Change Log
+
+Ad Inserter 2.2.10 - 2017-12-10
+- Fix for rotation editor code import/export
+- Fix for errors when using old |rotate| separator
+- Few minor bug fixes, cosmetic changes and code improvements
+
+Ad Inserter 2.2.9 - 2017-12-09
+- Output buffering is now disabled by default (for position Above header you need to enable it)
+- Fix for min. paragraph number not processed
+
+Ad Inserter 2.2.8 - 2017-12-08
+- Added position for automatic insertion Above header (after `<body>` tag)
+- Added rotation code editor
+- Added support to name rotation options
+- Added code generator for banners
+- Added code generator for AdSense
+- Added support to rearrange code blocks
+- Added support to copy any block settings
+- Added support for clipboard to copy/paste block settings
+- Added option to select ad blocking detection mode (Pro only)
+- Delayed insertion on posts now available for all insertion positions
+- Few minor bug fixes, cosmetic changes and code improvements
 
 Ad Inserter 2.2.7 - 2017-11-08
 - Fix for duplicate amp-custom tag on AMP pages
@@ -503,6 +525,7 @@ if (version_compare ($wp_version, "4.0", "<")) {
 require_once AD_INSERTER_PLUGIN_DIR.'class.php';
 require_once AD_INSERTER_PLUGIN_DIR.'constants.php';
 require_once AD_INSERTER_PLUGIN_DIR.'settings.php';
+require_once AD_INSERTER_PLUGIN_DIR.'editor.php';
 require_once AD_INSERTER_PLUGIN_DIR.'preview.php';
 require_once AD_INSERTER_PLUGIN_DIR.'preview-adb.php';
 
@@ -673,6 +696,14 @@ if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_PROCESSING) != 0) {
 }
 
 
+
+function ai_wp_default_editor () {
+  return 'tinymce';
+}
+
+function ai_wp_default_editor_html () {
+  return 'html';
+}
 
 function ai_toolbar ($wp_admin_bar) {
   global $block_object, $ai_wp_data;
@@ -947,7 +978,10 @@ function ai_block_insertion_status ($block, $ai_last_check) {
     case AI_CHECK_AD_BELOW:                 $status .= "PARAGRAPH CLEARANCE BELOW"; break;
     case AI_CHECK_SHORTCODE_ATTRIBUTES:     $status .= "SHORTCODE ATTRIBUTES"; break;
 
-    case AI_CHECK_ENABLED:                  $status .= "ENABLED"; break;
+    case AI_CHECK_ENABLED_PHP:              $status .= "ENABLED PHP FUNCTION"; break;
+    case AI_CHECK_ENABLED_SHORTCODE:        $status .= "ENABLED SHORTCODE"; break;
+    case AI_CHECK_ENABLED_WIDGET:           $status .= "ENABLED WIDGET"; break;
+
     case AI_CHECK_NONE:                     $status = "BLOCK $block"; break;
     default: $status .= "?"; break;
   }
@@ -1027,11 +1061,20 @@ function ai_buffering_end () {
   if (!defined ('AI_BUFFERING_START')) return;
 
   $page = ob_get_clean();
+
+
+  // TEST
+//  $page = ai_content_hook ($page);
+
+
   $matches = preg_split ('/(<body.*?'.'>)/i', $page, - 1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
   echo $matches [0],  $matches [1];
   ai_custom_hook ('above_header', 'Above Header');
   echo $matches [2];
+
+
+//  echo ai_content_hook ($matches [2]);
 }
 
 function ai_post_check ($post, $action) {
@@ -1230,7 +1273,7 @@ function ai_wp_hook () {
       (isset ($ai_db_options_extract [AFTER_COMMENTS_HOOK_BLOCKS][$ai_wp_data [AI_WP_PAGE_TYPE]]) && count ($ai_db_options_extract [AFTER_COMMENTS_HOOK_BLOCKS][$ai_wp_data [AI_WP_PAGE_TYPE]]) != 0) ||
       $debug_positions) {
     $ai_wp_data [AI_NUMBER_OF_COMMENTS] = 0;
-    add_filter ('comments_array' ,        'ai_comments_array' , 10, 2);
+    add_filter ('comments_array' ,        'ai_comments_array', 10, 2);
     add_filter ('wp_list_comments_args' , 'ai_wp_list_comments_args');
     $ai_walker = new ai_Walker_Comment;
   }
@@ -1253,44 +1296,43 @@ function ai_wp_hook () {
 
   if ($ai_wp_data [AI_WP_AMP_PAGE] ) {
     // AMP, Accelerated Mobile Pages
-    add_action ('amp_post_template_head', 'ai_amp_head_hook');
-    add_action ('amp_post_template_css',  'ai_amp_css_hook');
+    add_action ('amp_post_template_head', 'ai_amp_head_hook', 99999);
+    add_action ('amp_post_template_css',  'ai_amp_css_hook', 99999);
 
     // WP AMP Ninja
-    add_action ('wpamp_custom_script',    'ai_amp_head_hook');
+    add_action ('wpamp_custom_script',    'ai_amp_head_hook', 99999);
     // No usable hook for custom CSS
-//    add_action ('wpamp_custom_style',     'ai_amp_css_hook');
+//    add_action ('wpamp_custom_style',     'ai_amp_css_hook', 99999);
 
     // WP AMP - Accelerated Mobile Pages for WordPress
-    add_action ('amphtml_template_head',  'ai_amp_head_hook');
-    add_action ('amphtml_template_css',   'ai_amp_css_hook');
+    add_action ('amphtml_template_head',  'ai_amp_head_hook', 99999);
+    add_action ('amphtml_template_css',   'ai_amp_css_hook', 99999);
   } else
   // WP
-  add_action ('wp_head',                  'ai_wp_head_hook');
+  add_action ('wp_head',                  'ai_wp_head_hook', 99999);
 
   $automatic_insertion_footer_hook = isset ($ai_db_options_extract [FOOTER_HOOK_BLOCKS][$ai_wp_data [AI_WP_PAGE_TYPE]]) && count ($ai_db_options_extract [FOOTER_HOOK_BLOCKS][$ai_wp_data [AI_WP_PAGE_TYPE]]) != 0 || $debug_positions;
   if ($ai_wp_data [AI_WP_AMP_PAGE]) {
     // AMP, Accelerated Mobile Pages
     if ($automatic_insertion_footer_hook)
-      add_action ('amp_post_template_footer',     'ai_hook_function_footer');
-    add_action ('amp_post_template_footer',     'ai_amp_footer_hook');
+      add_action ('amp_post_template_footer',     'ai_hook_function_footer', 5);
+    add_action ('amp_post_template_footer',     'ai_amp_footer_hook', 5);
 
     // WP AMP Ninja
     if ($automatic_insertion_footer_hook)
-      add_action ('wpamp_google_analytics_code',  'ai_hook_function_footer');
-    add_action ('wpamp_google_analytics_code',  'ai_amp_footer_hook');
+      add_action ('wpamp_google_analytics_code',  'ai_hook_function_footer', 5);
+    add_action ('wpamp_google_analytics_code',  'ai_amp_footer_hook', 5);
 
     // WP AMP - Accelerated Mobile Pages for WordPress
     if ($automatic_insertion_footer_hook)
-      add_action ('amphtml_after_footer',         'ai_hook_function_footer');
-    add_action ('amphtml_after_footer',         'ai_amp_footer_hook');
+      add_action ('amphtml_after_footer',         'ai_hook_function_footer', 5);
+    add_action ('amphtml_after_footer',         'ai_amp_footer_hook', 5);
   } else {
       // WP
       if ($automatic_insertion_footer_hook)
-        add_action ('wp_footer', 'ai_hook_function_footer');
-      add_action ('wp_footer', 'ai_wp_footer_hook');
+        add_action ('wp_footer', 'ai_hook_function_footer', 5);
+      add_action ('wp_footer', 'ai_wp_footer_hook', 5);
     }
-
 
   if ($ai_wp_data [AI_WP_AMP_PAGE]) {
     // No scripts on AMP pages
@@ -1304,6 +1346,13 @@ function ai_wp_hook () {
     $ai_total_plugin_time += microtime (true) - $start_time;
     ai_log ("WP HOOK END\n");
   }
+
+
+
+//  wp_dequeue_script ('jquery');
+//  wp_deregister_script ('jquery');
+
+
 };
 
 function ai_init_hook() {
@@ -1315,8 +1364,10 @@ function ai_init_hook() {
     ai_wp_hook ();
   }
 
-  add_shortcode ('adinserter', 'process_shortcodes_lc');
-  add_shortcode ('ADINSERTER', 'process_shortcodes_uc');
+  add_shortcode ('adinserter', 'ai_process_shortcodes');
+  add_shortcode ('ADINSERTER', 'ai_process_shortcodes');
+
+  add_filter ('pre_do_shortcode_tag', 'ai_pre_do_shortcode_tag', 10, 4);
 }
 
 function ai_wp_loaded_hook () {
@@ -1540,9 +1591,10 @@ function ai_replace_js_data ($js) {
     if (strpos ($js, 'AI_ADB_STATUS_MESSAGE') !== false) {
       $adb = $block_object [AI_ADB_MESSAGE_OPTION_NAME];
 
-      $js = str_replace ('AI_ADB_OVERLAY_WINDOW', "jQuery ('<div>', {attr: {'style': '" . str_replace (array ("'", "\r", "\n"), array ("\'", '', ''), AI_BASIC_ADB_OVERLAY_CSS) . get_overlay_css () . "'}})", $js);
-      $js = str_replace ('AI_ADB_MESSAGE_WINDOW', "jQuery ('<div>', {attr: {'style': '" . str_replace (array ("'", "\r", "\n"), array ("\'", '', ''), AI_BASIC_ADB_MESSAGE_CSS) . get_message_css () . "'}, html: '" .
-        str_replace (array ("'", "\r", "\n"), array ("\'", '', ''), do_shortcode ($adb->ai_getCode ())) . "'});", $js);
+      $js = str_replace ('AI_ADB_OVERLAY_WINDOW', "jQuery ('<div>', {attr: {'style': jQuery.base64Decode ('" . base64_encode (str_replace (array ("'", "\r", "\n"), array ("\'", '', ''), AI_BASIC_ADB_OVERLAY_CSS) . get_overlay_css ()) . "')}})", $js);
+      $js = str_replace ('AI_ADB_MESSAGE_WINDOW', "jQuery ('<div>', {attr: {'style': jQuery.base64Decode ('" . base64_encode (str_replace (array ("'", "\r", "\n"), array ("\'", '', ''), AI_BASIC_ADB_MESSAGE_CSS) . get_message_css ()) . "')}, 'html': jQuery.base64Decode ('" .
+        base64_encode (str_replace (array ("'", "\r", "\n"), array ("\'", '', ''), do_shortcode ($adb->ai_getCode ()))) . "')})", $js);
+
       $js = str_replace ('AI_ADB_SELECTORS', str_replace (' ', '', get_adb_selectors ()), $js);
 
       $redirection_page = get_redirection_page ();
@@ -1674,10 +1726,10 @@ function ai_admin_notice_hook () {
 
       $used_blocks = count (unserialize ($ai_db_options_extract [AI_EXTRACT_USED_BLOCKS]));
 
-      if ((get_option ('ai-notice-review') === false  && $used_blocks >=  6 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 10) ||
+      if ((get_option ('ai-notice-review') === false  && $used_blocks >=  4 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 20) ||
 
-          (get_option ('ai-notice-review') == 'later' && ($used_blocks >= 12 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 30 ||
-                                                          $used_blocks >=  8 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 60))) {
+          (get_option ('ai-notice-review') == 'later' && ($used_blocks >= 8 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 50 ||
+                                                          $used_blocks >= 4 && $ai_wp_data [AI_DAYS_SINCE_INSTAL] > 70))) {
 
         if (get_option ('ai-notice-review') == 'later') {
                $message = "Hey, you are now using <strong>{$used_blocks} Ad Inserter</strong> code blocks.";
@@ -1969,7 +2021,7 @@ function get_page_type_debug_info ($text = '') {
   }
   $class = AI_DEBUG_PAGE_TYPE_CLASS;
 
-  $page_type = "<section class='$class'>".$text.$page_type."</section>";;
+  $page_type = "<section class='$class'>".$text.$page_type."</section>";
 
   return $page_type;
 }
@@ -2073,8 +2125,10 @@ function ai_wp_head_hook () {
   }
 
   if (defined ('AI_BUFFERING')) {
-    if ($ai_wp_data [AI_WP_PAGE_TYPE] != AI_PT_AJAX) {
-      ai_buffering_start ();
+    if (get_output_buffering ()) {
+      if ($ai_wp_data [AI_WP_PAGE_TYPE] != AI_PT_AJAX) {
+        ai_buffering_start ();
+      }
     }
   }
 
@@ -2137,8 +2191,10 @@ function ai_amp_head_hook () {
 //  }
 
   if (defined ('AI_BUFFERING')) {
-    if ($ai_wp_data [AI_WP_PAGE_TYPE] != AI_PT_AJAX) {
-      ai_buffering_start ();
+    if (get_output_buffering ()) {
+      if ($ai_wp_data [AI_WP_PAGE_TYPE] != AI_PT_AJAX) {
+        ai_buffering_start ();
+      }
     }
   }
 
@@ -2169,8 +2225,10 @@ function ai_wp_footer_hook () {
   }
 
   if (defined ('AI_BUFFERING')) {
-    if ($ai_wp_data [AI_WP_PAGE_TYPE] != AI_PT_AJAX) {
-      ai_buffering_end ();
+    if (get_output_buffering ()) {
+      if ($ai_wp_data [AI_WP_PAGE_TYPE] != AI_PT_AJAX) {
+        ai_buffering_end ();
+      }
     }
   }
 
@@ -2217,8 +2275,10 @@ function ai_amp_footer_hook () {
   }
 
   if (defined ('AI_BUFFERING')) {
-    if ($ai_wp_data [AI_WP_PAGE_TYPE] != AI_PT_AJAX) {
-      ai_buffering_end ();
+    if (get_output_buffering ()) {
+      if ($ai_wp_data [AI_WP_PAGE_TYPE] != AI_PT_AJAX) {
+        ai_buffering_end ();
+      }
     }
   }
 
@@ -2436,6 +2496,16 @@ function ai_write_debug_info ($write_processing_log = false) {
       break;
     case AI_MULTIBYTE_PARAGRAPH_COUNTING_FUNCTIONS:
       echo AI_TEXT_MULTIBYTE;
+      break;
+  }
+  echo "\n";
+  echo 'OUTPUT BUFFERING:        ';
+  switch (get_output_buffering()) {
+    case AI_OUTPUT_BUFFERING_DISABLED:
+      echo AI_TEXT_DISABLED;
+      break;
+    case AI_OUTPUT_BUFFERING_ENABLED:
+      echo AI_TEXT_ENABLED;
       break;
   }
   echo "\n";
@@ -2791,6 +2861,7 @@ function ai_check_plugin_options ($plugin_options = array ()) {
 
   if (!isset ($plugin_options ['DYNAMIC_BLOCKS']))                $plugin_options ['DYNAMIC_BLOCKS']                = DEFAULT_DYNAMIC_BLOCKS;
   if (!isset ($plugin_options ['PARAGRAPH_COUNTING_FUNCTIONS']))  $plugin_options ['PARAGRAPH_COUNTING_FUNCTIONS']  = DEFAULT_PARAGRAPH_COUNTING_FUNCTIONS;
+  if (!isset ($plugin_options ['OUTPUT_BUFFERING']))              $plugin_options ['OUTPUT_BUFFERING']              = DEFAULT_OUTPUT_BUFFERING;
   if (!isset ($plugin_options ['NO_PARAGRAPH_COUNTING_INSIDE']))  $plugin_options ['NO_PARAGRAPH_COUNTING_INSIDE']  = DEFAULT_NO_PARAGRAPH_COUNTING_INSIDE;
   if (!isset ($plugin_options ['ADB_ACTION']))                    $plugin_options ['ADB_ACTION']                    = AI_DEFAULT_ADB_ACTION;
   if (!isset ($plugin_options ['ADB_DELAY_ACTION']))              $plugin_options ['ADB_DELAY_ACTION']              = '';
@@ -2982,6 +3053,14 @@ function get_paragraph_counting_functions(){
   if (!isset ($ai_db_options [AI_OPTION_GLOBAL]['PARAGRAPH_COUNTING_FUNCTIONS'])) $ai_db_options [AI_OPTION_GLOBAL]['PARAGRAPH_COUNTING_FUNCTIONS'] = DEFAULT_PARAGRAPH_COUNTING_FUNCTIONS;
 
   return ($ai_db_options [AI_OPTION_GLOBAL]['PARAGRAPH_COUNTING_FUNCTIONS']);
+}
+
+function get_output_buffering(){
+  global $ai_db_options;
+
+  if (!isset ($ai_db_options [AI_OPTION_GLOBAL]['OUTPUT_BUFFERING'])) $ai_db_options [AI_OPTION_GLOBAL]['OUTPUT_BUFFERING'] = DEFAULT_OUTPUT_BUFFERING;
+
+  return ($ai_db_options [AI_OPTION_GLOBAL]['OUTPUT_BUFFERING']);
 }
 
 function get_no_paragraph_counting_inside () {
@@ -3375,29 +3454,54 @@ function ai_ajax_backend () {
     if (is_numeric ($block) && $block >= 1 && $block <= AD_INSERTER_BLOCKS) {
       generate_code_preview (
         $block,
-        wp_unslash (urldecode ($_POST ["name"])),
-        urldecode ($_POST ["alignment"]),
-        wp_unslash (urldecode ($_POST ["alignment_css"])),
-        wp_unslash (urldecode ($_POST ["custom_css"])),
-        wp_unslash (urldecode (base64_decode ($_POST ["code"]))),
-        urldecode ($_POST ["php"]) == 1);
+//        wp_unslash (urldecode ($_POST ["name"])),
+        base64_decode ($_POST ["name"]),
+//        urldecode ($_POST ["alignment"]),
+        base64_decode ($_POST ["alignment"]),
+//        wp_unslash (urldecode ($_POST ["alignment_css"])),
+        base64_decode ($_POST ["alignment_css"]),
+//        wp_unslash (urldecode ($_POST ["custom_css"])),
+        base64_decode ($_POST ["custom_css"]),
+//        wp_unslash (urldecode (base64_decode ($_POST ["code"]))),   // base64_decode after wp_unslash / urldecode ?
+        base64_decode ($_POST ["code"]),
+//        urldecode ($_POST ["php"]) == 1);
+        $_POST ["php"]) == 1;
     }
     elseif ($block == 'adb') {
-      generate_code_preview_adb (wp_unslash (urldecode ($_POST ["code"])), urldecode ($_POST ["php"]) == 1);
 //      generate_code_preview_adb (wp_unslash (urldecode (base64_decode ($_POST ["code"]))), urldecode ($_POST ["php"]) == 1);
+      generate_code_preview_adb (base64_decode ($_POST ["code"]), $_POST ["php"] == 1);
     }
   }
 
-  elseif (isset ($_GET ["generate-code"])) {
-    $code_generator = new ai_code_generator ();
-
-    echo $code_generator->generate ($_GET);
+  elseif (isset ($_POST ["edit"])) {
+    if (is_numeric ($_POST ["edit"]) && $_POST ["edit"] >= 1 && $_POST ["edit"] <= AD_INSERTER_BLOCKS) {
+//      generate_code_editor ($_POST ["edit"], wp_unslash (urldecode (base64_decode ($_POST ["code"]))), urldecode ($_POST ["php"]) == 1);
+      generate_code_editor ($_POST ["edit"], base64_decode ($_POST ["code"]), $_POST ["php"] == 1);
+    }
   }
 
-  elseif (isset ($_GET ["import-code"])) {
+  elseif (isset ($_POST ["generate-code"])) {
     $code_generator = new ai_code_generator ();
 
-    echo json_encode ($code_generator->import (wp_unslash ($_GET ["import-code"])));
+    echo json_encode ($code_generator->generate ($_POST));
+  }
+
+  elseif (isset ($_POST ["import-code"])) {
+    $code_generator = new ai_code_generator ();
+
+    echo json_encode ($code_generator->import (base64_decode ($_POST ["import-code"])));
+  }
+
+  elseif (isset ($_POST ["import-rotation-code"])) {
+    $code_generator = new ai_code_generator ();
+
+    echo json_encode ($code_generator->import_rotation (base64_decode ($_POST ["import-rotation-code"])));
+  }
+
+  elseif (isset ($_POST ["generate-rotation-code"])) {
+    $code_generator = new ai_code_generator ();
+
+    echo json_encode ($code_generator->generate_rotation (json_decode (base64_decode ($_POST ['generate-rotation-code']), true)));
   }
 
   elseif (isset ($_GET ["image"])) {
@@ -3437,6 +3541,10 @@ function ai_ajax_backend () {
 
   elseif (isset ($_GET ["list"])) {
     code_block_list ();
+  }
+
+  elseif (isset ($_GET ["settings"])) {
+    generate_settings_form ();
   }
 
   elseif (function_exists ('ai_ajax_backend_2')) {
@@ -3783,7 +3891,7 @@ function generate_alignment_css () {
 function generate_debug_css () {
 ?>
 .ai-debug-tags {font-weight: bold; color: white; padding: 2px;}
-.ai-debug-positions {text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid blue; color: blue; background: #eef;}
+.ai-debug-positions {clear: both; text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid blue; color: blue; background: #eef;}
 .ai-debug-page-type {text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid green; color: green; background: #efe;}
 .ai-debug-adb {text-align: center; padding: 10px 0; font-weight: bold; border: 1px solid red; color: red; background: #fee; opacity: 0.85; cursor: pointer;}
 .ai-debug-widget {margin: 0; padding: 0 5px; font-size: 10px; white-space: pre; overflow-x: auto; overflow-y: hidden;}
@@ -3965,6 +4073,7 @@ function ai_settings () {
         if (isset ($_POST ['plugin_priority']))                     $options ['PLUGIN_PRIORITY']              = filter_option ('PLUGIN_PRIORITY',               $_POST ['plugin_priority']);
         if (isset ($_POST ['dynamic_blocks']))                      $options ['DYNAMIC_BLOCKS']               = filter_option ('DYNAMIC_BLOCKS',                $_POST ['dynamic_blocks']);
         if (isset ($_POST ['paragraph_counting_functions']))        $options ['PARAGRAPH_COUNTING_FUNCTIONS'] = filter_option ('PARAGRAPH_COUNTING_FUNCTIONS',  $_POST ['paragraph_counting_functions']);
+        if (isset ($_POST ['output-buffering']))                    $options ['OUTPUT_BUFFERING']             = filter_option ('OUTPUT_BUFFERING',              $_POST ['output-buffering']);
         if (isset ($_POST ['no-paragraph-counting-inside']))        $options ['NO_PARAGRAPH_COUNTING_INSIDE'] = filter_option ('NO_PARAGRAPH_COUNTING_INSIDE',  $_POST ['no-paragraph-counting-inside']);
         if (isset ($_POST [AI_OPTION_ADB_ACTION]))                  $options ['ADB_ACTION']                   = filter_option ('ADB_ACTION',                    $_POST [AI_OPTION_ADB_ACTION]);
         if (isset ($_POST [AI_OPTION_ADB_DELAY_ACTION]))            $options ['ADB_DELAY_ACTION']             = filter_option ('ADB_DELAY_ACTION',              $_POST [AI_OPTION_ADB_DELAY_ACTION]);
@@ -4200,7 +4309,7 @@ function ai_adinserter ($ad_number = '', $ignore = ''){
   $obj = $block_object [$ad_number];
   $obj->clear_code_cache ();
 
-  $ai_last_check = AI_CHECK_ENABLED;
+  $ai_last_check = AI_CHECK_ENABLED_PHP;
   if (!$obj->get_enable_php_call ()) return "";
   if (!$obj->check_server_side_detection ()) return "";
   if (!$obj->check_page_types_lists_users (in_array ("page-type", $ignore_array))) return "";
@@ -4298,6 +4407,7 @@ function ai_content_hook ($content = '') {
 
       if (!isset ($block_object [$block])) continue;
 
+      $ai_last_check = AI_CHECK_NONE;
       $current_block = $block;
 
       $obj = $block_object [$block];
@@ -4406,6 +4516,8 @@ function ai_content_hook ($content = '') {
     }
 
     $content = $content . "<section class='$class'>AFTER CONTENT ".$counter."</section>";
+
+    $content = $content . get_page_type_debug_info ();
 
     if ($ai_wp_data [AI_WP_AMP_PAGE]) {
       $content = $content . get_page_type_debug_info ('AMP ');
@@ -5053,7 +5165,33 @@ function ai_custom_hook ($action, $name, $hook_parameter = null, $hook_check = n
   }
 }
 
-function process_shortcode (&$block, $atts) {
+
+function ai_pre_do_shortcode_tag ($return, $tag, $attr, $m) {
+    global $ai_expand_only_rotate;
+
+//    Array
+//(
+//    [0] => [ADINSERTER ROTATE='1']
+//    [1] =>
+//    [2] => ADINSERTER
+//    [3] =>  ROTATE='1'
+//    [4] =>
+//    [5] =>
+//    [6] =>
+
+  if (strtolower ($tag) == 'adinserter') {
+    if ($ai_expand_only_rotate) {
+      // Expand only ROTATE
+      if (isset ($attr ['rotate']) || in_array ('ROTATE', $attr) || in_array ('rotate', $atts)) {
+        return false;
+      } else return $m [0];
+    }
+  }
+
+  return $return;
+}
+
+function ai_process_shortcode (&$block, $atts) {
   global $block_object, $ai_last_check, $ai_wp_data;
 
   if ($atts == '') return '';
@@ -5075,6 +5213,7 @@ function process_shortcode (&$block, $atts) {
     "custom-field" => "",
     "data" => "",
   ), $atts);
+
 
   $output = "";
   if (function_exists ('ai_shortcode')) {
@@ -5121,6 +5260,8 @@ function process_shortcode (&$block, $atts) {
 
   if ($block == - 1) {
     if ($parameters ['rotate'] != '' || in_array ('ROTATE', $atts) || in_array ('rotate', $atts)) {
+      if (!isset ($ai_wp_data [AI_SHORTCODES]['rotate'])) $ai_wp_data [AI_SHORTCODES]['rotate'] = array ();
+      $ai_wp_data [AI_SHORTCODES]['rotate'] []= $parameters;
       return AD_ROTATE_SEPARATOR;
     }
     if ($parameters ['count'] != '' || in_array ('COUNT', $atts) || in_array ('count', $atts)) {
@@ -5183,7 +5324,7 @@ function process_shortcode (&$block, $atts) {
   $obj = $block_object [$block];
   $obj->clear_code_cache ();
 
-  $ai_last_check = AI_CHECK_ENABLED;
+  $ai_last_check = AI_CHECK_ENABLED_SHORTCODE;
   if (!$obj->get_enable_manual ()) return "";
 
   if (!$obj->check_server_side_detection ()) return "";
@@ -5211,7 +5352,7 @@ function process_shortcode (&$block, $atts) {
   }
 }
 
-function process_shortcodes ($atts, $ai_shortcode_name) {
+function ai_process_shortcodes ($atts, $content, $tag) {
   global $ai_last_check, $ai_wp_data, $ai_total_plugin_time;
 
   $debug_processing = ($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_PROCESSING) != 0;
@@ -5223,12 +5364,12 @@ function process_shortcodes ($atts, $ai_shortcode_name) {
           $atts_string .= $att.' '; else
             $atts_string .= $index.("='".$att."'").' ';
       }
-    ai_log ("PROCESS SHORTCODES [$ai_shortcode_name ".trim ($atts_string).']');
+    ai_log ("PROCESS SHORTCODES [$tag ".trim ($atts_string).']');
     $start_time = microtime (true);
   }
   $ai_last_check = AI_CHECK_NONE;
   $block = - 1;
-  $shortcode = process_shortcode ($block, $atts);
+  $shortcode = ai_process_shortcode ($block, $atts);
 
   if ($debug_processing) {
     $ai_total_plugin_time += microtime (true) - $start_time;
@@ -5243,13 +5384,13 @@ function process_shortcodes ($atts, $ai_shortcode_name) {
   return $shortcode;
 }
 
-function process_shortcodes_lc ($atts) {
-  return process_shortcodes ($atts, 'adinserter');
-}
+//function process_shortcodes_lc ($atts, $content, $tag) {
+//  return process_shortcodes ($atts, 'adinserter');
+//}
 
-function process_shortcodes_uc ($atts) {
-  return process_shortcodes ($atts, 'ADINSERTER');
-}
+//function process_shortcodes_uc ($atts, $content, $tag) {
+//  return process_shortcodes ($atts, 'ADINSERTER');
+//}
 
 
 class ai_widget extends WP_Widget {
@@ -5407,7 +5548,7 @@ function ai_widget_draw ($args, $instance, &$block) {
 
   $ai_wp_data [AI_CONTEXT] = AI_CONTEXT_WIDGET;
 
-  $ai_last_check = AI_CHECK_ENABLED;
+  $ai_last_check = AI_CHECK_ENABLED_WIDGET;
   if (!$obj->get_enable_widget ()) return;
   if (!$obj->check_server_side_detection ()) return;
   if (!$obj->check_page_types_lists_users ()) return;

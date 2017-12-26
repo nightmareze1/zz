@@ -9,7 +9,9 @@ abstract class ai_BaseCodeBlock {
   var $w3tc_code;
   var $needs_class;
   var $code_version;
-  var $debug_code;
+  var $version_name;
+  var $debug_code_before;
+  var $debug_code_after;
 
   function __construct () {
 
@@ -21,7 +23,10 @@ abstract class ai_BaseCodeBlock {
     $this->w3tc_code = '';
     $this->needs_class = false;
     $this->code_version = 0;
+    $this->version_name = '';
     $this->color_class = 'ai-debug-default';
+    $this->debug_code_before = '';
+    $this->debug_code_after = '';
 
     $this->wp_options [AI_OPTION_CODE]                = AD_EMPTY_DATA;
     $this->wp_options [AI_OPTION_PROCESS_PHP]         = AI_DISABLED;
@@ -344,8 +349,8 @@ abstract class ai_BaseCodeBlock {
     if ($this->fallback != 0) return $block_object [$this->fallback]->ai_getCode ();
 
     $obj = $this;
-    $code = $client_code == null ? $obj->get_ad_data()      : $client_code;
-    $php  = $process_php == null ? $obj->get_process_php () : $process_php;
+    $code = $client_code === null ? $obj->get_ad_data()      : $client_code;
+    $php  = $process_php === null ? $obj->get_process_php () : $process_php;
 
     if ($php && (!is_multisite() || is_main_site () || multisite_php_processing ())) {
 
@@ -1118,6 +1123,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
     $code = $this->ai_getCode ($client_code, $process_php);
 
+    unset ($ai_wp_data [AI_SHORTCODES]['rotate']);
+
     $processed_code = $this->replace_ai_tags (do_shortcode ($code));
 
     if (strpos ($code, AD_COUNT_SEPARATOR) !== false) {
@@ -1137,7 +1144,26 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
 
     if (strpos ($processed_code, AD_ROTATE_SEPARATOR) !== false) {
+
       $ads = explode (AD_ROTATE_SEPARATOR, $processed_code);
+
+      if (!isset ($ai_wp_data [AI_SHORTCODES]['rotate'])) {
+        // using old separator |rotate|
+        $ai_wp_data [AI_SHORTCODES]['rotate'] = array ();
+        foreach ($ads as $ad) {
+          $ai_wp_data [AI_SHORTCODES]['rotate'] []= array ();
+        }
+      }
+
+      if (trim ($ads [0]) == '') {
+        unset ($ads [0]);
+        $ads = array_values ($ads);
+      } else array_unshift ($ai_wp_data [AI_SHORTCODES]['rotate'],  array ('name' => ''));
+
+      $version_names = array ();
+      foreach ($ai_wp_data [AI_SHORTCODES]['rotate'] as $index => $option) {
+        $version_names []= isset ($option ['name']) && trim ($option ['name']) != '' ? $option ['name'] : chr (ord ('A') + $index);
+      }
 
       $amp_dynamic_blocks = $dynamic_blocks;
       if ($amp_dynamic_blocks == AI_DYNAMIC_BLOCKS_CLIENT_SIDE && $ai_wp_data [AI_WP_AMP_PAGE]) $amp_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
@@ -1146,6 +1172,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
         case AI_DYNAMIC_BLOCKS_SERVER_SIDE:
           $this->code_version = mt_rand (1, count ($ads));
           $processed_code = trim ($ads [$this->code_version - 1]);
+          $this->version_name = $version_names [$this->code_version - 1];
           break;
         case AI_DYNAMIC_BLOCKS_CLIENT_SIDE:
           $this->code_version = '""';
@@ -1158,12 +1185,14 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
               $ad = trim ($codes [0]);
             }
 
+            $version_name_data = " data-name='".base64_encode ($version_names [$index])."'";
+
             switch ($index) {
               case 0:
-                $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden;'>\n".trim ($ad, "\n")."\n</div>\n";
+                $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden;'".$version_name_data.">\n".trim ($ad, "\n")."\n</div>\n";
                 break;
               default:
-                $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%;'>".trim ($ad, "\n")."\n</div>\n";
+                $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%;'".$version_name_data.">".trim ($ad, "\n")."\n</div>\n";
                 break;
             }
           }
@@ -1183,7 +1212,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
     $amp_dynamic_blocks = $dynamic_blocks;
         if ($amp_dynamic_blocks == AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC && $this->w3tc_code == '')  $amp_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
-    elseif ($amp_dynamic_blocks == AI_DYNAMIC_BLOCKS_CLIENT_SIDE && $ai_wp_data [AI_WP_AMP_PAGE]) $amp_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
+    elseif ($amp_dynamic_blocks == AI_DYNAMIC_BLOCKS_CLIENT_SIDE) $amp_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
 
     switch ($amp_dynamic_blocks) {
       case AI_DYNAMIC_BLOCKS_SERVER_SIDE:
@@ -1212,7 +1241,6 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
         $processed_code .= '<!-- /mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
         break;
     }
-
 
     $amp_dynamic_blocks = $dynamic_blocks;
     if ($amp_dynamic_blocks == AI_DYNAMIC_BLOCKS_CLIENT_SIDE && $ai_wp_data [AI_WP_AMP_PAGE]) $amp_dynamic_blocks = AI_DYNAMIC_BLOCKS_SERVER_SIDE;
@@ -1286,8 +1314,13 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       if (function_exists ('ai_settings_url_parameters')) $url_parameters = ai_settings_url_parameters ($this->number); else $url_parameters = "";
       $url = admin_url ('options-general.php?page=ad-inserter.php') . $url_parameters . '&tab=' . $this->number;
 
-      $processed_code = '<section class="ai-debug-block '.$this->color_class.'"><section class="ai-debug-bar ai-debug-bar-left '.$this->color_class.'"><a title="Click to go to block settings" href="'
-      . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' &nbsp; ' . $this->get_ad_name () .'</a>&nbsp;'.$fallback_code.'<a class="ai-debug-text-right"><kbd class="ai-debug-text-right" title="'.$title.'">'.$counters.'</kbd><kbd class="ai-debug-invisible">[/AI]</kbd></a></section>' . $processed_code . '</section>';
+      $version_name = $this->version_name == '' ? '' : ' - ' . $this->version_name;
+
+      $this->debug_code_before = '<section class="ai-debug-block '.$this->color_class.'"><section class="ai-debug-bar ai-debug-bar-left '.$this->color_class.'"><a title="Click to go to block settings" href="'
+      . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' &nbsp; ' . $this->get_ad_name () . '<span class="ai-option-name">' . $version_name . '</span></a>&nbsp;'.$fallback_code.'<a class="ai-debug-text-right"><kbd class="ai-debug-text-right" title="'.$title.'">'.$counters.'</kbd><kbd class="ai-debug-invisible">[/AI]</kbd></a></section>';
+      $this->debug_code_after = '</section>';
+
+      $processed_code = $this->debug_code_before . $processed_code . $this->debug_code_after;
     }
 
     return $processed_code;
@@ -1314,10 +1347,12 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       for ($viewport = 1; $viewport <= AD_INSERTER_VIEWPORTS; $viewport ++) {
         $viewport_name = get_viewport_name ($viewport);
         if ($viewport_name != '') {
+          $version_name = $this->version_name == '' ? '' : ' - ' . $this->version_name;
           if ($this->get_detection_viewport ($viewport))
-            $visible_viewports .= '<section class="ai-viewport-' . $viewport .'"><section class="ai-debug-bar '.$this->color_class.'"><a class="ai-debug-text-left" title="Click to go to block settings" href="' . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () .'</a><a>&nbsp;'.$viewport_name.'&nbsp;</a><a class="ai-debug-text-right" title="'.$title.'">'.$counters.'<kbd class="ai-debug-invisible">[/AI]</kbd></a></section></section>'; else
+            $visible_viewports .= '<section class="ai-viewport-' . $viewport .'"><section class="ai-debug-bar '.$this->color_class.'"><a class="ai-debug-text-left" title="Click to go to block settings" href="' . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () . '<span class="ai-option-name">' . $version_name . '</span></a><a>&nbsp;'.$viewport_name.'&nbsp;</a><a class="ai-debug-text-right" title="'.$title.'">'.$counters.'<kbd class="ai-debug-invisible">[/AI]</kbd></a></section></section>'; else
               if (!$ai_wp_data [AI_WP_AMP_PAGE])
-                $hidden_viewports .= '<section class="ai-viewport-' . $viewport .' ai-debug-block ai-debug-viewport-invisible" style="' . $this->get_alignment_style() . '"><section class="ai-debug-bar ai-debug-viewport-invisible"><a class="ai-debug-text-left" title="Click to go to block settings" href="' . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () .'</a><a>&nbsp;'.$viewport_name.'&nbsp;</a><a class="ai-debug-text-right" title="'.$title.'">'.$counters.'<kbd class="ai-debug-invisible">[/AI]</kbd></a></section>' . $hidden_block_text . '</section>';
+                $hidden_viewports .= '<section class="ai-viewport-' . $viewport .' ai-debug-block ai-debug-viewport-invisible" style="' . $this->get_alignment_style() . '"><section class="ai-debug-bar ai-debug-viewport-invisible"><a class="ai-debug-text-left" title="Click to go to block settings" href="' . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () . '<span class="ai-option-name">' . $version_name . '</span></a><a>&nbsp;'.$viewport_name.'&nbsp;</a><a class="ai-debug-text-right" title="'.$title.'">'.$counters.'<kbd class="ai-debug-invisible">[/AI]</kbd></a></section>' . $hidden_block_text . '</section>';
+
         }
       }
 
@@ -1384,9 +1419,18 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
             $wrapper_before = $hidden_viewports . "<div" . $class . $tracking_code_pre . $tracking_code_data . $tracking_code_post . " style='" . $additional_block_style . $this->get_alignment_style() . "'>\n";
           }
 
+        $wrapper_before .= $this->debug_code_before;
+        $wrapper_after = $this->debug_code_after . $wrapper_after;
+
+        if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 && $this->get_detection_client_side()) {
+          $wrapper_before .= "<div class='ai-debug-block " . $this->color_class . "'>".$visible_viewports;
+          $wrapper_after = '</div>' . $wrapper_after;
+        }
+
         $code = '<!-- mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
         $code .= $this->w3tc_code.' if ($ai_enabled) echo str_replace (\'[#AI_DATA#]\', base64_encode ("[' . $this->number . ',$ai_index]"), unserialize (base64_decode (\''.base64_encode (serialize ($wrapper_before)).'\'))), $ai_code, unserialize (base64_decode (\''.base64_encode (serialize ($wrapper_after)).'\'));';
         $code .= '<!-- /mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
+
         return $code;
       } else return $wrapper_before . $code . $wrapper_after;
     }
@@ -1854,12 +1898,22 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     }
 
 
-    $position = trim ($this->get_paragraph_number());
+//  $position is index in $paragraph_positions
+    $position_text = trim ($this->get_paragraph_number());
+    $position = $position_text;
+    if ($position > 0 && $position < 1) {
+      $position = intval ($position * (count ($paragraph_positions) - 1) + 0.5);
+    }
+    elseif ($position <= 0) {
+      $position = mt_rand (0, count ($paragraph_positions) - 1);
+    } else $position --;
 
-    $positions = array ();
+
+//  $positions contains indexes in $paragraph_positions
+    $positions = array ($position);
     if (!$position_preview) {
-      if (strpos ($position, ',') !== false) {
-        $positions = explode (',', str_replace (' ', '', $position));
+      if (strpos ($position_text, ',') !== false) {
+        $positions = explode (',', str_replace (' ', '', $position_text));
         foreach ($positions as $index => $position) {
           if ($position > 0 && $position < 1) {
             $positions [$index] = intval ($position * (count ($paragraph_positions) - 1) + 0.5);
@@ -1867,11 +1921,35 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
           elseif ($position <= 0) {
             $positions [$index] = mt_rand (0, count ($paragraph_positions) - 1);
           }
+          else  $positions [$index] = $position - 1;
         }
       }
-      elseif ($position == '') {
+      elseif ($position_text == '') {
+        $positions = array ();
+
+        $min_words_above = $this->get_minimum_words_above ();
+        if (!empty ($min_words_above)) {
+          $words_above = 0;
+          foreach ($paragraph_positions as $index => $paragraph_position) {
+
+            if ($multibyte) {
+              $paragraph_code = $index == count ($paragraph_positions) - 1 ? mb_substr ($content, $paragraph_position) : mb_substr ($content, $paragraph_position, $paragraph_positions [$index + 1] - $paragraph_position);
+            } else {
+                $paragraph_code = $index == count ($paragraph_positions) - 1 ? substr ($content, $paragraph_position) : substr ($content, $paragraph_position, $paragraph_positions [$index + 1] - $paragraph_position);
+              }
+
+            $words_above += number_of_words ($paragraph_code);
+            if ($words_above >= $min_words_above) {
+//              $positions []= $index + 1;
+              $positions []= $index;
+              $words_above = 0;
+            }
+
+          }
+        } else
         foreach ($paragraph_positions as $index => $paragraph_position) {
-          $positions []= $index + 1;
+//          $positions []= $index + 1;
+          $positions []= $index;
         }
 
         if ($this->get_filter_type() == AI_FILTER_PARAGRAPHS) {
@@ -1912,164 +1990,238 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       }
     }
 
-    if (empty ($positions)) {
-      if ($position > 0 && $position < 1) {
-        $position = intval ($position * (count ($paragraph_positions) - 1) + 0.5);
-      }
-      elseif ($position <= 0) {
-        $position = mt_rand (0, count ($paragraph_positions) - 1);
-      } else $position --;
+    $debug_processing = ($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_PROCESSING) != 0;
 
-
+//    if (empty ($positions)) {
+    if (!empty ($positions)) {
       $avoid_paragraphs_above = intval ($this->get_avoid_paragraphs_above());
       $avoid_paragraphs_below = intval ($this->get_avoid_paragraphs_below());
 
-      if (($avoid_paragraphs_above != 0 || $avoid_paragraphs_below != 0) && count ($paragraph_positions) > $position) {
-        $avoid_text_above = $this->get_avoid_text_above();
-        $avoid_text_below = $this->get_avoid_text_below();
-        $avoid_paragraph_texts_above = explode (",", html_entity_decode (trim ($avoid_text_above)));
-        $avoid_paragraph_texts_below = explode (",", html_entity_decode (trim ($avoid_text_below)));
+      $avoid_text_above = $this->get_avoid_text_above();
+      $avoid_text_below = $this->get_avoid_text_below();
+      $avoid_paragraph_texts_above = explode (",", html_entity_decode (trim ($avoid_text_above)));
+      $avoid_paragraph_texts_below = explode (",", html_entity_decode (trim ($avoid_text_below)));
 
-        $direction = $this->get_avoid_direction();
-        $max_checks = $this->get_avoid_try_limit();
+      $direction  = $this->get_avoid_direction();
+      $max_checks = $this->get_avoid_try_limit();
 
-        $checks = $max_checks;
-        $saved_position = $position;
-        do {
-          $found_above = false;
-          if ($position != 0 && $avoid_paragraphs_above != 0 && $avoid_text_above != "" && is_array ($avoid_paragraph_texts_above) && count ($avoid_paragraph_texts_above) != 0) {
-            $paragraph_position_above = $position - $avoid_paragraphs_above;
-            if ($paragraph_position_above < 0) $paragraph_position_above = 0;
+      $failed_clearance_positions = array ();
+      foreach ($positions as $position_index => $position) {
 
-            if ($multibyte) {
-              $paragraph_code = mb_substr ($content, $paragraph_positions [$paragraph_position_above], $paragraph_positions [$position] - $paragraph_positions [$paragraph_position_above]);
-            } else {
-                $paragraph_code = substr ($content, $paragraph_positions [$paragraph_position_above], $paragraph_positions [$position] - $paragraph_positions [$paragraph_position_above]);
-              }
+        if (($avoid_paragraphs_above != 0 || $avoid_paragraphs_below != 0) && count ($paragraph_positions) > $position) {
 
-            foreach ($avoid_paragraph_texts_above as $paragraph_text_above) {
-              if (trim ($paragraph_text_above) == '') continue;
+          if ($debug_processing && $this->number != 0) ai_log ('BLOCK ' . $this->number . ' CLEARANCE CHECK POSITION ' . ($position + 1));
+
+          $checks = $max_checks;
+          $saved_position = $position;
+          do {
+            $found_above = false;
+            if ($position != 0 && $avoid_paragraphs_above != 0 && $avoid_text_above != "" && is_array ($avoid_paragraph_texts_above) && count ($avoid_paragraph_texts_above) != 0) {
+              $paragraph_position_above = $position - $avoid_paragraphs_above;
+              if ($paragraph_position_above < 0) $paragraph_position_above = 0;
+
               if ($multibyte) {
-                if (mb_stripos ($paragraph_code, trim ($paragraph_text_above)) !== false) {
-                  $found_above = true;
-                  break;
-                }
+                $paragraph_code = mb_substr ($content, $paragraph_positions [$paragraph_position_above], $paragraph_positions [$position] - $paragraph_positions [$paragraph_position_above]);
               } else {
-                  if (stripos ($paragraph_code, trim ($paragraph_text_above)) !== false) {
+                  $paragraph_code = substr ($content, $paragraph_positions [$paragraph_position_above], $paragraph_positions [$position] - $paragraph_positions [$paragraph_position_above]);
+                }
+
+              foreach ($avoid_paragraph_texts_above as $paragraph_text_above) {
+                if (trim ($paragraph_text_above) == '') continue;
+                if ($multibyte) {
+                  if (mb_stripos ($paragraph_code, trim ($paragraph_text_above)) !== false) {
                     $found_above = true;
                     break;
                   }
-                }
-            }
-          }
-
-          $found_below = false;
-          if ($avoid_paragraphs_below != 0 && $avoid_text_below != "" && is_array ($avoid_paragraph_texts_below) && count ($avoid_paragraph_texts_below) != 0) {
-            $paragraph_position_below = $position + $avoid_paragraphs_below;
-
-            if ($multibyte) {
-              if ($paragraph_position_below > count ($paragraph_positions) - 1)
-                $content_position_below = mb_strlen ($content); else
-                  $content_position_below = $paragraph_positions [$paragraph_position_below];
-              $paragraph_code = mb_substr ($content, $paragraph_positions [$position], $content_position_below - $paragraph_positions [$position]);
-            } else {
-                if ($paragraph_position_below > count ($paragraph_positions) - 1)
-                  $content_position_below = strlen ($content); else
-                    $content_position_below = $paragraph_positions [$paragraph_position_below];
-                $paragraph_code = substr ($content, $paragraph_positions [$position], $content_position_below - $paragraph_positions [$position]);
+                } else {
+                    if (stripos ($paragraph_code, trim ($paragraph_text_above)) !== false) {
+                      $found_above = true;
+                      break;
+                    }
+                  }
               }
+            }
 
-            foreach ($avoid_paragraph_texts_below as $paragraph_text_below) {
-              if (trim ($paragraph_text_below) == '') continue;
+            $found_below = false;
+            if ($avoid_paragraphs_below != 0 && $avoid_text_below != "" && is_array ($avoid_paragraph_texts_below) && count ($avoid_paragraph_texts_below) != 0) {
+              $paragraph_position_below = $position + $avoid_paragraphs_below;
 
               if ($multibyte) {
-                if (mb_stripos ($paragraph_code, trim ($paragraph_text_below)) !== false) {
-                  $found_below = true;
-                  break;
-                }
+                if ($paragraph_position_below > count ($paragraph_positions) - 1)
+                  $content_position_below = mb_strlen ($content); else
+                    $content_position_below = $paragraph_positions [$paragraph_position_below];
+                $paragraph_code = mb_substr ($content, $paragraph_positions [$position], $content_position_below - $paragraph_positions [$position]);
               } else {
-                  if (stripos ($paragraph_code, trim ($paragraph_text_below)) !== false) {
+                  if ($paragraph_position_below > count ($paragraph_positions) - 1)
+                    $content_position_below = strlen ($content); else
+                      $content_position_below = $paragraph_positions [$paragraph_position_below];
+                  $paragraph_code = substr ($content, $paragraph_positions [$position], $content_position_below - $paragraph_positions [$position]);
+                }
+
+              foreach ($avoid_paragraph_texts_below as $paragraph_text_below) {
+                if (trim ($paragraph_text_below) == '') continue;
+
+                if ($multibyte) {
+                  if (mb_stripos ($paragraph_code, trim ($paragraph_text_below)) !== false) {
                     $found_below = true;
                     break;
                   }
-                }
+                } else {
+                    if (stripos ($paragraph_code, trim ($paragraph_text_below)) !== false) {
+                      $found_below = true;
+                      break;
+                    }
+                  }
+              }
             }
-          }
 
 
-  //        echo "position: $position = before #", $position + 1, "<br />\n";
-  //        echo "checks: $checks<br />\n";
-  //        echo "direction: $direction<br />\n";
-  //        if ($found_above)
-  //        echo "found_above<br />\n";
-  //        if ($found_below)
-  //        echo "found_below<br />\n";
-  //        echo "=================<br />\n";
+//            echo "position: $position = before #", $position + 1, "<br />\n";
+//            echo "checks: $checks<br />\n";
+//            echo "direction: $direction<br />\n";
+//            if ($found_above)
+//            echo "found_above<br />\n";
+//            if ($found_below)
+//            echo "found_below<br />\n";
+//            echo "=================<br />\n";
 
 
-          if ($found_above || $found_below) {
-            $ai_last_check = AI_CHECK_DO_NOT_INSERT;
-            if ($this->get_avoid_action() == AD_DO_NOT_INSERT) return $content;
+            if ($found_above || $found_below) {
 
-            switch ($direction) {
-              case AD_ABOVE: // Try above
-                $ai_last_check = AI_CHECK_AD_ABOVE;
-                if ($position == 0) return $content; // Already at the top - do not insert
-                $position --;
+              if ($debug_processing && $this->number != 0) ai_log ('BLOCK ' . $this->number . ' CLEARANCE CHECK POSITION ' . ($position + 1) . ' FAILED');
+
+              $ai_last_check = AI_CHECK_DO_NOT_INSERT;
+  //            if ($this->get_avoid_action() == AD_DO_NOT_INSERT) return $content;
+              if ($this->get_avoid_action() == AD_DO_NOT_INSERT) {
+                $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                $positions [$position_index] = - 1;
                 break;
-              case AD_BELOW: // Try below
-                $ai_last_check = AI_CHECK_AD_BELOW;
-                if ($position >= count ($paragraph_positions) - 1) return $content; // Already at the bottom - do not insert
-                $position ++;
-                break;
-              case AD_ABOVE_AND_THEN_BELOW: // Try first above and then below
-                if ($position == 0 || $checks == 0) {
-                  // Try below
-                  $direction = AD_BELOW;
-                  $checks = $max_checks;
-                  $position = $saved_position;
-                  $ai_last_check = AI_CHECK_AD_BELOW;
-                  if ($position >= count ($paragraph_positions) - 1) return $content; // Already at the bottom - do not insert
-                  $position ++;
-                } else $position --;
-                break;
-              case AD_BELOW_AND_THEN_ABOVE: // Try first below and then above
-                if ($position >= count ($paragraph_positions) - 1 || $checks == 0) {
-                  // Try above
-                  $direction = AD_ABOVE;
-                  $checks = $max_checks;
-                  $position = $saved_position;
+              }
+
+              switch ($direction) {
+                case AD_ABOVE: // Try above
                   $ai_last_check = AI_CHECK_AD_ABOVE;
-                  if ($position == 0) return $content; // Already at the top - do not insert
+  //                if ($position == 0) return $content; // Already at the top - do not insert
+                  if ($position == 0) {
+                    $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                    $positions [$position_index] = - 1;
+                    break 2;
+                  }
+
                   $position --;
-                } else $position ++;
+                  break;
+                case AD_BELOW: // Try below
+                  $ai_last_check = AI_CHECK_AD_BELOW;
+  //                if ($position >= count ($paragraph_positions) - 1) return $content; // Already at the bottom - do not insert
+                  if ($position >= count ($paragraph_positions) - 1) {
+                    $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                    $positions [$position_index] = - 1;
+                    break 2;
+                  }
+
+                  $position ++;
+                  break;
+                case AD_ABOVE_AND_THEN_BELOW: // Try first above and then below
+                  if ($position == 0 || $checks == 0) {
+                    // Try below
+                    $direction = AD_BELOW;
+                    $checks = $max_checks;
+                    $position = $saved_position;
+                    $ai_last_check = AI_CHECK_AD_BELOW;
+  //                  if ($position >= count ($paragraph_positions) - 1) return $content; // Already at the bottom - do not insert
+                    if ($position >= count ($paragraph_positions) - 1) {
+                      $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                      $positions [$position_index] = - 1;
+                      break 2;
+                    }
+
+                    $position ++;
+                  } else $position --;
+                  break;
+                case AD_BELOW_AND_THEN_ABOVE: // Try first below and then above
+                  if ($position >= count ($paragraph_positions) - 1 || $checks == 0) {
+                    // Try above
+                    $direction = AD_ABOVE;
+                    $checks = $max_checks;
+                    $position = $saved_position;
+                    $ai_last_check = AI_CHECK_AD_ABOVE;
+  //                  if ($position == 0) return $content; // Already at the top - do not insert
+                    if ($position == 0) {
+                      $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                      $positions [$position_index] = - 1;
+                      break 2;
+                    }
+
+                    $position --;
+                  } else $position ++;
+                  break;
+              }
+            } else {
+                // Text not found - insert
+                $positions [$position_index] = $position;
                 break;
+              }
+
+            // Try next position
+  //          if ($checks <= 0) return $content; // Suitable position not found - do not insert
+            if ($checks <= 0) {
+              // Suitable position not found - do not insert
+              $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+              $positions [$position_index] = - 1;
+              break;
             }
-          } else break; // Text not found - insert
 
-          // Try next position
-          if ($checks <= 0) return $content; // Suitable position not found - do not insert
-          $checks --;
-        } while (true);
+            $checks --;
+          } while (true);
+        }
+
+        // Nothing to do
+        $ai_last_check = AI_CHECK_PARAGRAPHS_AFTER_CLEARANCE;
+        if (count ($paragraph_positions) == 0) return $content;
       }
-
-      // Nothing to do
-      $ai_last_check = AI_CHECK_PARAGRAPHS_AFTER_CLEARANCE;
-      if (count ($paragraph_positions) == 0) return $content;
     }
+
 
     if ($position_preview || !empty ($positions)) {
       $offset = 0;
       if (!empty ($positions)) $ai_last_check = AI_CHECK_PARAGRAPH_NUMBER;
 
+      $debug_processing = ($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_PROCESSING) != 0;
+
+      $real_positions = array ();
+      foreach ($positions as $position_index) $real_positions []= $position_index >= 0 ? $position_index + 1 : '*';
+      if ($debug_processing && $this->number != 0) ai_log ('BLOCK ' . $this->number . ' INSERTION POSITIONS: ' . implode (', ', $real_positions));
+
+      $min_paragraphs = intval ($this->get_paragraph_number_minimum());
+
       foreach ($paragraph_positions as $counter => $paragraph_position) {
         if ($position_preview) $inserted_code = "[[AI_BP".($counter + 1)."]]";
-        elseif (!empty ($positions) && in_array ($counter + 1, $positions) && $this->check_block_counter ()) {
-          $this->increment_block_counter ();
-          $inserted_code = $this->get_code_for_insertion ();
-          $ai_last_check = AI_CHECK_INSERTED;
+//        elseif (!empty ($positions) && in_array ($counter + 1, $positions) && $this->check_block_counter ()) {
+        elseif (!empty ($positions) && in_array ($counter, $positions) && $this->check_block_counter ()) {
+
+          $inserted = false;
+
+          $ai_last_check = AI_CHECK_PARAGRAPHS_MIN_NUMBER;
+          if (count ($paragraph_positions) >= $min_paragraphs) {
+            $this->increment_block_counter ();
+
+            $ai_last_check = AI_CHECK_DEBUG_NO_INSERTION;
+            if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_NO_INSERTION) == 0) {
+              $ai_last_check = AI_CHECK_INSERTED;
+              $inserted_code = $this->get_code_for_insertion ();
+              $inserted = true;
+            }
+          }
+//          $ai_last_check = AI_CHECK_INSERTED;
+          if ($debug_processing) ai_log (ai_log_block_status ($this->number, $ai_last_check));
+
+          if (!$inserted) continue;
         }
-        else continue;
+//        else continue;
+        else {
+          if ($debug_processing && isset ($failed_clearance_positions [$counter])) ai_log (ai_log_block_status ($this->number, $failed_clearance_positions [$counter]));
+          continue;
+        }
 
         if ($multibyte) {
           if ($this->get_direction_type() == AD_DIRECTION_FROM_BOTTOM) {
@@ -2088,9 +2240,11 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
           }
       }
 
+      $ai_last_check = AI_CHECK_NONE;  // Already logged on each insertion
       return $content;
     }
 
+    // Deprecated since $postion is now in array $positions
     $ai_last_check = AI_CHECK_PARAGRAPHS_MIN_NUMBER;
     if (count ($paragraph_positions) >= intval ($this->get_paragraph_number_minimum())) {
       $ai_last_check = AI_CHECK_PARAGRAPH_NUMBER;
@@ -2318,12 +2472,22 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     }
 
 
-    $position = $this->get_paragraph_number();
+//  $position is index in $paragraph_positions
+    $position_text = trim ($this->get_paragraph_number());
+    $position = $position_text;
+    if ($position > 0 && $position < 1) {
+      $position = intval ($position * (count ($paragraph_positions) - 1) + 0.5);
+    }
+    elseif ($position <= 0) {
+      $position = mt_rand (0, count ($paragraph_positions) - 1);
+    } else $position --;
 
-    $positions = array ();
+
+//  $positions contains indexes in $paragraph_positions
+    $positions = array ($position);
     if (!$position_preview) {
-      if (strpos ($position, ',') !== false) {
-        $positions = explode (',', str_replace (' ', '', $position));
+      if (strpos ($position_text, ',') !== false) {
+        $positions = explode (',', str_replace (' ', '', $position_text));
         foreach ($positions as $index => $position) {
           if ($position > 0 && $position < 1) {
             $positions [$index] = intval ($position * (count ($paragraph_positions) - 1) + 0.5);
@@ -2331,9 +2495,11 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
           elseif ($position <= 0) {
             $positions [$index] = mt_rand (0, count ($paragraph_positions) - 1);
           }
+          else  $positions [$index] = $position - 1;
         }
       }
-      elseif ($position == '') {
+      elseif ($position_text == '') {
+        $positions = array ();
 
         $min_words_above = $this->get_minimum_words_above ();
         if (!empty ($min_words_above)) {
@@ -2348,14 +2514,16 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
             $words_above += number_of_words ($paragraph_code);
             if ($words_above >= $min_words_above) {
-              $positions []= $index + 1;
+//              $positions []= $index + 1;
+              $positions []= $index;
               $words_above = 0;
             }
 
           }
         } else
         foreach ($paragraph_positions as $index => $paragraph_position) {
-          $positions []= $index + 1;
+//          $positions []= $index + 1;
+          $positions []= $index;
         }
 
         if ($this->get_filter_type() == AI_FILTER_PARAGRAPHS) {
@@ -2389,156 +2557,203 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
             $positions = $filtered_positions;
           } else $positions = array ();
         }
-
       }
-
     }
 
-    if (empty ($positions)) {
-      if ($position > 0 && $position < 1) {
-        $position = intval ($position * (count ($paragraph_positions) - 1) + 0.5);
-      }
-      elseif ($position <= 0) {
-        $position = mt_rand (0, count ($paragraph_positions) - 1);
-      } else $position --;
+    $debug_processing = ($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_PROCESSING) != 0;
 
-
+//    if (empty ($positions)) {
+    if (!empty ($positions)) {
       $avoid_paragraphs_above = intval ($this->get_avoid_paragraphs_above());
       $avoid_paragraphs_below = intval ($this->get_avoid_paragraphs_below());
 
-      if (($avoid_paragraphs_above != 0 || $avoid_paragraphs_below != 0) && count ($paragraph_positions) > $position) {
-        $avoid_text_above = $this->get_avoid_text_above();
-        $avoid_text_below = $this->get_avoid_text_below();
-        $avoid_paragraph_texts_above = explode (",", html_entity_decode (trim ($avoid_text_above)));
-        $avoid_paragraph_texts_below = explode (",", html_entity_decode (trim ($avoid_text_below)));
+      $avoid_text_above = $this->get_avoid_text_above();
+      $avoid_text_below = $this->get_avoid_text_below();
+      $avoid_paragraph_texts_above = explode (",", html_entity_decode (trim ($avoid_text_above)));
+      $avoid_paragraph_texts_below = explode (",", html_entity_decode (trim ($avoid_text_below)));
 
-        $direction = $this->get_avoid_direction();
-        $max_checks = $this->get_avoid_try_limit();
+      $direction = $this->get_avoid_direction();
+      $max_checks = $this->get_avoid_try_limit();
 
-        $checks = $max_checks;
-        $saved_position = $position;
-        do {
-          $found_above = false;
-          if ($avoid_paragraphs_above != 0 && $avoid_text_above != "" && is_array ($avoid_paragraph_texts_above) && count ($avoid_paragraph_texts_above) != 0) {
-            $paragraph_position_above = $position - $avoid_paragraphs_above;
-            if ($paragraph_position_above <= 0)
-              $content_position_above = 0; else
-                $content_position_above = $paragraph_positions [$paragraph_position_above] + 1;
+      $failed_clearance_positions = array ();
+      foreach ($positions as $position_index => $position) {
 
-            if ($multibyte) {
-              $paragraph_code = mb_substr ($content, $content_position_above, $paragraph_positions [$position] - $content_position_above);
-            } else {
-                $paragraph_code = substr ($content, $content_position_above, $paragraph_positions [$position] - $content_position_above);
-              }
+        if (($avoid_paragraphs_above != 0 || $avoid_paragraphs_below != 0) && count ($paragraph_positions) > $position) {
 
-            foreach ($avoid_paragraph_texts_above as $paragraph_text_above) {
-              if (trim ($paragraph_text_above) == '') continue;
+          if ($debug_processing && $this->number != 0) ai_log ('BLOCK ' . $this->number . ' CLEARANCE CHECK POSITION ' . ($position + 1));
+
+          $checks = $max_checks;
+          $saved_position = $position;
+          do {
+            $found_above = false;
+            if ($avoid_paragraphs_above != 0 && $avoid_text_above != "" && is_array ($avoid_paragraph_texts_above) && count ($avoid_paragraph_texts_above) != 0) {
+              $paragraph_position_above = $position - $avoid_paragraphs_above;
+              if ($paragraph_position_above <= 0)
+                $content_position_above = 0; else
+                  $content_position_above = $paragraph_positions [$paragraph_position_above] + 1;
 
               if ($multibyte) {
-                if (mb_stripos ($paragraph_code, trim ($paragraph_text_above)) !== false) {
-                  $found_above = true;
-                  break;
-                }
+                $paragraph_code = mb_substr ($content, $content_position_above, $paragraph_positions [$position] - $content_position_above);
               } else {
-                  if (stripos ($paragraph_code, trim ($paragraph_text_above)) !== false) {
+                  $paragraph_code = substr ($content, $content_position_above, $paragraph_positions [$position] - $content_position_above);
+                }
+
+              foreach ($avoid_paragraph_texts_above as $paragraph_text_above) {
+                if (trim ($paragraph_text_above) == '') continue;
+
+                if ($multibyte) {
+                  if (mb_stripos ($paragraph_code, trim ($paragraph_text_above)) !== false) {
                     $found_above = true;
                     break;
                   }
-                }
+                } else {
+                    if (stripos ($paragraph_code, trim ($paragraph_text_above)) !== false) {
+                      $found_above = true;
+                      break;
+                    }
+                  }
 
-            }
-          }
-
-          $found_below = false;
-          if ($avoid_paragraphs_below != 0 && $position != count ($paragraph_positions) - 1 && $avoid_text_below != "" && is_array ($avoid_paragraph_texts_below) && count ($avoid_paragraph_texts_below) != 0) {
-            $paragraph_position_below = $position + $avoid_paragraphs_below;
-
-            if ($multibyte) {
-              if ($paragraph_position_below > count ($paragraph_positions) - 1) $paragraph_position_below = count ($paragraph_positions) - 1;
-                $paragraph_code = mb_substr ($content, $paragraph_positions [$position] + 1, $paragraph_positions [$paragraph_position_below] - $paragraph_positions [$position]);
-            } else {
-                if ($paragraph_position_below > count ($paragraph_positions) - 1) $paragraph_position_below = count ($paragraph_positions) - 1;
-                  $paragraph_code = substr ($content, $paragraph_positions [$position] + 1, $paragraph_positions [$paragraph_position_below] - $paragraph_positions [$position]);
               }
+            }
 
-            foreach ($avoid_paragraph_texts_below as $paragraph_text_below) {
-              if (trim ($paragraph_text_below) == '') continue;
+            $found_below = false;
+            if ($avoid_paragraphs_below != 0 && $position != count ($paragraph_positions) - 1 && $avoid_text_below != "" && is_array ($avoid_paragraph_texts_below) && count ($avoid_paragraph_texts_below) != 0) {
+              $paragraph_position_below = $position + $avoid_paragraphs_below;
 
               if ($multibyte) {
-                if (mb_stripos ($paragraph_code, trim ($paragraph_text_below)) !== false) {
-                  $found_below = true;
-                  break;
-                }
+                if ($paragraph_position_below > count ($paragraph_positions) - 1) $paragraph_position_below = count ($paragraph_positions) - 1;
+                  $paragraph_code = mb_substr ($content, $paragraph_positions [$position] + 1, $paragraph_positions [$paragraph_position_below] - $paragraph_positions [$position]);
               } else {
-                  if (stripos ($paragraph_code, trim ($paragraph_text_below)) !== false) {
+                  if ($paragraph_position_below > count ($paragraph_positions) - 1) $paragraph_position_below = count ($paragraph_positions) - 1;
+                    $paragraph_code = substr ($content, $paragraph_positions [$position] + 1, $paragraph_positions [$paragraph_position_below] - $paragraph_positions [$position]);
+                }
+
+              foreach ($avoid_paragraph_texts_below as $paragraph_text_below) {
+                if (trim ($paragraph_text_below) == '') continue;
+
+                if ($multibyte) {
+                  if (mb_stripos ($paragraph_code, trim ($paragraph_text_below)) !== false) {
                     $found_below = true;
                     break;
                   }
-                }
+                } else {
+                    if (stripos ($paragraph_code, trim ($paragraph_text_below)) !== false) {
+                      $found_below = true;
+                      break;
+                    }
+                  }
 
+              }
             }
-          }
 
 
-  //        echo "position: $position = after #", $position + 1, "<br />\n";
-  //        echo "checks: $checks<br />\n";
-  //        echo "direction: $direction<br />\n";
-  //        if ($found_above)
-  //        echo "found_above<br />\n";
-  //        if ($found_below)
-  //        echo "found_below<br />\n";
-  //        echo "=================<br />\n";
+    //        echo "position: $position = after #", $position + 1, "<br />\n";
+    //        echo "checks: $checks<br />\n";
+    //        echo "direction: $direction<br />\n";
+    //        if ($found_above)
+    //        echo "found_above<br />\n";
+    //        if ($found_below)
+    //        echo "found_below<br />\n";
+    //        echo "=================<br />\n";
 
 
-          if ($found_above || $found_below) {
-            $ai_last_check = AI_CHECK_DO_NOT_INSERT;
-            if ($this->get_avoid_action() == AD_DO_NOT_INSERT) return $content;
+            if ($found_above || $found_below) {
 
-            switch ($direction) {
-              case AD_ABOVE: // Try above
-                $ai_last_check = AI_CHECK_AD_ABOVE;
-                if ($position == 0) return $content; // Already at the top - do not insert
-                $position --;
+              if ($debug_processing && $this->number != 0) ai_log ('BLOCK ' . $this->number . ' CLEARANCE CHECK POSITION ' . ($position + 1) . ' FAILED');
+
+              $ai_last_check = AI_CHECK_DO_NOT_INSERT;
+//              if ($this->get_avoid_action() == AD_DO_NOT_INSERT) return $content;
+              if ($this->get_avoid_action() == AD_DO_NOT_INSERT) {
+                $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                $positions [$position_index] = - 1;
                 break;
-              case AD_BELOW: // Try below
-                $ai_last_check = AI_CHECK_AD_BELOW;
-                if ($position >= count ($paragraph_positions) - 1) return $content; // Already at the bottom - do not insert
-                $position ++;
-                break;
-              case AD_ABOVE_AND_THEN_BELOW: // Try first above and then below
-                if ($position == 0 || $checks == 0) {
-                  // Try below
-                  $direction = AD_BELOW;
-                  $checks = $max_checks;
-                  $position = $saved_position;
-                  $ai_last_check = AI_CHECK_AD_BELOW;
-                  if ($position >= count ($paragraph_positions) - 1) return $content; // Already at the bottom - do not insert
-                  $position ++;
-                } else $position --;
-                break;
-              case AD_BELOW_AND_THEN_ABOVE: // Try first below and then above
-                if ($position >= count ($paragraph_positions) - 1 || $checks == 0) {
-                  // Try above
-                  $direction = AD_ABOVE;
-                  $checks = $max_checks;
-                  $position = $saved_position;
+              }
+
+              switch ($direction) {
+                case AD_ABOVE: // Try above
                   $ai_last_check = AI_CHECK_AD_ABOVE;
-                  if ($position == 0) return $content; // Already at the top - do not insert
+                  // Already at the top - do not insert
+//                  if ($position == 0) return $content;
+                  if ($position == 0) {
+                    $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                    $positions [$position_index] = - 1;
+                    break 2;
+                  }
+
                   $position --;
-                } else $position ++;
+                  break;
+                case AD_BELOW: // Try below
+                  $ai_last_check = AI_CHECK_AD_BELOW;
+                  // Already at the bottom - do not insert
+//                  if ($position >= count ($paragraph_positions) - 1) return $content; // Already at the bottom - do not insert
+                  if ($position >= count ($paragraph_positions) - 1) {
+                    $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                    $positions [$position_index] = - 1;
+                    break 2;
+                  }
+
+                  $position ++;
+                  break;
+                case AD_ABOVE_AND_THEN_BELOW: // Try first above and then below
+                  if ($position == 0 || $checks == 0) {
+                    // Try below
+                    $direction = AD_BELOW;
+                    $checks = $max_checks;
+                    $position = $saved_position;
+                    $ai_last_check = AI_CHECK_AD_BELOW;
+                    // Already at the bottom - do not insert
+//                    if ($position >= count ($paragraph_positions) - 1) return $content; // Already at the bottom - do not insert
+                    if ($position >= count ($paragraph_positions) - 1) {
+                      $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                      $positions [$position_index] = - 1;
+                      break 2;
+                    }
+
+                    $position ++;
+                  } else $position --;
+                  break;
+                case AD_BELOW_AND_THEN_ABOVE: // Try first below and then above
+                  if ($position >= count ($paragraph_positions) - 1 || $checks == 0) {
+                    // Try above
+                    $direction = AD_ABOVE;
+                    $checks = $max_checks;
+                    $position = $saved_position;
+                    $ai_last_check = AI_CHECK_AD_ABOVE;
+                    // Already at the top - do not insert
+//                    if ($position == 0) return $content; // Already at the top - do not insert
+                    if ($position == 0) {
+                      $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+                      $positions [$position_index] = - 1;
+                      break 2;
+                    }
+
+                    $position --;
+                  } else $position ++;
+                  break;
+              }
+            } else {
+                // Text not found - insert
+                $positions [$position_index] = $position;
                 break;
+              }
+
+            // Try next position
+//            if ($checks <= 0) return $content; // Suitable position not found - do not insert
+            if ($checks <= 0) {
+              // Suitable position not found - do not insert
+              $failed_clearance_positions [$positions [$position_index]] = $ai_last_check;
+              $positions [$position_index] = - 1;
+              break;
             }
-          } else break; // Text not found - insert
 
-          // Try next position
-          if ($checks <= 0) return $content; // Suitable position not found - do not insert
-          $checks --;
-        } while (true);
+            $checks --;
+          } while (true);
+        }
+
+        // Nothing to do
+        $ai_last_check = AI_CHECK_PARAGRAPHS_AFTER_CLEARANCE;
+        if (count ($paragraph_positions) == 0) return $content;
       }
-
-      // Nothing to do
-      $ai_last_check = AI_CHECK_PARAGRAPHS_AFTER_CLEARANCE;
-      if (count ($paragraph_positions) == 0) return $content;
     }
 
 
@@ -2546,14 +2761,40 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       $offset = 0;
       if (!empty ($positions)) $ai_last_check = AI_CHECK_PARAGRAPH_NUMBER;
 
+      $real_positions = array ();
+      foreach ($positions as $position_index) $real_positions []= $position_index >= 0 ? $position_index + 1 : '*';
+      if ($debug_processing && $this->number != 0) ai_log ('BLOCK ' . $this->number . ' INSERTION POSITIONS: ' . implode (', ', $real_positions));
+
+      $min_paragraphs = intval ($this->get_paragraph_number_minimum());
+
       foreach ($paragraph_positions as $counter => $paragraph_position) {
         if ($position_preview) $inserted_code = "[[AI_AP".($counter + 1)."]]";
-        elseif (!empty ($positions) && in_array ($counter + 1, $positions) && $this->check_block_counter ()) {
-          $this->increment_block_counter ();
-          $inserted_code = $this->get_code_for_insertion ();
-          $ai_last_check = AI_CHECK_INSERTED;
+//        elseif (!empty ($positions) && in_array ($counter + 1, $positions) && $this->check_block_counter ()) {
+        elseif (!empty ($positions) && in_array ($counter, $positions) && $this->check_block_counter ()) {
+
+          $inserted = false;
+
+          $ai_last_check = AI_CHECK_PARAGRAPHS_MIN_NUMBER;
+          if (count ($paragraph_positions) >= $min_paragraphs) {
+            $this->increment_block_counter ();
+
+            $ai_last_check = AI_CHECK_DEBUG_NO_INSERTION;
+            if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_NO_INSERTION) == 0) {
+              $ai_last_check = AI_CHECK_INSERTED;
+              $inserted_code = $this->get_code_for_insertion ();
+              $inserted = true;
+            }
+          }
+
+          if ($debug_processing) ai_log (ai_log_block_status ($this->number, $ai_last_check));
+
+          if (!$inserted) continue;
         }
-        else continue;
+//        else continue;
+        else {
+          if ($debug_processing && isset ($failed_clearance_positions [$counter])) ai_log (ai_log_block_status ($this->number, $failed_clearance_positions [$counter]));
+          continue;
+        }
 
         if ($multibyte) {
           if ($this->get_direction_type() == AD_DIRECTION_FROM_BOTTOM) {
@@ -2573,9 +2814,11 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
       }
 
+      $ai_last_check = AI_CHECK_NONE; // Already logged on each insertion
       return $content;
     }
 
+    // Deprecated since $postion is now in array $positions
     $ai_last_check = AI_CHECK_PARAGRAPHS_MIN_NUMBER;
     if (count ($paragraph_positions) >= intval ($this->get_paragraph_number_minimum())) {
       $ai_last_check = AI_CHECK_PARAGRAPH_NUMBER;
@@ -3544,8 +3787,8 @@ class ai_code_generator {
   }
 
   public function generate ($data){
-
     $code = '';
+
     switch ($data ['generate-code']) {
       case AI_CODE_BANNER:
         $code = '';
@@ -3664,6 +3907,62 @@ class ai_code_generator {
 (adsbygoogle = window.adsbygoogle || []).push({});
 </script>';
             break;
+          case AI_ADSENSE_AUTO:
+            $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+   (adsbygoogle = window.adsbygoogle || []).push({
+      google_ad_client: "ca-'.$data ['adsense-publisher-id'].'",
+      enable_page_level_ads: true
+   });
+</script>';
+
+            break;
+        }
+
+        if ($data ['adsense-amp'] != AI_ADSENSE_AMP_DISABLED) {
+          switch ($data ['adsense-type']) {
+            case AI_ADSENSE_AUTO:
+                  $code .= '
+
+[ADINSERTER AMP]
+
+<amp-auto-ads
+  type="adsense"
+  data-ad-client="'.$data ['adsense-publisher-id'].'">
+</amp-auto-ads>';
+              break;
+            default:
+              switch ($data ['adsense-amp']) {
+                case AI_ADSENSE_AMP_ABOVE_THE_FOLD:
+                  $code .= '
+
+[ADINSERTER AMP]
+
+<amp-ad
+  layout="fixed-height"
+  height=100
+  type="adsense"
+  data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
+  data-ad-slot="'.$data ['adsense-ad-slot-id'].'">
+</amp-ad>';
+                  break;
+                case AI_ADSENSE_AMP_BELOW_THE_FOLD:
+                  $code .= '
+
+[ADINSERTER AMP]
+
+<amp-ad
+  layout="responsive"
+  width=300
+  height=250
+  type="adsense"
+  data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
+  data-ad-slot="'.$data ['adsense-ad-slot-id'].'">
+</amp-ad>';
+                  break;
+              }
+              break;
+          }
         }
         break;
     }
@@ -3673,84 +3972,133 @@ class ai_code_generator {
 
   public function import ($code){
 
+    $amp = AI_ADSENSE_AMP_DISABLED;
+    if (strpos (do_shortcode ($code), AD_AMP_SEPARATOR) !== false) {
+      $amp = AI_ADSENSE_AMP_ABOVE_THE_FOLD;
+    }
+
     $dom = new DOMDocument ();
     @$dom->loadHTML ($code);
 
     // AdSense
-    $adsense_code = $dom->getElementsByTagName ('ins');
+    if (strpos ($code, 'data-ad-client') !== false) {
+      $adsense_code     = $dom->getElementsByTagName ('ins');
+      $adsense_code_amp = $dom->getElementsByTagName ('amp-ad');
 
-    if ($adsense_code->length == 0)
-      $adsense_code = $dom->getElementsByTagName ('amp-ad');
+      if ($adsense_code_amp->length != 0) {
+        $layout = $adsense_code_amp [0]->getAttribute ('layout');
+        switch ($layout) {
+          case 'fixed-height':
+            $amp = AI_ADSENSE_AMP_ABOVE_THE_FOLD;
+            break;
+          case 'responsive':
+            $amp = AI_ADSENSE_AMP_BELOW_THE_FOLD;
+            break;
+        }
 
-    if ($adsense_code->length != 0) {
+        if ($adsense_code->length == 0) $adsense_code = $adsense_code_amp;
+      }
+
+      if ($adsense_code->length != 0) {
+        $data = array (
+          'type' => AI_CODE_ADSENSE,
+          'adsense-publisher-id' => '',
+          'adsense-ad-slot-id' => '',
+          'adsense-type' => AI_ADSENSE_STANDARD,
+          'adsense-responsive' => 0,
+          'adsense-width' => '',
+          'adsense-height' => '',
+          'adsense-layout' => '',
+          'adsense-layout-key' => '',
+          'adsense-amp' => $amp,
+        );
+
+        $data ['adsense-publisher-id'] = str_replace ('ca-', '', $adsense_code [0]->getAttribute ('data-ad-client'));
+        $data ['adsense-ad-slot-id']   = $adsense_code [0]->getAttribute ('data-ad-slot');
+
+        $adsense_style = $adsense_code [0]->getAttribute ('style');
+
+        $style_width  = preg_match ("/width\s*:\s*(\d+)px/",  $adsense_style, $width_match);
+        if ($style_width) $data ['adsense-width'] = $width_match [1];
+
+        $style_height = preg_match ("/height\s*:\s*(\d+)px/", $adsense_style, $height_match);
+        if ($style_height) $data ['adsense-height'] = $height_match [1];
+
+        $adsense_responsive = !$style_width && !$style_height;
+
+        $adsense_ad_format = $adsense_code [0]->getAttribute ('data-ad-format');
+        switch ($adsense_ad_format) {
+          case '':
+            break;
+          case 'auto':
+            if ($adsense_responsive) $data ['adsense-responsive'] = 1;
+            break;
+          case 'autorelaxed':
+            $data ['adsense-type'] = AI_ADSENSE_MATCHED_CONTENT;
+            break;
+          case 'link':
+            $data ['adsense-type'] = AI_ADSENSE_LINK;
+            if ($adsense_responsive) $data ['adsense-responsive'] = 1;
+            break;
+          case 'fluid':
+            $adsense_ad_layout = $adsense_code [0]->getAttribute ('data-ad-layout');
+
+            switch ($adsense_ad_layout) {
+              case 'in-article':
+                $data ['adsense-type'] = AI_ADSENSE_IN_ARTICLE;
+                break 2;
+            }
+
+            $data ['adsense-type']        = AI_ADSENSE_IN_FEED;
+
+            $data ['adsense-layout']      = $adsense_ad_layout;
+            $data ['adsense-layout-key']  = urlencode ($adsense_code [0]->getAttribute ('data-ad-layout-key'));
+
+            break;
+        }
+
+
+        return $data;
+      }
+    }
+
+    // Old AdSense / AdSense Auto ads
+    if (strpos ($code, 'google_ad_client') !== false) {
+
       $data = array (
         'type' => AI_CODE_ADSENSE,
-        'data-ad-client' => '',
-        'data-ad-slot' => '',
+        'adsense-publisher-id' => '',
+        'adsense-ad-slot-id' => '',
         'adsense-type' => AI_ADSENSE_STANDARD,
         'adsense-responsive' => 0,
         'adsense-width' => '',
         'adsense-height' => '',
         'adsense-layout' => '',
-        'adsense-layout-key' => '');
+        'adsense-layout-key' => '',
+        'adsense-amp' => $amp,
+      );
 
-      $data ['data-ad-client'] = str_replace ('ca-', '', $adsense_code [0]->getAttribute ('data-ad-client'));
-      $data ['data-ad-slot']   = $adsense_code [0]->getAttribute ('data-ad-slot');
-
-      $adsense_style = $adsense_code [0]->getAttribute ('style');
-
-      $style_width  = preg_match ("/width\s*:\s*(\d+)px/",  $adsense_style, $width_match);
-      if ($style_width) $data ['adsense-width'] = $width_match [1];
-
-      $style_height = preg_match ("/height\s*:\s*(\d+)px/", $adsense_style, $height_match);
-      if ($style_height) $data ['adsense-height'] = $height_match [1];
-
-      $adsense_responsive = !$style_width && !$style_height;
-
-      $adsense_ad_format = $adsense_code [0]->getAttribute ('data-ad-format');
-      switch ($adsense_ad_format) {
-        case '':
-          break;
-        case 'auto':
-          if ($adsense_responsive) $data ['adsense-responsive'] = 1;
-          break;
-        case 'autorelaxed':
-          $data ['adsense-type'] = AI_ADSENSE_MATCHED_CONTENT;
-          break;
-        case 'link':
-          $data ['adsense-type'] = AI_ADSENSE_LINK;
-          if ($adsense_responsive) $data ['adsense-responsive'] = 1;
-          break;
-        case 'fluid':
-          $adsense_ad_layout = $adsense_code [0]->getAttribute ('data-ad-layout');
-
-          switch ($adsense_ad_layout) {
-            case 'in-article':
-              $data ['adsense-type'] = AI_ADSENSE_IN_ARTICLE;
-              break 2;
-          }
-
-          $data ['adsense-type']        = AI_ADSENSE_IN_FEED;
-
-          $data ['adsense-layout']      = $adsense_ad_layout;
-          $data ['adsense-layout-key']  = $adsense_code [0]->getAttribute ('data-ad-layout-key');
-
-          break;
+      if (preg_match ("/google_ad_client.+[\"\'](.+?)[\"\']/", $code, $match)) {
+        $data ['adsense-publisher-id'] = str_replace ('ca-', '', $match [1]);
       }
 
+      if (preg_match ("/google_ad_slot.+[\"\'](.+?)[\"\']/", $code, $match)) {
+        $data ['adsense-ad-slot-id'] = $match [1];
+      }
+
+      if (preg_match ("/google_ad_width[^\d]+(\d+)/", $code, $match)) {
+        $data ['adsense-width'] = $match [1];
+      }
+
+      if (preg_match ("/google_ad_height[^\d]+(\d+)/", $code, $match)) {
+        $data ['adsense-height'] = $match [1];
+      }
+
+      if (preg_match ("/enable_page_level_ads[^\d]+true/", $code, $match)) {
+        $data ['adsense-type'] = AI_ADSENSE_AUTO;
+      }
 
       return $data;
-    }
-
-    // Old AdSense
-    if (strpos ($code, 'google_ad_client') !== false) {
-      if (preg_match ("/google_ad_client.+[\"\'](.+?)[\"\']/", $code, $match)) {
-        $data = array ('type' => AI_CODE_ADSENSE, 'data-ad-client' => '', 'data-ad-slot' => '');
-
-        $data ['data-ad-client'] = str_replace ('ca-', '', $match [1]);
-
-        return $data;
-      }
     }
 
 
@@ -3774,5 +4122,65 @@ class ai_code_generator {
     }
 
     return array ('type' => AI_CODE_UNKNOWN);
+  }
+
+  public function import_rotation ($code){
+    global $ai_expand_only_rotate, $ai_wp_data;
+
+    $data = array (
+      'options' => array (
+          array (
+            'code' => $code,
+            'name' => '',
+          ),
+        ),
+    );
+
+    $ai_expand_only_rotate = true;
+    unset ($ai_wp_data [AI_SHORTCODES]['rotate']);
+    $code = do_shortcode ($code);
+    $ai_expand_only_rotate = false;
+
+    if (strpos ($code, AD_ROTATE_SEPARATOR) !== false) {
+      $options = explode (AD_ROTATE_SEPARATOR, $code);
+      $data ['options'] = array ();
+      foreach ($options as $index => $option) {
+        $option_code = trim ($option, "\n");
+        $option_name = isset ($ai_wp_data [AI_SHORTCODES]['rotate'][$index - 1]['name']) ? $ai_wp_data [AI_SHORTCODES]['rotate'][$index - 1]['name'] : '';
+        if ($index == 0 && $option_code == '') continue;
+        $data ['options'] []= array ('code' => $option_code, 'name' => $option_name);
+      }
+    }
+
+    return $data;
+  }
+
+  public function generate_rotation ($rotation_data){
+
+    if (count ($rotation_data) == 1) {
+      $rotation_code = trim ($rotation_data [0]['code']);
+    } else {
+        $rotation_code = '';
+        foreach ($rotation_data as $index => $rotation_data_row) {
+
+          $name = trim ($rotation_data_row ['name']);
+          $code = trim ($rotation_data_row ['code'], "\n");
+
+          if ($index != 0 || $name != '') {
+
+            $shortcode = "" ;
+            if ($index != 0) $shortcode .= "\n\n";
+
+            $shortcode .= '[ADINSERTER ROTATE';
+
+            if ($name != '') $shortcode .= ' name="'.str_replace ('"', '\'', $name).'"';
+            $shortcode .= "]\n\n";
+          } else $shortcode = '';
+
+          $rotation_code .= $shortcode . $code;
+        }
+      }
+
+    return $rotation_code;
   }
 }

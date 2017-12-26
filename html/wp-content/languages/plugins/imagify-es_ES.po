@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Plugins - Imagify Image Optimizer - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-10-30 12:56:53+0000\n"
+"PO-Revision-Date: 2017-11-17 11:36:13+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -10,6 +10,18 @@ msgstr ""
 "X-Generator: GlotPress/2.4.0-alpha\n"
 "Language: es\n"
 "Project-Id-Version: Plugins - Imagify Image Optimizer - Stable (latest release)\n"
+
+#: inc/classes/class-imagify-attachment.php:501
+msgid "This file has no backup file."
+msgstr "Este archivo todavía no tiene una copia de seguridad."
+
+#: inc/admin/ui/bulk.php:206 inc/admin/ui/options.php:88
+msgid "Check our documentation."
+msgstr "Mira nuestra documentación."
+
+#: inc/admin/ui/bulk.php:205 inc/admin/ui/options.php:87
+msgid "Need help or have questions?"
+msgstr "¿Necesitas ayuda o tienes preguntas?"
 
 #. translators: URL to a Wikipedia page explaining what EXIF means.
 #: inc/functions/common.php:211
@@ -194,55 +206,6 @@ msgstr "No ha sido posible enviar los archivos a Amazon S3."
 msgid "This type of file is not supported."
 msgstr "Esta tipología de archivos no es compatible."
 
-#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:743
-msgid "%n thumbnail could not be restored."
-msgid_plural "%n thumbnails could not be restored."
-msgstr[0] "Imposible restaurar % miniatura."
-msgstr[1] "Imposible restaurar % miniaturas."
-
-#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:737
-msgid "Related data could not be saved."
-msgstr "No ha sido posible guardar los datos relacionados."
-
-#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:593
-msgid "Restoration failed."
-msgstr "La restauración ha fallado."
-
-#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:580
-msgid "The image to replace is not writable."
-msgstr "La imagen a sustituir no tiene permisos de escritura."
-
-#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:576
-msgid "Image path and backup path are identical."
-msgstr "Las rutas de la imagen y de su copia de seguridad son idénticas."
-
-#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:565
-msgid "Image not found in NextGen Gallery data."
-msgstr "Imposible encontrar la imagen en los datos de NextGen Gallery."
-
-#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:558
-msgid "Backup image not found."
-msgstr "Imposible encontrar la copia de seguridad de la imagen. "
-
-#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:553
-msgid "Mime type not supported."
-msgstr "No compatible con el tipo Mime."
-
-#. translators: %s is a file path.
-#: inc/admin/ui/options.php:229
-msgid "The backup folder %s cannot be created or is not writable by the server, original images cannot be saved!"
-msgstr "La carpeta de seguridad %s no se puede crear o el servidor no permite su escritura: la imágenes originales no se pueden guardar! "
-
-#. translators: %s is a file path.
-#: inc/admin/ui/notice-backup-folder-not-writable.php:14
-msgid "The backup folder %s cannot be created. Is its parent directory writable by the server? Original images cannot be saved!"
-msgstr "La carpeta de seguridad %s no se puede crear. ¿Has verificado si su directorio principal tiene permisos de escritura? Las imágenes originales no se pueden guardar!"
-
-#. translators: %s is a file path.
-#: inc/admin/ui/notice-backup-folder-not-writable.php:11
-msgid "The backup folder %s is not writable by the server, original images cannot be saved!"
-msgstr "La carpeta de seguridad %s no tiene permisos de escritura de parte del servidor, las imágenes originales no se pueden guardar!"
-
 #: inc/functions/process.php:266
 msgid "The file could not be saved."
 msgstr "Imposible guardar el archivo."
@@ -299,6 +262,21 @@ msgstr "(De)Selecciona todo"
 msgid "Choose the sizes to optimize"
 msgstr "Elige los tamaño a optimizar"
 
+#. translators: %s is a file path.
+#: inc/admin/ui/options.php:229
+msgid "The backup folder %s cannot be created or is not writable by the server, original images cannot be saved!"
+msgstr "La carpeta de seguridad %s no se puede crear o el servidor no permite su escritura: la imágenes originales no se pueden guardar! "
+
+#. translators: %s is a file path.
+#: inc/admin/ui/notice-backup-folder-not-writable.php:14
+msgid "The backup folder %s cannot be created. Is its parent directory writable by the server? Original images cannot be saved!"
+msgstr "La carpeta de seguridad %s no se puede crear. ¿Has verificado si su directorio principal tiene permisos de escritura? Las imágenes originales no se pueden guardar!"
+
+#. translators: %s is a file path.
+#: inc/admin/ui/notice-backup-folder-not-writable.php:11
+msgid "The backup folder %s is not writable by the server, original images cannot be saved!"
+msgstr "La carpeta de seguridad %s no tiene permisos de escritura de parte del servidor, las imágenes originales no se pueden guardar!"
+
 #. translators: %s is a number. Don't use %d.
 #: inc/admin/ui/bulk.php:366
 msgid "%s error"
@@ -313,6 +291,40 @@ msgid_plural "%s files"
 msgstr[0] "%s archivo"
 msgstr[1] "%s archivos"
 
+#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:743
+msgid "%n thumbnail could not be restored."
+msgid_plural "%n thumbnails could not be restored."
+msgstr[0] "Imposible restaurar % miniatura."
+msgstr[1] "Imposible restaurar % miniaturas."
+
+#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:737
+msgid "Related data could not be saved."
+msgstr "No ha sido posible guardar los datos relacionados."
+
+#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:593
+msgid "Restoration failed."
+msgstr "La restauración ha fallado."
+
+#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:580
+msgid "The image to replace is not writable."
+msgstr "La imagen a sustituir no tiene permisos de escritura."
+
+#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:576
+msgid "Image path and backup path are identical."
+msgstr "Las rutas de la imagen y de su copia de seguridad son idénticas."
+
+#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:565
+msgid "Image not found in NextGen Gallery data."
+msgstr "Imposible encontrar la imagen en los datos de NextGen Gallery."
+
+#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:558
+msgid "Backup image not found."
+msgstr "Imposible encontrar la copia de seguridad de la imagen. "
+
+#: inc/3rd-party/nextgen-gallery/inc/classes/class-imagify-ngg-attachment.php:553
+msgid "Mime type not supported."
+msgstr "No compatible con el tipo Mime."
+
 #. translators: 1 is a data quota, 2 is a date.
 #: inc/classes/class-imagify-admin-ajax-post.php:727 inc/functions/i18n.php:175
 msgid "You have consumed all your credit for this month. You will have <strong>%1$s back on %2$s</strong>."
@@ -325,15 +337,16 @@ msgstr "Has consumido todo tu crédito para este mes. Volverás a tener <strong>
 msgid "This size could not be retrieved from Amazon S3."
 msgstr "No hemos podido recuperar el tamaño desde Amazon S3."
 
-#: inc/common/cron.php:58
-msgid "Once Weekly"
-msgstr "Una vez a la semana"
+#. translators: %s is a percentage.
+#: inc/admin/ui/bulk.php:117
+msgid "You optimized %s of your website's images"
+msgstr "Has optimizado el %s de tus imágenes"
 
-#. translators: 1 and 2 are optimization levels: "Original", "Normal",
-#. "Aggressive", or "Ultra".
-#: inc/admin/ui/options.php:467
-msgid "I want to compare %1$s and %2$s"
-msgstr "Quiero comparar %1$s y %2$s"
+#. translators: 1 is a "bold" tag start, 2 is a pourcentage, 3 is the "bold"
+#. tag end, 4 is a coupon code.
+#: inc/admin/ui/notice-wp-rocket.php:20
+msgid "%1$sGet %2$s off%3$s with this coupon code: %4$s"
+msgstr "%1$sObtén un %2$s de descuento %3$s con este código: %4$s"
 
 #. translators: 1 is the start of a styled wrapper, 2 is a "bold" tag start, 3
 #. is a percentage, 4 is the "bold" tag end, 5 is the styled wrapper end, 6 is
@@ -342,66 +355,65 @@ msgstr "Quiero comparar %1$s y %2$s"
 msgid "%1$sGet %2$s%3$s off%4$s%5$s with this coupon code: %6$s"
 msgstr "%1$sObtén %2$s%3$s de descuento%4$s%5$s con este cupón: %6$s"
 
-#. translators: 1 is a "bold" tag start, 2 is a pourcentage, 3 is the "bold"
-#. tag end, 4 is a coupon code.
-#: inc/admin/ui/notice-wp-rocket.php:20
-msgid "%1$sGet %2$s off%3$s with this coupon code: %4$s"
-msgstr "%1$sObtén un %2$s de descuento %3$s con este código: %4$s"
+#. translators: 1 and 2 are optimization levels: "Original", "Normal",
+#. "Aggressive", or "Ultra".
+#: inc/admin/ui/options.php:467
+msgid "I want to compare %1$s and %2$s"
+msgstr "Quiero comparar %1$s y %2$s"
 
-#. translators: %s is a percentage.
-#: inc/admin/ui/bulk.php:117
-msgid "You optimized %s of your website's images"
-msgstr "Has optimizado el %s de tus imágenes"
-
-#. translators: %s is a formatted percentage.
-#: inc/functions/admin-ui.php:849
-msgid "%s OFF on all the subscriptions"
-msgstr "%s OFF en todas las suscripciones"
+#: inc/common/cron.php:58
+msgid "Once Weekly"
+msgstr "Una vez a la semana"
 
 #. translators: %s is a formatted date.
 #: inc/functions/admin-ui.php:858
 msgid "Special Offer<br><strong>Until %s</strong>"
 msgstr "Oferta Especial <br><strong>Hasta %s</strong>"
 
-#: inc/functions/admin-ui.php:618
-msgid "Choose a plan"
-msgstr "Elige un plan"
-
-#: inc/functions/i18n.php:69
-msgid "Error with checking this coupon."
-msgstr "Error al comprobar este cupón."
-
-#: inc/functions/i18n.php:72
-msgid "Something went wrong with getting our updated offers. Please retry later."
-msgstr "Se ha producido un error al obtener nuestras ofertas actualizadas. Vuelve a intentarlo más tarde."
-
-#: inc/functions/admin-ui.php:595
-msgid "Coupon Code"
-msgstr "Código de descuento"
-
-#: inc/functions/admin-ui.php:592
-msgid "If you have a <strong>coupon code</strong><br> use it there:"
-msgstr "Si tienes un <strong> código de descuento </strong><br> úsalo aquí:"
-
-#: inc/functions/admin-ui.php:590
-msgid "Checking Coupon"
-msgstr "Comprobando el Cupón"
-
-#: inc/functions/admin-ui.php:466
-msgid "The free plan is enough to optimize your images"
-msgstr "El plan gratuito es suficiente para optimizar tus imágenes"
-
-#: inc/functions/admin-ui.php:420
-msgid "Analyzing"
-msgstr "Analizando"
+#. translators: %s is a formatted percentage.
+#: inc/functions/admin-ui.php:849
+msgid "%s OFF on all the subscriptions"
+msgstr "%s OFF en todas las suscripciones"
 
 #: inc/functions/admin-ui.php:417
 msgid "We are analysing your images"
 msgstr "Estamos analizando tus imágenes"
 
+#: inc/functions/admin-ui.php:420
+msgid "Analyzing"
+msgstr "Analizando"
+
+#: inc/functions/admin-ui.php:466
+msgid "The free plan is enough to optimize your images"
+msgstr "El plan gratuito es suficiente para optimizar tus imágenes"
+
+#: inc/functions/admin-ui.php:590
+msgid "Checking Coupon"
+msgstr "Comprobando el Cupón"
+
+#: inc/functions/admin-ui.php:592
+msgid "If you have a <strong>coupon code</strong><br> use it there:"
+msgstr "Si tienes un <strong> código de descuento </strong><br> úsalo aquí:"
+
+#: inc/functions/admin-ui.php:595
+msgid "Coupon Code"
+msgstr "Código de descuento"
+
 #: inc/functions/admin-ui.php:596
 msgid "OK"
 msgstr "OK"
+
+#: inc/functions/admin-ui.php:618
+msgid "Choose a plan"
+msgstr "Elige un plan"
+
+#: inc/functions/i18n.php:72
+msgid "Something went wrong with getting our updated offers. Please retry later."
+msgstr "Se ha producido un error al obtener nuestras ofertas actualizadas. Vuelve a intentarlo más tarde."
+
+#: inc/functions/i18n.php:69
+msgid "Error with checking this coupon."
+msgstr "Error al comprobar este cupón."
 
 #. translators: 1 is a percentage, 2 is a coupon code.
 #: inc/functions/i18n.php:71
@@ -429,6 +441,10 @@ msgstr "¿Qué piensa nuestro usuario sobre Imagify?"
 msgid "Thank you for being awesome!"
 msgstr "¡Gracias por ser increíble!"
 
+#: inc/functions/admin-ui.php:715
+msgid "One time plans are useful if you have a lots of existing images which need to be optimized. You can use it for bulk optimizing all your past images. You will pay only once."
+msgstr "Los planes a cuota única son útiles si tienes un montón de imágenes existentes que deben ser optimizadas. Puedes utilizarlo para optimizar de forma masiva todas tus imágenes anteriores. Pagarás solamente una vez."
+
 #: inc/functions/admin-ui.php:708
 msgid "Contact Us"
 msgstr "Contacta con Nosotros"
@@ -453,6 +469,10 @@ msgstr "te recomendamos"
 msgid "Monthly plans come with credits which is renewed every months. The billing happens automatically each month or year depending the billing period you choose."
 msgstr "Los planes mensuales vienen con créditos que se renuevan cada mes. La facturación se realiza automáticamente cada mes o año dependiendo del período de facturación que elijas."
 
+#: inc/functions/admin-ui.php:627
+msgid "One Time Plans"
+msgstr "Planes a cuota única"
+
 #: inc/functions/admin-ui.php:622
 msgid "Monthly Plans"
 msgstr "Planes Mensuales"
@@ -468,6 +488,13 @@ msgstr "Optimiza las imágenes que ya tienes, compra un plan único"
 #: inc/functions/admin-ui.php:535 inc/functions/admin-ui.php:578
 msgid "Choose another plan"
 msgstr "Elige otro plan"
+
+#. translators: %s is a formatted price.
+#: inc/functions/admin-ui.php:527 inc/functions/admin-ui.php:686
+msgid "%s per<br>additionnal Gb"
+msgstr ""
+"%s para<br>\n"
+"cada GB adicional"
 
 #. translators: %s is a formatted number (don't use %d).
 #: inc/functions/admin-ui.php:498 inc/functions/admin-ui.php:561
@@ -525,6 +552,10 @@ msgstr[1] "Tienes %s imágenes"
 msgid "We analysed your images"
 msgstr "Analizamos sus imágenes"
 
+#: inc/functions/admin-ui.php:371
+msgid "Let us help you by analyzing your existing images and determine the best plan for you"
+msgstr "Permítenos ayudarte: vamos a analizar tus imágenes existentes y determinar el mejor plan para ti"
+
 #: inc/functions/admin-ui.php:370
 msgid "You're new to Imagify?"
 msgstr "¿Eres nuevo en Imagify?"
@@ -546,25 +577,6 @@ msgstr "Todas las imágenes mayores de %s se optimizarán cuando utilices un pla
 msgid "Let's go!"
 msgstr "Vamos allá"
 
-#. translators: %s is a formatted price.
-#: inc/functions/admin-ui.php:527 inc/functions/admin-ui.php:686
-msgid "%s per<br>additionnal Gb"
-msgstr ""
-"%s para<br>\n"
-"cada GB adicional"
-
-#: inc/functions/admin-ui.php:371
-msgid "Let us help you by analyzing your existing images and determine the best plan for you"
-msgstr "Permítenos ayudarte: vamos a analizar tus imágenes existentes y determinar el mejor plan para ti"
-
-#: inc/functions/admin-ui.php:715
-msgid "One time plans are useful if you have a lots of existing images which need to be optimized. You can use it for bulk optimizing all your past images. You will pay only once."
-msgstr "Los planes a cuota única son útiles si tienes un montón de imágenes existentes que deben ser optimizadas. Puedes utilizarlo para optimizar de forma masiva todas tus imágenes anteriores. Pagarás solamente una vez."
-
-#: inc/functions/admin-ui.php:627
-msgid "One Time Plans"
-msgstr "Planes a cuota única"
-
 #: inc/functions/i18n.php:50
 msgid "Cancel"
 msgstr "Cancelar"
@@ -580,6 +592,10 @@ msgstr "Si tienes más de %s imágenes, tendrás que iniciar la optimización ma
 msgid "%1$sCongratulations%2$s, you have optimized %1$s%3$s images%2$s and improved your website's speed by reducing your images size."
 msgstr "%1$sFelicidades%2$s, has optimizado %1$s%3$s imágenes%2$s y, gracias a la reducción de su tamaño, has mejorado la velocidad de tu sitio web."
 
+#: inc/admin/media.php:88 inc/functions/i18n.php:95
+msgid "Compare Original VS Optimized"
+msgstr "Compara Original VS Optimizada"
+
 #: inc/functions/i18n.php:94
 msgid "Optimized Image"
 msgstr "Imagen Optimizada"
@@ -588,35 +604,29 @@ msgstr "Imagen Optimizada"
 msgid "Original Image"
 msgstr "Imagen Original"
 
-#: inc/admin/media.php:88 inc/functions/i18n.php:95
-msgid "Compare Original VS Optimized"
-msgstr "Compara Original VS Optimizada"
+#: inc/functions/i18n.php:146
+msgid "An unknown error occurred when we tried to get all your unoptimized images. Try again and if the issue still persists, please contact us!"
+msgstr "Se ha producido un error desconocido mientras intentábamos colectar todas las imágenes sin optimizar. Inténtalo de nuevo y, si el problema persiste, ¡ponte en contacto con nosotros!"
 
 #: inc/functions/i18n.php:145
 msgid "Oops, There is something wrong!"
 msgstr "Ohhh. Ha habido un error"
 
-#: inc/functions/i18n.php:146
-msgid "An unknown error occurred when we tried to get all your unoptimized images. Try again and if the issue still persists, please contact us!"
-msgstr "Se ha producido un error desconocido mientras intentábamos colectar todas las imágenes sin optimizar. Inténtalo de nuevo y, si el problema persiste, ¡ponte en contacto con nosotros!"
-
 #: inc/functions/i18n.php:126
 msgid "Imagify is still processing. Are you sure you want to leave this page?"
 msgstr "Imagify se está procesando todavía. ¿Estás seguro de que quieres salir de esta página?"
 
-#. translators: %s is a file path.
-#: inc/functions/process.php:60
-msgid "Could not find %s"
-msgstr "No se pudo encontrar %s"
-
-#. translators: %s is a file path.
-#: inc/functions/process.php:67
-msgid "%s is not writable"
-msgstr "%s no se puede escribir"
+#. Author URI of the plugin/theme
+msgid "https://wp-media.me/"
+msgstr "https://wp-media.me/"
 
 #. Author of the plugin/theme
 msgid "WP Media"
 msgstr "WP Media"
+
+#. Description of the plugin/theme
+msgid "Dramaticaly reduce image file sizes without losing quality, make your website load faster, boost your SEO and save money on your bandwidth using Imagify, the new most advanced image optimization tool."
+msgstr "Reduce dramáticamente el tamaño de tus archivos de imagen sin perder calidad, haz que tu sitio web cargue más rápido, impulsa tu SEO y ahorra dinero en tu ancho de banda utilizando Imagify, la herramienta de optimización de imágenes más avanzada."
 
 #. #-#-#-#-#  imagify-code.pot (Imagify 1.6.13.1)  #-#-#-#-#
 #. translators: Plugin URI of the plugin/theme
@@ -630,6 +640,16 @@ msgstr "https://wordpress.org/plugins/imagify/"
 #: inc/functions/process.php:77
 msgid "Skipped (%s), image not found."
 msgstr "Omitido (%s), imagen no encontrada."
+
+#. translators: %s is a file path.
+#: inc/functions/process.php:67
+msgid "%s is not writable"
+msgstr "%s no se puede escribir"
+
+#. translators: %s is a file path.
+#: inc/functions/process.php:60
+msgid "Could not find %s"
+msgstr "No se pudo encontrar %s"
 
 #: inc/functions/process.php:51
 msgid "File path is empty"
@@ -654,14 +674,6 @@ msgstr "%s no se pueden optimizar"
 msgid "Re-Optimize to %s"
 msgstr "Re-optimizar a %s"
 
-#. Description of the plugin/theme
-msgid "Dramaticaly reduce image file sizes without losing quality, make your website load faster, boost your SEO and save money on your bandwidth using Imagify, the new most advanced image optimization tool."
-msgstr "Reduce dramáticamente el tamaño de tus archivos de imagen sin perder calidad, haz que tu sitio web cargue más rápido, impulsa tu SEO y ahorra dinero en tu ancho de banda utilizando Imagify, la herramienta de optimización de imágenes más avanzada."
-
-#. Author URI of the plugin/theme
-msgid "https://wp-media.me/"
-msgstr "https://wp-media.me/"
-
 #: inc/functions/admin-ui.php:155
 msgid "Try again"
 msgstr "Inténtalo de nuevo"
@@ -678,14 +690,6 @@ msgstr "Miniaturas optimizadas:"
 msgid "Original Filesize:"
 msgstr "Tamaño del archivo original:"
 
-#: inc/admin/upload.php:64
-msgid "Filter by status"
-msgstr "Filtrar por estatus"
-
-#: inc/common/admin-bar.php:74
-msgid "Loading..."
-msgstr "Cargando…"
-
 #: inc/functions/admin-ui.php:73 inc/functions/admin-ui.php:74
 msgid "View details"
 msgstr "Ver detalles"
@@ -693,6 +697,19 @@ msgstr "Ver detalles"
 #: inc/functions/admin-ui.php:73
 msgid "Close details"
 msgstr "Cerrar detalles"
+
+#: inc/functions/admin-ui.php:44
+msgid "New Filesize:"
+msgstr "Nuevo tamaño de fichero:"
+
+#: inc/common/admin-bar.php:74
+msgid "Loading..."
+msgstr "Cargando…"
+
+#. translators: %s is WordPress.org.
+#: inc/common/admin-bar.php:58
+msgid "Rate Imagify on %s"
+msgstr "Valorar Imagify en %s"
 
 #: inc/3rd-party/amazon-s3-and-cloudfront/inc/classes/class-imagify-as3cf-attachment.php:281
 #: inc/classes/class-imagify-attachment.php:418
@@ -703,24 +720,31 @@ msgstr "Este tamaño no está autorizado para ser optimizado. Actualiza la confi
 msgid "All images"
 msgstr "Todas las imágenes"
 
-#. translators: %s is WordPress.org.
-#: inc/common/admin-bar.php:58
-msgid "Rate Imagify on %s"
-msgstr "Valorar Imagify en %s"
+#: inc/admin/upload.php:64
+msgid "Filter by status"
+msgstr "Filtrar por estatus"
 
-#: inc/functions/admin-ui.php:44
-msgid "New Filesize:"
-msgstr "Nuevo tamaño de fichero:"
+#: inc/admin/upload.php:61
+msgid "Errors"
+msgstr "Errores"
+
+#: inc/admin/ui/options.php:534 inc/admin/ui/options.php:554
+#: inc/admin/ui/options.php:575 inc/functions/admin-ui.php:64
+#: inc/functions/i18n.php:91
+msgid "Original Saving:"
+msgstr "Guardar el original:"
+
+#: inc/admin/ui/options.php:520 inc/admin/ui/options.php:530
+#: inc/admin/ui/options.php:550 inc/admin/ui/options.php:571
+#: inc/functions/i18n.php:90
+msgid "File Size:"
+msgstr "Tamaño de fichero:"
 
 #: inc/admin/ui/options.php:516 inc/admin/ui/options.php:526
 #: inc/admin/ui/options.php:546 inc/admin/ui/options.php:567
 #: inc/functions/admin-ui.php:84
 msgid "Level:"
 msgstr "Nivel:"
-
-#: inc/admin/upload.php:61
-msgid "Errors"
-msgstr "Errores"
 
 #. translators: %s is a formatted file size.
 #: inc/admin/ui/options.php:494 inc/admin/ui/options.php:502
@@ -732,18 +756,6 @@ msgstr "Fotografía optimizada sobre %s"
 #: inc/admin/ui/options.php:486
 msgid "Original photography about %s"
 msgstr "Fotografía original sobre %s"
-
-#: inc/admin/ui/options.php:520 inc/admin/ui/options.php:530
-#: inc/admin/ui/options.php:550 inc/admin/ui/options.php:571
-#: inc/functions/i18n.php:90
-msgid "File Size:"
-msgstr "Tamaño de fichero:"
-
-#: inc/admin/ui/options.php:534 inc/admin/ui/options.php:554
-#: inc/admin/ui/options.php:575 inc/functions/admin-ui.php:64
-#: inc/functions/i18n.php:91
-msgid "Original Saving:"
-msgstr "Guardar el original:"
 
 #: inc/admin/ui/options.php:454 inc/admin/ui/options.php:589
 #: inc/functions/admin-ui.php:781 inc/functions/i18n.php:92
@@ -766,10 +778,6 @@ msgstr "Este modo proporciona una optimización sin pérdidas. Tus imágenes se 
 msgid "If you want the maximum weight reduction, we recommend using this mode."
 msgstr "Si deseas reducir el peso máximo, te recomendamos que utilices este modo."
 
-#: inc/admin/ui/options.php:441
-msgid "This mode will apply all available optimizations for maximum image compression."
-msgstr "Este modo aplicará todas las optimizaciones disponibles para la máxima compresión de la imagen."
-
 #: inc/admin/ui/options.php:431
 msgid "This will provide a drastic savings on the initial weight, with a small reduction in image quality. Most of the time it's not even noticeable."
 msgstr "Esto proporcionará un ahorro drástico en el peso inicial, con una pequeña reducción en la calidad de la imagen. La mayoría de las veces ni siquiera se nota."
@@ -786,9 +794,18 @@ msgstr "Si deseas una reducción de peso máxima y aceptas perder algo de calida
 msgid "This will provide a huge savings on the initial weight. Sometimes the image quality could be degraded a little."
 msgstr "Esto proporcionará un ahorro enorme en el peso inicial. A veces la calidad de la imagen podría degradarse un poco."
 
+#: inc/admin/ui/options.php:441
+msgid "This mode will apply all available optimizations for maximum image compression."
+msgstr "Este modo aplicará todas las optimizaciones disponibles para la máxima compresión de la imagen."
+
 #: inc/admin/ui/options.php:410
 msgid "You can choose three levels of compression"
 msgstr "Puedes elegir tres niveles de compresión"
+
+#. translators: 1 is a link tag start, 2 is the link tag end.
+#: inc/admin/ui/options.php:397
+msgid "Once your settings saved, optimize all your images by using the %1$sImagify Bulk Optimization%2$s feature."
+msgstr "Una vez guardados los ajustes, optimiza todas tus imágenes mediante la función %1$sOptimización Masiva de Imagify%2$s."
 
 #: inc/admin/ui/options.php:365
 msgid "I want this awesome quick access menu on my admin bar."
@@ -798,18 +815,18 @@ msgstr "Quiero este impresionante menú de acceso rápido en mi barra de adminis
 msgid "Show Admin Bar menu"
 msgstr "Mostrar en el menú de la Barra de Administración"
 
-#. translators: 1 is a link tag start, 2 is the link tag end.
-#: inc/admin/ui/options.php:397
-msgid "Once your settings saved, optimize all your images by using the %1$sImagify Bulk Optimization%2$s feature."
-msgstr "Una vez guardados los ajustes, optimiza todas tus imágenes mediante la función %1$sOptimización Masiva de Imagify%2$s."
-
-#: inc/admin/ui/options.php:274
-msgid "Learn more"
-msgstr "Saber más"
-
 #: inc/admin/ui/options.php:354
 msgid "Display options"
 msgstr "Opciones de presentación"
+
+#: inc/admin/ui/options.php:299
+msgid "Remember each additional image size will affect your Imagify monthly usage!"
+msgstr "Recuerda que el tamaño de cada imagen adicional afectará tu cuota mensual de  Imagify!"
+
+#. translators: 1 is a "bold" tag start, 2 is the "bold" tag end.
+#: inc/admin/ui/options.php:293
+msgid "The %1$soriginal size%2$s is %1$sautomatically optimized%2$s by Imagify."
+msgstr "El %1$stamaño original%2$s ha sido %1$soptimizado automáticamente%2$s por Imagify."
 
 #: inc/admin/ui/options.php:288
 msgid "You can choose to compress different image sizes created by WordPress here."
@@ -823,10 +840,31 @@ msgstr "Optimización de Archivos"
 msgid "If you are a photographer, you may be interested in this option if you are displaying on your pages some info like the model of your camera."
 msgstr "Si eres un fotógrafo, puedes estar interesado en esta opción si estás mostrando en tus páginas algo de información como el modelo de tu cámara."
 
+#: inc/admin/ui/options.php:274
+msgid "Learn more"
+msgstr "Saber más"
+
+#: inc/admin/ui/options.php:273
+msgid "Keep all EXIF data from your images. EXIF are informations stored in your pictures like shutter speed, exposure compensation, ISO, etc..."
+msgstr "Mantén todos los datos EXIF de tus imágenes. Los datos EXIF son información almacenada en tus imágenes como por ejemplo apertura del obturador, compensación de la exposición, ISO, etc&hellip;"
+
+#: inc/admin/ui/options.php:266 inc/admin/ui/options.php:269
+msgid "EXIF Data"
+msgstr "Datos Exif"
+
+#. translators: 1 is a number of pixels.
+#: inc/admin/ui/options.php:257
+msgid "This option is recommended to reduce larger images. You can save up to 80%% after resizing. The new width should not be less than your largest thumbnail width, which is actually %dpx."
+msgstr "Te recomendamos esta opción para reducir las imágenes de mayor tamaño. Puedes ahorrar hasta el 80%% luego del cambio de tamaño. El nuevo ancho no debería ser menor del ancho de tu miniatura más grande, que al momento es de %dpx."
+
 #. translators: 1 is a text input for a number of pixels (don't use %d).
 #: inc/admin/ui/options.php:245
 msgid "to maximum %s pixels width"
 msgstr "hasta un máximo de %s pixeles de ancho"
+
+#: inc/admin/ui/options.php:235 inc/admin/ui/options.php:238
+msgid "Resize larger images"
+msgstr "Redimensiona las imágenes más grandes"
 
 #: inc/admin/ui/options.php:222
 msgid "Keep your original images in a separate folder before optimization process."
@@ -844,53 +882,33 @@ msgstr "Optimiza automáticamente cada imagen que subas a WordPress."
 msgid "Auto-Optimize images on upload"
 msgstr "Optimización automática de imágenes al subirlas"
 
-#: inc/admin/ui/options.php:157
-msgid "Optimization Level"
-msgstr "Nivel de Optimización"
-
-#: inc/admin/ui/options.php:266 inc/admin/ui/options.php:269
-msgid "EXIF Data"
-msgstr "Datos Exif"
+#. translators: 1 is a button tag start, 2 is the button tag end.
+#: inc/admin/ui/options.php:185
+msgid "Need help to choose? %1$sTry the Visual Comparison%2$s"
+msgstr "¿Necesitas ayuda para elegir? %1$sPrueba la comparación visual%2$s"
 
 #: inc/admin/ui/options.php:177
 msgid "More info?"
 msgstr "¿Más información?"
 
-#: inc/admin/ui/options.php:273
-msgid "Keep all EXIF data from your images. EXIF are informations stored in your pictures like shutter speed, exposure compensation, ISO, etc..."
-msgstr "Mantén todos los datos EXIF de tus imágenes. Los datos EXIF son información almacenada en tus imágenes como por ejemplo apertura del obturador, compensación de la exposición, ISO, etc&hellip;"
-
-#: inc/admin/ui/options.php:299
-msgid "Remember each additional image size will affect your Imagify monthly usage!"
-msgstr "Recuerda que el tamaño de cada imagen adicional afectará tu cuota mensual de  Imagify!"
-
-#. translators: 1 is a "bold" tag start, 2 is the "bold" tag end.
-#: inc/admin/ui/options.php:293
-msgid "The %1$soriginal size%2$s is %1$sautomatically optimized%2$s by Imagify."
-msgstr "El %1$stamaño original%2$s ha sido %1$soptimizado automáticamente%2$s por Imagify."
-
-#. translators: 1 is a number of pixels.
-#: inc/admin/ui/options.php:257
-msgid "This option is recommended to reduce larger images. You can save up to 80%% after resizing. The new width should not be less than your largest thumbnail width, which is actually %dpx."
-msgstr "Te recomendamos esta opción para reducir las imágenes de mayor tamaño. Puedes ahorrar hasta el 80%% luego del cambio de tamaño. El nuevo ancho no debería ser menor del ancho de tu miniatura más grande, que al momento es de %dpx."
-
-#. translators: 1 is a button tag start, 2 is the button tag end.
-#: inc/admin/ui/options.php:185
-msgid "Need help to choose? %1$sTry the Visual Comparison%2$s"
-msgstr "¿Necesitas ayuda para elegir? %1$sPrueba la comparación visual%2$s"
+#: inc/admin/ui/options.php:157
+msgid "Optimization Level"
+msgstr "Nivel de Optimización"
 
 #. translators: 1 is a link tag start, 2 is the link tag end.
 #: inc/admin/ui/options.php:137
 msgid "Don't have an API Key yet? %1$sCreate one, it's FREE%2$s."
 msgstr "¿Todavía no tienes una clave API? %1$sCrea una, es GRATIS%2$s."
 
-#: inc/admin/ui/options.php:235 inc/admin/ui/options.php:238
-msgid "Resize larger images"
-msgstr "Redimensiona las imágenes más grandes"
-
 #: inc/admin/ui/options.php:111
 msgid "API Key"
 msgstr "Clave de la API"
+
+#. translators: 1 is a "bold" tag start, 2 is the "bold" tag end + a line break
+#. tag, 3 is a link tag start, 4 is the link tag end.
+#: inc/admin/ui/notice-rating.php:21 inc/admin/ui/options.php:74
+msgid "%1$sDo you like this plugin?%2$s Please take a few seconds to %3$srate it on WordPress.org%4$s!"
+msgstr "%1$s¿Te gusta este plugin?%2$s Por favor, tómate unos segundos para %3$svalorarlo en WordPress.org%4$s!"
 
 #: inc/admin/ui/notice-wp-rocket.php:29 inc/admin/ui/options.php:51
 msgid "Get WP Rocket now"
@@ -932,19 +950,15 @@ msgstr "Se ha definido la constante <code>WP_HTTP_BLOCK_EXTERNAL</code> en el <c
 msgid "The external HTTP requests are blocked!"
 msgstr "¡Las peticiones HTTP externas están bloqueadas!"
 
-#. translators: 1 is a "bold" tag start, 2 is the "bold" tag end + a line break
-#. tag, 3 is a link tag start, 4 is the link tag end.
-#: inc/admin/ui/notice-rating.php:21 inc/admin/ui/options.php:74
-msgid "%1$sDo you like this plugin?%2$s Please take a few seconds to %3$srate it on WordPress.org%4$s!"
-msgstr "%1$s¿Te gusta este plugin?%2$s Por favor, tómate unos segundos para %3$svalorarlo en WordPress.org%4$s!"
-
-#: inc/admin/ui/notice-welcome-steps.php:17
-msgid "Create an Account"
-msgstr "Crear cuenta"
-
 #: inc/admin/ui/notice-plugins-to-deactivate.php:13
 msgid "Deactivate"
 msgstr "Inactivo"
+
+#: inc/admin/ui/notice-plugins-to-deactivate.php:6
+msgid "The following plugin is not compatible with this plugin and may cause unexpected results:"
+msgid_plural "The following plugins are not compatible with this plugin and may cause unexpected results:"
+msgstr[0] "Los siguientes plugins no son compatibles con este plugin y pueden causar resultados inesperados:"
+msgstr[1] ""
 
 #. translators: 1 and 2 are link tag starts, 3 is a link tag end.
 #: inc/admin/ui/notice-wrong-api-key.php:13
@@ -972,6 +986,11 @@ msgstr "Configurarlo"
 msgid "I have my API key"
 msgstr "Tengo mi API key"
 
+#. translators: 1 is a link tag start, 2 is the link tag end.
+#: inc/admin/ui/notice-welcome-steps.php:33
+msgid "Save your API Key you have received by email or you can get it on your %1$sImagify account page%2$s."
+msgstr "Guarda la clave API que has recibido por correo electrónico o obténla en la %1$spágina de tu cuenta Imagify%2$s."
+
 #: inc/admin/ui/notice-welcome-steps.php:28
 msgid "Enter your API Key"
 msgstr "Introduce tu API Key"
@@ -984,20 +1003,9 @@ msgstr "¡Regístrate, es gratis!"
 msgid "Don't have an Imagify account yet? Optimize your images by creating an account in a few seconds!"
 msgstr "¿Todavía no tienes una cuenta de Imagify? ¡Optimiza tus imágenes creando una cuenta en pocos segundos!"
 
-#. translators: 1 is a link tag start, 2 is the link tag end.
-#: inc/admin/ui/notice-welcome-steps.php:33
-msgid "Save your API Key you have received by email or you can get it on your %1$sImagify account page%2$s."
-msgstr "Guarda la clave API que has recibido por correo electrónico o obténla en la %1$spágina de tu cuenta Imagify%2$s."
-
-#: inc/admin/ui/notice-plugins-to-deactivate.php:6
-msgid "The following plugin is not compatible with this plugin and may cause unexpected results:"
-msgid_plural "The following plugins are not compatible with this plugin and may cause unexpected results:"
-msgstr[0] "Los siguientes plugins no son compatibles con este plugin y pueden causar resultados inesperados:"
-msgstr[1] ""
-
-#: inc/admin/ui/bulk.php:369
-msgid "Total:"
-msgstr "Cuota:"
+#: inc/admin/ui/notice-welcome-steps.php:17
+msgid "Create an Account"
+msgstr "Crear cuenta"
 
 #: inc/admin/ui/notice-footer.php:6 inc/admin/ui/notice-welcome-steps.php:10
 msgid "Dismiss this notice"
@@ -1007,22 +1015,17 @@ msgstr "Descartar este aviso"
 msgid "Welcome to Imagify, the best way to easily optimize your images!"
 msgstr "¡Bienvenido a Imagify, la mejor manera de optimizar fácilmente tus imágenes!"
 
-#: inc/admin/ui/bulk.php:370
-msgid "Gain:"
-msgstr "Ganancia:"
-
 #: inc/admin/ui/bulk.php:387
 msgid "Start the bulk optimization"
 msgstr "Lanza la optimización masiva"
 
-#: inc/admin/ui/bulk.php:348 inc/admin/ui/options.php:476
-#: inc/admin/ui/options.php:481 inc/admin/ui/options.php:517
-msgid "Original"
-msgstr "Original"
+#: inc/admin/ui/bulk.php:370
+msgid "Gain:"
+msgstr "Ganancia:"
 
-#: inc/admin/ui/bulk.php:350
-msgid "Percentage"
-msgstr "Porcentaje"
+#: inc/admin/ui/bulk.php:369
+msgid "Total:"
+msgstr "Cuota:"
 
 #: inc/admin/ui/bulk.php:352
 msgid "Overall saving"
@@ -1032,17 +1035,22 @@ msgstr "Ahorro global"
 msgid "Thumbnails optimized"
 msgstr "Miniaturas optimizadas"
 
-#: inc/admin/ui/bulk.php:346
-msgid "Filename"
-msgstr "Nombre Del Archivo"
+#: inc/admin/ui/bulk.php:350
+msgid "Percentage"
+msgstr "Porcentaje"
+
+#: inc/admin/ui/bulk.php:348 inc/admin/ui/options.php:476
+#: inc/admin/ui/options.php:481 inc/admin/ui/options.php:517
+msgid "Original"
+msgstr "Original"
 
 #: inc/admin/ui/bulk.php:347
 msgid "Status"
 msgstr "Status"
 
-#: inc/admin/ui/bulk.php:125
-msgid "Statistics"
-msgstr "Estadística"
+#: inc/admin/ui/bulk.php:346
+msgid "Filename"
+msgstr "Nombre Del Archivo"
 
 #: inc/admin/ui/bulk.php:343
 msgid "Compression process results"
@@ -1074,49 +1082,18 @@ msgstr "Tamaño optimizado"
 msgid "Original size"
 msgstr "Tamaño Original"
 
-#: inc/admin/ui/bulk.php:222 inc/admin/ui/bulk.php:249
-#: inc/admin/ui/options.php:172 inc/admin/ui/options.php:439
-#: inc/admin/ui/options.php:479 inc/admin/ui/options.php:505
-#: inc/admin/ui/options.php:568
-#: inc/classes/class-imagify-abstract-attachment.php:197
-#: inc/functions/admin-ui.php:202
-msgid "Ultra"
-msgstr "Ultra"
+#. translators: you can use %s to include a line break.
+#: inc/admin/ui/bulk.php:141
+msgid "that's the number of original images you optimized with Imagify"
+msgstr "Ese es el número de imágenes que has optimizado con Imagify"
 
-#: inc/admin/ui/bulk.php:229 inc/admin/ui/bulk.php:239
-#: inc/admin/ui/options.php:162 inc/admin/ui/options.php:413
-#: inc/admin/ui/options.php:477 inc/admin/ui/options.php:489
-#: inc/admin/ui/options.php:527
-#: inc/classes/class-imagify-abstract-attachment.php:203
-#: inc/functions/admin-ui.php:220
-msgid "Normal"
-msgstr "Normal"
+#: inc/admin/ui/bulk.php:125
+msgid "Statistics"
+msgstr "Estadística"
 
 #: inc/admin/ui/bulk.php:105
 msgid "Overview"
 msgstr "Resúmen"
-
-#. translators: %s is an optimization level.
-#: inc/admin/ui/bulk.php:233
-msgid "Your default setting: %s"
-msgstr "Tus ajustes por defecto: %s"
-
-#: inc/admin/ui/bulk.php:226 inc/admin/ui/bulk.php:244
-#: inc/admin/ui/options.php:167 inc/admin/ui/options.php:426
-#: inc/admin/ui/options.php:478 inc/admin/ui/options.php:497
-#: inc/admin/ui/options.php:547
-#: inc/classes/class-imagify-abstract-attachment.php:200
-#: inc/functions/admin-ui.php:211
-msgid "Aggressive"
-msgstr "Agresivo"
-
-#: inc/admin/ui/bulk.php:183
-msgid "Please be aware that optimizing a large number of images can take a while depending on your server and network speed."
-msgstr "Ten en cuenta que la optimización de un gran número de imágenes puede tardar un tiempo dependiendo del servidor y la velocidad de la red."
-
-#: inc/admin/ui/bulk.php:220
-msgid "Select Your Compression Level"
-msgstr "Selecciona tu Nivel de Compresión"
 
 #: inc/admin/ui/bulk.php:279
 msgid "Imagif'em all"
@@ -1127,17 +1104,57 @@ msgstr "Imagíficalo todo"
 msgid "Don't forget to check %1$syour settings%2$s before bulk optimization."
 msgstr "No olvides revisar %1$stus ajustes%2$s antes de la optimización masiva."
 
+#. translators: %s is an optimization level.
+#: inc/admin/ui/bulk.php:233
+msgid "Your default setting: %s"
+msgstr "Tus ajustes por defecto: %s"
+
+#: inc/admin/ui/bulk.php:229 inc/admin/ui/bulk.php:239
+#: inc/admin/ui/options.php:162 inc/admin/ui/options.php:413
+#: inc/admin/ui/options.php:477 inc/admin/ui/options.php:489
+#: inc/admin/ui/options.php:527
+#: inc/classes/class-imagify-abstract-attachment.php:203
+#: inc/functions/admin-ui.php:220
+msgid "Normal"
+msgstr "Normal"
+
+#: inc/admin/ui/bulk.php:226 inc/admin/ui/bulk.php:244
+#: inc/admin/ui/options.php:167 inc/admin/ui/options.php:426
+#: inc/admin/ui/options.php:478 inc/admin/ui/options.php:497
+#: inc/admin/ui/options.php:547
+#: inc/classes/class-imagify-abstract-attachment.php:200
+#: inc/functions/admin-ui.php:211
+msgid "Aggressive"
+msgstr "Agresivo"
+
+#: inc/admin/ui/bulk.php:222 inc/admin/ui/bulk.php:249
+#: inc/admin/ui/options.php:172 inc/admin/ui/options.php:439
+#: inc/admin/ui/options.php:479 inc/admin/ui/options.php:505
+#: inc/admin/ui/options.php:568
+#: inc/classes/class-imagify-abstract-attachment.php:197
+#: inc/functions/admin-ui.php:202
+msgid "Ultra"
+msgstr "Ultra"
+
+#: inc/admin/ui/bulk.php:220
+msgid "Select Your Compression Level"
+msgstr "Selecciona tu Nivel de Compresión"
+
 #: inc/admin/ui/bulk.php:200
 msgid "You must keep this page open while the bulk optimization is processing. If you leave you can come back to continue where it left off."
 msgstr "Debes mantener esta página abierta mientras se está procesando la optimización masiva. Si te marchas puedes volver a continuar donde lo dejaste."
 
-#: inc/admin/ui/bulk.php:75
-msgid "More info"
-msgstr "Más información"
+#: inc/admin/ui/bulk.php:183
+msgid "Please be aware that optimizing a large number of images can take a while depending on your server and network speed."
+msgstr "Ten en cuenta que la optimización de un gran número de imágenes puede tardar un tiempo dependiendo del servidor y la velocidad de la red."
 
 #: inc/admin/ui/bulk.php:179
 msgid "Information"
 msgstr "Información"
+
+#: inc/admin/ui/bulk.php:75
+msgid "More info"
+msgstr "Más información"
 
 #: inc/admin/ui/bulk.php:71
 msgid "Upgrade your account to continue optimizing your images"
@@ -1156,6 +1173,11 @@ msgstr "<strong>ERROR</strong>: no se encuentra la página de opciones."
 msgid "Check your Settings"
 msgstr "Comprueba tus Ajustes"
 
+#: inc/admin/meta-boxes.php:31 inc/functions/admin-ui.php:304
+#: inc/functions/api.php:287
+msgid "Invalid API key"
+msgstr "Clave API no válida."
+
 #. #-#-#-#-#  imagify-code.pot (Imagify 1.6.13.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: inc/admin/meta-boxes.php:29 inc/admin/meta-boxes.php:38
@@ -1169,24 +1191,9 @@ msgstr "Imagify"
 msgid "Bulk Optimization"
 msgstr "Optimización Masiva"
 
-#: inc/admin/meta-boxes.php:31 inc/functions/admin-ui.php:304
-#: inc/functions/api.php:287
-msgid "Invalid API key"
-msgstr "Clave API no válida."
-
 #: inc/functions/i18n.php:177
 msgid "F j, Y"
 msgstr "Mes, Día, Año"
-
-#. translators: 1 and 2 are file sizes. Don't use HTML entities here (like
-#. &nbsp;).
-#: inc/functions/i18n.php:143
-msgid "Discover @imagify, the new compression tool to optimize your images for free. I saved %1$s out of %2$s!"
-msgstr "Descubre @imagify, la nueva herramienta de compresión para optimizar tus imágenes de forma gratuita. He guardado %1$s de %2$s!"
-
-#: inc/functions/i18n.php:132
-msgid "Hold on!"
-msgstr "¡Espera!"
 
 #. translators: 1 is a link tag start, 2 is the link tag end.
 #: inc/admin/ui/notice-free-over-quota.php:21 inc/functions/i18n.php:168
@@ -1194,9 +1201,27 @@ msgstr "¡Espera!"
 msgid "To continue to optimize your images, log in to your Imagify account to %1$sbuy a pack or subscribe to a plan%2$s."
 msgstr "Para continuar optimizando tus imágenes, accede a tu cuenta Imagify para %1$scomprar un paquete o suscribirte a un plan%2$s."
 
+#. translators: 1 and 2 are file sizes. Don't use HTML entities here (like
+#. &nbsp;).
+#: inc/functions/i18n.php:143
+msgid "Discover @imagify, the new compression tool to optimize your images for free. I saved %1$s out of %2$s!"
+msgstr "Descubre @imagify, la nueva herramienta de compresión para optimizar tus imágenes de forma gratuita. He guardado %1$s de %2$s!"
+
 #: inc/functions/i18n.php:133
 msgid "All your images have been optimized by Imagify. Congratulations!"
 msgstr "Todas tus imágenes han sido optimizadas por Imagify. ¡Enhorabuena!"
+
+#: inc/functions/i18n.php:132
+msgid "Hold on!"
+msgstr "¡Espera!"
+
+#: inc/functions/i18n.php:124 inc/functions/i18n.php:135
+msgid "Error"
+msgstr "Error"
+
+#: inc/admin/upload.php:60 inc/functions/i18n.php:122
+msgid "Unoptimized"
+msgstr "Sin Optimizar"
 
 #: inc/admin/ui/bulk.php:349 inc/admin/upload.php:59 inc/functions/i18n.php:123
 msgid "Optimized"
@@ -1205,31 +1230,6 @@ msgstr "Optimizado"
 #: inc/functions/i18n.php:128
 msgid "We are trying to get your unoptimized images, it may take time depending on the number of images."
 msgstr "Estamos tratando de obtener tus imágenes sin optimizar, puede tomar tiempo dependiendo del número de imágenes."
-
-#: inc/admin/upload.php:60 inc/functions/i18n.php:122
-msgid "Unoptimized"
-msgstr "Sin Optimizar"
-
-#: inc/functions/i18n.php:124 inc/functions/i18n.php:135
-msgid "Error"
-msgstr "Error"
-
-#: inc/admin/meta-boxes.php:53
-#: inc/classes/class-imagify-admin-ajax-post.php:240
-#: inc/functions/admin-ui.php:323 inc/functions/i18n.php:96
-#: inc/functions/i18n.php:104
-msgid "Optimize"
-msgstr "Optimizar"
-
-#: inc/functions/i18n.php:32
-msgid "Sign Up"
-msgstr "Inscribete"
-
-#. translators: Don't use escaped HTML entities here (like &nbsp;).
-#: inc/functions/i18n.php:35 inc/functions/i18n.php:42
-#: inc/functions/i18n.php:59
-msgid "Congratulations!"
-msgstr "Enhorabuena!"
 
 #: inc/functions/i18n.php:127
 msgid "Please wait..."
@@ -1246,6 +1246,14 @@ msgstr "Si mantiense desactivada esta opción, no podrsá volver a optimizar tus
 #: inc/functions/i18n.php:61
 msgid "Don't Need a Parachute?"
 msgstr "¿No necesitas un paracaídas?"
+
+#: inc/admin/ui/options.php:119 inc/functions/i18n.php:57
+msgid "Your API key is valid."
+msgstr "Tu clave API no es válida."
+
+#: inc/functions/i18n.php:43 inc/functions/i18n.php:60
+msgid "Your API key is valid. You can now configure the Imagify settings to optimize your images."
+msgstr "Tu clave API es válida. Ahora puedes configurar los ajustes de Imagify para optimizar tus imágenes."
 
 #: inc/functions/i18n.php:58
 msgid "Check in progress..."
@@ -1264,9 +1272,27 @@ msgstr "Pega tu API key a continuación:"
 msgid "Connect to Imagify!"
 msgstr "Conectado a Imagify!"
 
+#: inc/functions/i18n.php:36
+msgid "Your account has been successfully created. Please check your mailbox, you are going to receive an email with API key."
+msgstr "Tu cuenta ha sido creada con éxito. Por favor, comprueba tu buzón, ya que vas a recibir un correo electrónico con la clave API."
+
+#. translators: Don't use escaped HTML entities here (like &nbsp;).
+#: inc/functions/i18n.php:35 inc/functions/i18n.php:42
+#: inc/functions/i18n.php:59
+msgid "Congratulations!"
+msgstr "Enhorabuena!"
+
 #: inc/functions/i18n.php:33
 msgid "You need to specify an email!"
 msgstr "¡Debes especificar un correo electrónico!"
+
+#: inc/functions/i18n.php:32
+msgid "Sign Up"
+msgstr "Inscribete"
+
+#: inc/functions/i18n.php:31
+msgid "Enter your email to get an API key:"
+msgstr "Introduce tu correo electrónico para recibir la clave API:"
 
 #. translators: Don't use escaped HTML entities here (like &nbsp;).
 #: inc/functions/i18n.php:30
@@ -1294,6 +1320,12 @@ msgstr "Estado de cuenta"
 msgid "Upgrade My Subscription"
 msgstr "Actualizar Mi Suscripción"
 
+#. translators: 1 is a "bold" tag start, 2 is a formatted data quota, 3 is a
+#. date, 4 is the "bold" tag end.
+#: inc/admin/ui/notice-free-over-quota.php:12
+msgid "You have consumed all your credit for this month. You will have %1$s%2$s back on %3$s%4$s."
+msgstr "Has consumido todo tu crédito para este mes. Volverás a tener %1$s%2$s el  %3$s%4$s."
+
 #: inc/admin/ui/notice-free-over-quota.php:5
 #: inc/classes/class-imagify-admin-ajax-post.php:724 inc/functions/i18n.php:130
 msgid "Oops, It's Over!"
@@ -1312,6 +1344,13 @@ msgstr "Has utilizado casi todo tu crédito.%sNo olvides actualizar tu suscripci
 msgid "Oops, It's almost over!"
 msgstr "Oops, ¡está casi terminado!"
 
+#: inc/admin/meta-boxes.php:53
+#: inc/classes/class-imagify-admin-ajax-post.php:240
+#: inc/functions/admin-ui.php:323 inc/functions/i18n.php:96
+#: inc/functions/i18n.php:104
+msgid "Optimize"
+msgstr "Optimizar"
+
 #: inc/admin/meta-boxes.php:46
 #: inc/classes/class-imagify-admin-ajax-post.php:240
 #: inc/functions/admin-ui.php:107 inc/functions/admin-ui.php:153
@@ -1319,25 +1358,3 @@ msgstr "Oops, ¡está casi terminado!"
 #: inc/functions/admin-ui.php:314 inc/functions/admin-ui.php:323
 msgid "Optimizing..."
 msgstr "Optimizando..."
-
-#. translators: 1 is a "bold" tag start, 2 is a formatted data quota, 3 is a
-#. date, 4 is the "bold" tag end.
-#: inc/admin/ui/notice-free-over-quota.php:12
-msgid "You have consumed all your credit for this month. You will have %1$s%2$s back on %3$s%4$s."
-msgstr "Has consumido todo tu crédito para este mes. Volverás a tener %1$s%2$s el  %3$s%4$s."
-
-#: inc/admin/ui/options.php:119 inc/functions/i18n.php:57
-msgid "Your API key is valid."
-msgstr "Tu clave API no es válida."
-
-#: inc/functions/i18n.php:43 inc/functions/i18n.php:60
-msgid "Your API key is valid. You can now configure the Imagify settings to optimize your images."
-msgstr "Tu clave API es válida. Ahora puedes configurar los ajustes de Imagify para optimizar tus imágenes."
-
-#: inc/functions/i18n.php:31
-msgid "Enter your email to get an API key:"
-msgstr "Introduce tu correo electrónico para recibir la clave API:"
-
-#: inc/functions/i18n.php:36
-msgid "Your account has been successfully created. Please check your mailbox, you are going to receive an email with API key."
-msgstr "Tu cuenta ha sido creada con éxito. Por favor, comprueba tu buzón, ya que vas a recibir un correo electrónico con la clave API."

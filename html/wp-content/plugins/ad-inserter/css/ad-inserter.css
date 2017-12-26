@@ -1,5 +1,5 @@
 #ai-data {
-  font-family: "2.2.7"; /* Used for version number of the file */
+  font-family: "2.2.10"; /* Used for version number of the file */
 }
 
 #blocked-warning {
@@ -35,8 +35,16 @@
   color: #555;
 }
 
+.ui-state-highlight {
+  background: #ff4;
+}
+
+button.ai-top-button {
+  min-width: 52px;
+}
+
 .ai-top-button.ui-button-text-only .ui-button-text {
-  padding: .4em 0.8em;
+  padding: .4em 0.6em;
 }
 
 .ace_editor {
@@ -147,13 +155,18 @@ a.clear-link, a.clear-link:hover, a.clear-link:focus {
   -webkit-user-select: none;  /* Chrome all / Safari all */
   -moz-user-select: none;     /* Firefox all */
   -ms-user-select: none;      /* IE 10+ */
-  user-select: none;          /* Likely future */
+  user-select: none;
 }
 .select {
-  -webkit-user-select: all;  /* Chrome all / Safari all */
-  -moz-user-select: all;     /* Firefox all */
-  -ms-user-select: all;      /* IE 10+ */
-  user-select: all;          /* Likely future */
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+.copy-blocker {
+   position: absolute;
+   user-select: text;
+   height: 100%;
 }
 
 .ui-dialog {
@@ -368,11 +381,15 @@ div.automatic-insertion img {
   display: table-cell;
   vertical-align: top;
   width: 28px;
-  padding: 0px 0 0 10px;
+  padding: 0 0 0 10px;
 }
 
 .ai-toolbar-button.text {
   width: auto;
+}
+
+.ai-toolbar-button.ai-button-left {
+  padding: 0 10px 0 0;
 }
 
 .checkbox-button {
@@ -416,11 +433,6 @@ div.automatic-insertion img {
    text-indent: -3333px;
    text-align: center;
    vertical-align: middle;
-}
-
-/* TEMP */
-img.automatic-insertion.above-header {
-  background: url('images/insertions-alignmets.png') -56px 0;
 }
 
 img.automatic-insertion.disabled {
@@ -531,9 +543,9 @@ img.automatic-insertion.sticky-bottom {
   background: url('images/insertions-alignmets.png') -112px -168px;
 }
 
-/*img.automatic-insertion.center {*/
-/*  background: url('images/insertions-alignmets.png') -168px -168px;*/
-/*}*/
+img.automatic-insertion.above-header {
+  background: url('images/insertions-alignmets.png') -168px -168px;
+}
 
 /*img.automatic-insertion.align-right {*/
 /*  background: url('images/insertions-alignmets.png') -224px -168px;*/
@@ -669,6 +681,91 @@ img.automatic-insertion.preview {
   background: url('images/icons.png') -120px 0;
 }
 
+.checkbox-icon.icon-code {
+  background: url('images/icons.png') 0 -80px;
+}
+
+.checkbox-icon.icon-code.on {
+  background: url('images/icons.png') 0 -60px;
+}
+
+.checkbox-icon.icon-rotation {
+  background: url('images/icons.png') -20px -80px;
+}
+
+.checkbox-icon.icon-rotation.on {
+  background: url('images/icons.png') -20px -60px;
+}
+
+.checkbox-icon.icon-rotation.active {
+  background: url('images/icons.png') -100px -40px;
+}
+
+.checkbox-icon.icon-generate {
+  background: url('images/icons.png') -40px -80px;
+}
+
+.checkbox-icon.icon-generate.on {
+  background: url('images/icons.png') -40px -60px;
+}
+
+.checkbox-icon.icon-import {
+  background: url('images/icons.png') -60px -80px;
+}
+
+.checkbox-icon.icon-import.on {
+  background: url('images/icons.png') -60px -60px;
+}
+
+.checkbox-icon.icon-edit {
+  background: url('images/icons.png') -80px -40px;
+}
+
+.checkbox-icon.icon-minus {
+  background: url('images/icons.png') -80px -80px;
+}
+
+.checkbox-icon.icon-plus {
+  background: url('images/icons.png') -80px -60px;
+}
+
+.checkbox-icon.icon-tools {
+  background: url('images/icons.png') -100px -80px;
+}
+
+.checkbox-icon.icon-tools.on {
+  background: url('images/icons.png') -100px -60px;
+}
+
+.checkbox-icon.icon-copy {
+  background: url('images/icons.png') -120px -80px;
+}
+
+.checkbox-icon.icon-copy.on {
+  background: url('images/icons.png') -120px -60px;
+}
+
+.checkbox-icon.icon-paste {
+  background: url('images/icons.png') -120px -40px;
+}
+
+.checkbox-icon.icon-paste-name {
+  background: url('images/icons.png') -140px -40px;
+}
+
+.checkbox-icon.icon-paste-code {
+  background: url('images/icons.png') -160px -40px;
+}
+
+.checkbox-icon.icon-paste-settings {
+  background: url('images/icons.png') -180px -40px;
+}
+
+.checkbox-icon.icon-clear {
+  background: url('images/icons.png') -160px -80px;
+}
+
+
 .checkbox-icon.icon-enabled-all {
   width: 16px;
   height: 16px;
@@ -679,6 +776,16 @@ img.automatic-insertion.preview {
   background: url('images/icons.png') -142px -2px;
 }
 
+
+.checkbox-icon.icon-rearrange {
+  width: 16px;
+  height: 16px;
+  background: url('images/icons.png') -140px -80px;
+}
+
+.checkbox-icon.icon-rearrange.on {
+  background: url('images/icons.png') -140px -60px;
+}
 
 .checkbox-icon.icon-loading {
   width: 12px;
@@ -706,6 +813,30 @@ img.automatic-insertion.preview {
   width: 10px;
   height: 12px;
   margin-top: 6px;
+}
+
+.checkbox-icon.icon-none-small {
+  width: 8px;
+  height: 8px;
+}
+
+.banner-preview {
+  float: left;
+  margin: 0 10px 0 0;
+}
+
+.banner-preview img {
+  max-width: 100px;
+  max-height: 160px;
+}
+
+.ai-banner-top .banner-preview img {
+  max-width: 718px;
+  max-height: 100px;
+}
+
+.ai-banner-top table {
+  float: right;
 }
 
 #ai-sidebar .notice-dismiss {
@@ -751,7 +882,7 @@ img.automatic-insertion.preview {
    .ai-settings-table tr {
      height: 40px;
    }
-   .ai-settings-table input {
+   .ai-settings-table input[type=text] {
      height: 30px;
    }
    .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button {
@@ -777,6 +908,11 @@ img.automatic-insertion.preview {
 
    .checkbox-icon.icon-enabled-all.on {
      background: url('images/icons.png') -140px -0px;
+   }
+
+   .banner-preview img {
+     max-width: 160px;
+     max-height: 160px;
    }
 }
 

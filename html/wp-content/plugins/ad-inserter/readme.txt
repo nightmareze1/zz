@@ -6,7 +6,7 @@ Tags: ads, adsense, ad management, advertising manager, advanced contextual ads,
 Requires at least: 4.0
 Tested up to: 4.9
 Requires PHP: 5.2.4
-Stable tag: 2.2.6
+Stable tag: 2.2.9
 License: GPLv3
 
 Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
@@ -23,6 +23,7 @@ Ad Inserter is more than just ad manager plugin. It provides many advanced optio
 > *   Syntax highlighting editor
 > *   Code preview with visual CSS editor
 > *   Automatically inserts ads in posts and pages
+> *   Insert above header (after `<body>` tag)
 > *   Insert before or after post
 > *   Insert before or after content
 > *   Insert before or after paragraph
@@ -31,6 +32,7 @@ Ad Inserter is more than just ad manager plugin. It provides many advanced optio
 > *   Insert before or after comments
 > *   Insert before or after excerpt
 > *   Insert before or after any HTML element in post
+> *   Insert in footer (before `</body>` tag)
 > *   Insert at relative position in posts
 > *   Insert between posts on blog pages (in-feed AdSense ads)
 > *   Insert between excerpts on blog pages
@@ -42,6 +44,8 @@ Ad Inserter is more than just ad manager plugin. It provides many advanced optio
 > *   Insert raw HTTP response header lines
 > *   Insert Google Analytics, Piwik or any other web analytics code
 > *   Insert HTML, CSS, Javascript or PHP code
+> *   Code generator for banners
+> *   Visual ad editor
 > *   Manual insertion: widgets, shortcodes, PHP function call
 > *   Sticky (fixed) widgets (sticky sidebar - the sidebar does not move when the page is scrolled)
 > *   Custom block alignments and styles
@@ -50,10 +54,12 @@ Ad Inserter is more than just ad manager plugin. It provides many advanced optio
 > *   Use shortcodes from other plugins
 > *   Use custom fields as defined in posts
 > *   PHP code processing
+> *   Banner code generator
 > *   Ad rotation (server-side and client-side - works with caching)
 > *   Ad blocking detection - popup message, page redirection
 > *   Desktop/mobile device detection (server-side and client-side - works with caching)
 > *   Black/White-list categories, tags, taxonomies, post IDs, urls, url query parameters, cookies, referers
+> *   Clipboard support to easily copy code blocks or settings
 > *   Simple troubleshooting with many debugging functions
 > *   Function to visualize inserted code blocks
 > *   Function to visualize available insertion positions
@@ -130,6 +136,7 @@ Maintaining several plugins (often from different vendors) is not easy. And each
 Few very important things you need to know in order to <a href="http://adinserter.pro/documentation#quick-start">insert code and display some ad</a>:
 
 *   Code block is any code (for example Google AdSense ad) that has to be inserted (and displayed) at some position. Each code block can be configured to insert code at almost any position supported by Wordpress
+*   To rename block click on the name
 *   **Enable and use at least one insertion option** (Automatic insertion, Widget, Shortcode, PHP function call)
 *   **Enable insertion on at least one <a href="https://adinserter.pro/page-types">Wordpress page type</a>** (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages)
 *   For Posts and Static pages **leave default BLANK selection value** after the checkbox unless you really know what are you doing (using individual exceptions)
@@ -726,26 +733,48 @@ AD CODE RIGHT
 
 == Screenshots ==
 
-1. Settings for one code block (Before post). Up to 16 blocks can be configured (up to 64 in <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro</a>)
+1. Settings for one code block (Before content). Up to 16 blocks can be configured (up to 64 in <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro</a>)
 2. Code preview with visual CSS editor
 3. Code preview with visual CSS editor - highlighted code
 4. Post / Page Ad Inserter Exceptions
 5. Some <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro</a> features: IP address and country lists, Scheduling between dates with fallback
-6. Ad Inserter settings
+6. Ad Inserter plugin settings
 7. Visualization of HTML tags in post
 8. Visualization of positions for automatic insertion in post
 9. Visualization of inserted block in post
-10. Alignment **Left**, **Default** - Default means default (usually left) aligned ad block with thin margin around
-11. Alignment **Right** - Right aligned ad block with thin margin around
-12. Alignment **Center** - Center aligned ad block with thin margin around
-13. Alignment **No Wrapping** - Default (usually left) aligned ad block **with no margin around**
-14. Alignment **Custom CSS** - Ad block with custom CSS (no margin around). You can use it for special effects (border, background, padding, margin, floating, etc.)
-15. Alignment **Float Left** - Left aligned ad block with thin margin around wrapped with text on the right
-16. Alignment **Float Right** - Right aligned ad block with thin margin around wrapped with text on the left
+10. Automatic insertion, Alignment and Style settings
+11. Rotation code editor and banner code generator
+12. Settings for automatic insertion before/after paragraphs
+13. Settings for custom hooks
+14. Settings automatic insertion at custom hook positions
+15. Settings ad blocking detection
+16. AdSense code generator
 17. Complete settings for one code block (Before Paragraph)
 
 
 == Changelog ==
+
+= 2.2.10 =
+- Fix for rotation editor code import/export
+- Fix for errors when using old |rotate| separator
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.2.9 =
+- Output buffering is now disabled by default (for position Above header you need to enable it)
+- Fix for min. paragraph number not processed
+
+= 2.2.8 =
+- Added position for automatic insertion Above header (after `<body>` tag)
+- Added rotation code editor
+- Added support to name rotation options
+- Added code generator for banners
+- Added code generator for AdSense
+- Added support to rearrange code blocks
+- Added support to copy any block settings
+- Added support for clipboard to copy/paste block settings
+- Added option to select ad blocking detection mode (Pro only)
+- Delayed insertion on posts now available for all insertion positions
+- Few minor bug fixes, cosmetic changes and code improvements
 
 = 2.2.7 =
 - Fix for duplicate amp-custom tag on AMP pages
@@ -877,6 +906,23 @@ AD CODE RIGHT
 - Bug fix for IP database update cron event (Pro only)
 
 == Upgrade Notice ==
+
+= 2.2.10 =
+Fix for rotation editor code import/export;
+Fix for errors when using old |rotate| separator
+
+= 2.2.9 =
+Output buffering is now disabled by default (for position Above header you need to enable it);
+Fix for min. paragraph number not processed
+
+= 2.2.8 =
+Added position for automatic insertion Above header (after `<body>` tag);
+Added rotation code editor;
+Added support to name rotation options;
+Added code generator for banners and AdSense;
+Added support to rearrange code blocks;
+Added support for clipboard to copy/paste block settings;
+Added option to select ad blocking detection mode (Pro only);
 
 = 2.2.7 =
 Fix for duplicate amp-custom tag on AMP pages

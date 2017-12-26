@@ -19,7 +19,7 @@ if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.2.7');
+  define ('AD_INSERTER_VERSION', '2.2.10');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -409,6 +409,14 @@ define ('AI_TEXT_REPLACE',                'Replace');
 define ('AI_TEXT_SHOW',                   'Show');
 define ('AI_TEXT_HIDE',                   'Hide');
 
+// Ad blocking detection
+define ('AI_ADB_DETECTION_STANDARD', 0);
+define ('AI_ADB_DETECTION_ADVANCED', 1);
+
+// Output buffering
+define ('AI_OUTPUT_BUFFERING_DISABLED', 0);
+define ('AI_OUTPUT_BUFFERING_ENABLED',  1);
+
 // Click detection
 define ('AI_CLICK_DETECTION_STANDARD', 0);
 define ('AI_CLICK_DETECTION_ADVANCED', 1);
@@ -468,12 +476,14 @@ define ('DEFAULT_TRACKING_LOGGED_IN',           AI_TRACKING_ENABLED);
 define ('DEFAULT_TRACK_PAGEVIEWS',              AI_TRACKING_DISABLED);
 define ('DEFAULT_CLICK_DETECTION',              AI_CLICK_DETECTION_STANDARD);
 define ('DEFAULT_ADB_BLOCK_ACTION',             AI_ADB_BLOCK_ACTION_DO_NOTHING);
+define ('DEFAULT_ADB_DETECTION',                AI_ADB_DETECTION_ADVANCED);
 define ('DEFAULT_CUSTOM_HOOK_PRIORITY',         10);
+define ('DEFAULT_OUTPUT_BUFFERING',             AI_OUTPUT_BUFFERING_DISABLED);
 
 define ('AI_ADBLOCKING_DETECTION',              true);
 define ('AI_AMP_HEADER_STYLES',                 true);
-//define ('AI_CODE_GENERATOR',                    true);
-//define ('AI_BUFFERING',                         true);
+define ('AI_CODE_GENERATOR',                    true);
+define ('AI_BUFFERING',                         true);
 define ('AI_ADB_1_NAME',                        'dqwpediwqswqma');
 define ('AI_ADB_2_DEFAULT_NAME',                'lfoswyekaaslsd');
 define ('AI_ADB_CONTENT_CSS_BEGIN',             'ai-adb-content-begin');
@@ -552,9 +562,10 @@ define ('AI_CHECK_DISABLED_MANUALLY',     26);
 define ('AI_CHECK_MAX_INSERTIONS',        27);
 define ('AI_CHECK_FILTER',                28);
 define ('AI_CHECK_PARAGRAPH_COUNTING',    29);
-define ('AI_CHECK_ENABLED',               30);
-define ('AI_CHECK_PARAGRAPHS_MIN_NUMBER', 31);
-//define ('AI_CHECK_NUMBER_OF_WORDS',       32);
+define ('AI_CHECK_ENABLED_PHP',           30);
+define ('AI_CHECK_ENABLED_SHORTCODE',     31);
+define ('AI_CHECK_PARAGRAPHS_MIN_NUMBER', 32);
+
 define ('AI_CHECK_DEBUG_NO_INSERTION',    33);
 define ('AI_CHECK_PARAGRAPH_TAGS',        34);
 define ('AI_CHECK_PARAGRAPHS_WITH_TAGS',  35);
@@ -574,6 +585,7 @@ define ('AI_CHECK_PARAGRAPH_NUMBER',      48);
 define ('AI_CHECK_MIN_NUMBER_OF_WORDS',   49);
 define ('AI_CHECK_MAX_NUMBER_OF_WORDS',   50);
 define ('AI_CHECK_TAXONOMY',              51);
+define ('AI_CHECK_ENABLED_WIDGET',     52);
 
 define ('AI_PT_NONE',                   - 1);
 define ('AI_PT_ANY',                      0);
@@ -615,6 +627,7 @@ define ('AI_TAGS',                       19);
 define ('AI_VIEWPORTS',                  20);
 define ('AI_WORD_COUNT',                 21);
 define ('AI_ADB_SHORTCODE_ACTION',       22);
+define ('AI_SHORTCODES',                 23);
 
 define ('AI_CONTEXT_NONE',                0);
 define ('AI_CONTEXT_CONTENT',             1);
@@ -668,18 +681,25 @@ define ('AI_DEBUG_POSITIONS_CLASS',      'ai-debug-positions');
 define ('AI_DEBUG_PAGE_TYPE_CLASS',      'ai-debug-page-type');
 define ('AI_DEBUG_ADB_CLASS',            'ai-debug-adb');
 
-define ('AI_CODE_UNKNOWN',               0);
-define ('AI_CODE_BANNER',                1);
-define ('AI_CODE_ADSENSE',               2);
+define ('AI_CODE_UNKNOWN',               100);
+define ('AI_CODE_BANNER',                0);
+define ('AI_CODE_ADSENSE',               1);
 
 define ('AI_ADSENSE_STANDARD',           0);
 define ('AI_ADSENSE_LINK',               1);
 define ('AI_ADSENSE_IN_ARTICLE',         2);
 define ('AI_ADSENSE_IN_FEED',            3);
 define ('AI_ADSENSE_MATCHED_CONTENT',    4);
+define ('AI_ADSENSE_AUTO',               5);
+
+define ('AI_ADSENSE_AMP_DISABLED',       0);
+define ('AI_ADSENSE_AMP_ABOVE_THE_FOLD', 1);
+define ('AI_ADSENSE_AMP_BELOW_THE_FOLD', 2);
 
 define ('AI_TEXT_LINK',                 'Link');
 define ('AI_TEXT_IN_ARTICLE',           'In-article');
 define ('AI_TEXT_IN_FEED',              'In-feed');
 define ('AI_TEXT_MATCHED_CONTENT',      'Matched content');
 
+define ('AI_TEXT_ABOVE_THE_FOLD', 'Above the fold');
+define ('AI_TEXT_BELOW_THE_FOLD', 'Below the fold');
