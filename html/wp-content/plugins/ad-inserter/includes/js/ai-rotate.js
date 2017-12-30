@@ -10,8 +10,8 @@ jQuery (function ($) {
 
     rotate_options.hide ();
     var option = $(rotate_options [random_index]);
-    option.css ({"display": "", "visibility": "", "position": "", "width": "", "height": "", "top": "", "left": ""});
-    $(this).css ({"position": ""});
+    option.css ({"display": "", "visibility": "", "position": "", "width": "", "height": "", "top": "", "left": ""}).removeClass ('ai-rotate-option').removeClass ('ai-rotate-options');
+    $(this).css ({"position": ""}).removeClass ('ai-rotate');
 
     var wrapping_div = $(this).closest (wrapping_div_selector);
 

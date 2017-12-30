@@ -1176,7 +1176,12 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
           break;
         case AI_DYNAMIC_BLOCKS_CLIENT_SIDE:
           $this->code_version = '""';
+
+          if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
+            $processed_code = "\n<div class='ai-rotate'>\n";
+          } else
           $processed_code = "\n<div class='ai-rotate' style='position: relative;'>\n";
+
           foreach ($ads as $index => $ad) {
 
             // If AMP separator use only code for normal pages
@@ -1189,9 +1194,15 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
             switch ($index) {
               case 0:
+                if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
+                  $processed_code .= "<div class='ai-rotate-option'".$version_name_data.">\n".trim ($ad, "\n")."\n</div>\n";
+                } else
                 $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden;'".$version_name_data.">\n".trim ($ad, "\n")."\n</div>\n";
                 break;
               default:
+                if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
+                  $processed_code .= "<div class='ai-rotate-option ai-rotate-options'".$version_name_data.">".trim ($ad, "\n")."\n</div>\n";
+                } else
                 $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%;'".$version_name_data.">".trim ($ad, "\n")."\n</div>\n";
                 break;
             }
@@ -1268,7 +1279,9 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
               $this->client_side_ip_address_detection = true;
               $this->needs_class = true;
 
-              $processed_code = "\n<div class='ai-ip-data' $ip_address_attributes $country_attributes class-name='$block_class_name' style='visibility: hidden; position: absolute; width: 100%; height: 100%; z-index: -9999;'>$processed_code</div>\n";
+              if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
+                $processed_code = "\n<div class='ai-ip-data' $ip_address_attributes $country_attributes class-name='$block_class_name'>$processed_code</div>\n";
+              } else $processed_code = "\n<div class='ai-ip-data' $ip_address_attributes $country_attributes class-name='$block_class_name' style='visibility: hidden; position: absolute; width: 100%; height: 100%; z-index: -9999;'>$processed_code</div>\n";
             }
             break;
           case AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC:
@@ -1331,6 +1344,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
     if ($this->get_alignment_type() == AI_ALIGNMENT_NO_WRAPPING) return $this->ai_getProcessedCode ();
 
+    $alignment_class = $this->get_alignment_class ();
+
     $hidden_viewports = '';
     if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 && $this->get_detection_client_side()) {
 
@@ -1350,8 +1365,11 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
           $version_name = $this->version_name == '' ? '' : ' - ' . $this->version_name;
           if ($this->get_detection_viewport ($viewport))
             $visible_viewports .= '<section class="ai-viewport-' . $viewport .'"><section class="ai-debug-bar '.$this->color_class.'"><a class="ai-debug-text-left" title="Click to go to block settings" href="' . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () . '<span class="ai-option-name">' . $version_name . '</span></a><a>&nbsp;'.$viewport_name.'&nbsp;</a><a class="ai-debug-text-right" title="'.$title.'">'.$counters.'<kbd class="ai-debug-invisible">[/AI]</kbd></a></section></section>'; else
-              if (!$ai_wp_data [AI_WP_AMP_PAGE])
-                $hidden_viewports .= '<section class="ai-viewport-' . $viewport .' ai-debug-block ai-debug-viewport-invisible" style="' . $this->get_alignment_style() . '"><section class="ai-debug-bar ai-debug-viewport-invisible"><a class="ai-debug-text-left" title="Click to go to block settings" href="' . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () . '<span class="ai-option-name">' . $version_name . '</span></a><a>&nbsp;'.$viewport_name.'&nbsp;</a><a class="ai-debug-text-right" title="'.$title.'">'.$counters.'<kbd class="ai-debug-invisible">[/AI]</kbd></a></section>' . $hidden_block_text . '</section>';
+              if (!$ai_wp_data [AI_WP_AMP_PAGE]) {
+                if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
+                  $hidden_viewports .= '<section class="ai-viewport-' . $viewport .' ai-debug-block ai-debug-viewport-invisible '.$alignment_class.'"><section class="ai-debug-bar ai-debug-viewport-invisible"><a class="ai-debug-text-left" title="Click to go to block settings" href="' . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () . '<span class="ai-option-name">' . $version_name . '</span></a><a>&nbsp;'.$viewport_name.'&nbsp;</a><a class="ai-debug-text-right" title="'.$title.'">'.$counters.'<kbd class="ai-debug-invisible">[/AI]</kbd></a></section>' . $hidden_block_text . '</section>';
+                } else $hidden_viewports .= '<section class="ai-viewport-' . $viewport .' ai-debug-block ai-debug-viewport-invisible" style="' . $this->get_alignment_style() . '"><section class="ai-debug-bar ai-debug-viewport-invisible"><a class="ai-debug-text-left" title="Click to go to block settings" href="' . $url . '"><kbd class="ai-debug-invisible">[AI]</kbd>' . $this->number . ' ' . $this->get_ad_name () . '<span class="ai-option-name">' . $version_name . '</span></a><a>&nbsp;'.$viewport_name.'&nbsp;</a><a class="ai-debug-text-right" title="'.$title.'">'.$counters.'<kbd class="ai-debug-invisible">[/AI]</kbd></a></section>' . $hidden_block_text . '</section>';
+              }
 
         }
       }
@@ -1365,18 +1383,35 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     $block_class_name = get_block_class_name ();
     if ($block_class_name == '' && $this->needs_class) $block_class_name = DEFAULT_BLOCK_CLASS_NAME;
     $viewport_classes = $include_viewport_classes ? $this->get_viewport_classes () : "";
-    $alignment_class = $this->get_alignment_class ();
     if ($block_class_name != '' || $viewport_classes != '' || $alignment_class != '') {
       if ($block_class_name != '') {
-        $class = " class='" . $block_class_name . ' ' . $alignment_class . ' ' . $block_class_name . "-" . $this->number . $viewport_classes ."'";
+//        $class = " class='" . $block_class_name . ' ' . $alignment_class . ' ' . $block_class_name . "-" . $this->number . $viewport_classes ."'";
+        $classes = array ($block_class_name, $alignment_class, $block_class_name . "-" . $this->number, trim ($viewport_classes));
       } else {
-          $class = " class='" . $alignment_class . $viewport_classes ."'";
+//          $class = " class='" . $alignment_class . $viewport_classes ."'";
+          $classes = array ($alignment_class, $viewport_classes);
         }
-    } else $class = '';
-    $class = str_replace ('  ', ' ', $class);
+//    } else $class = '';
+    } else $classes = array ();
+//    $class = str_replace ('  ', ' ', $class);
 
     if ($hidden_widgets) return $hidden_viewports; else {
-      if ($this->client_side_ip_address_detection && !$ai_wp_data [AI_WP_AMP_PAGE]) $additional_block_style = 'visibility: hidden; position: absolute; width: 100%; height: 100%; z-index: -9999; '; else $additional_block_style = '';
+      if ($this->client_side_ip_address_detection && !$ai_wp_data [AI_WP_AMP_PAGE]) {
+        $additional_block_style = 'visibility: hidden; position: absolute; width: 100%; height: 100%; z-index: -9999; ';
+        if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
+          $classes [] = 'ai-ip-data-block';
+        }
+       } else {
+           $additional_block_style = '';
+         }
+
+      foreach ($classes as $index => $class_name) {
+        if (trim ($class_name) == '') unset ($classes [$index]);
+      }
+//      $class = " class='" . str_replace ('  ', ' ', implode (' ', $classes)) . "'";
+      if (count ($classes) != 0) {
+        $class = " class='" . implode (' ', $classes) . "'";
+      } else $class = "";
 
       $tracking_code_pre  = '';
       $tracking_code_data = '';
@@ -1386,7 +1421,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       if ($this->fallback != 0) {
         if ($block_object [$this->fallback]->get_tracking ()) {
           $tracking_code_pre = " data-ai='";
-          $tracking_code_data = "[{$this->fallback},{$this->code_version}]";
+          $tracking_code_data = "[{$this->fallback},{$this->code_version},\"{$block_object [$this->fallback]->get_ad_name ()}\",\"{$this->version_name}\"]";
           $tracking_code_post = "'";
 
           $tracking_code = $tracking_code_pre . base64_encode ($tracking_code_data) . $tracking_code_post;
@@ -1394,14 +1429,14 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       } else {
           if ($this->get_tracking ()) {
             $tracking_code_pre = " data-ai='";
-            $tracking_code_data = "[{$this->number},{$this->code_version}]";
+            $tracking_code_data = "[{$this->number},{$this->code_version},\"{$this->get_ad_name ()}\",\"{$this->version_name}\"]";
             $tracking_code_post = "'";
 
             $tracking_code = $tracking_code_pre . base64_encode ($tracking_code_data) . $tracking_code_post;
           }
         }
 
-      if ($alignment_class != '') {
+      if ($alignment_class != '' && defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
         $wrapper_before = $hidden_viewports . "<div" . $class . $tracking_code . ">\n";
       } else {
           $wrapper_before = $hidden_viewports . "<div" . $class . $tracking_code . " style='" . $additional_block_style . $this->get_alignment_style() . "'>\n";
@@ -1689,28 +1724,30 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
   public function get_alignment_class (){
     global $ai_wp_data;
 
-    if (defined ('AI_AMP_HEADER_STYLES') && AI_AMP_HEADER_STYLES) {
-      if ($ai_wp_data [AI_WP_AMP_PAGE]) {
-        $block_class_name = get_block_class_name ();
-        if ($block_class_name == '') $block_class_name = 'ai-'; else $block_class_name .= '-';
+//    if (defined ('AI_AMP_HEADER_STYLES') && AI_AMP_HEADER_STYLES && $ai_wp_data [AI_WP_AMP_PAGE]) {
 
-        switch ($this->get_alignment_type ()) {
-          case AI_ALIGNMENT_DEFAULT:
-          case AI_ALIGNMENT_LEFT:
-          case AI_ALIGNMENT_RIGHT:
-          case AI_ALIGNMENT_CENTER:
-          case AI_ALIGNMENT_FLOAT_LEFT:
-          case AI_ALIGNMENT_FLOAT_RIGHT:
-          case AI_ALIGNMENT_STICKY_LEFT:
-          case AI_ALIGNMENT_STICKY_RIGHT:
-          case AI_ALIGNMENT_STICKY_TOP:
-          case AI_ALIGNMENT_STICKY_BOTTOM:
-            return $block_class_name . str_replace (' ', '-', strtolower ($this->get_alignment_type_text ()));
-            break;
-          case AI_ALIGNMENT_CUSTOM_CSS:
-            return $block_class_name . str_replace (' ', '-', strtolower (md5 ($this->get_custom_css ())));
-            break;
-        }
+    if (defined ('AI_AMP_HEADER_STYLES')    && AI_AMP_HEADER_STYLES     &&  $ai_wp_data [AI_WP_AMP_PAGE] ||
+        defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES  && !$ai_wp_data [AI_WP_AMP_PAGE] && !get_inline_styles ()) {
+
+      $block_class_name = get_block_class_name ();
+      if ($block_class_name == '') $block_class_name = DEFAULT_BLOCK_CLASS_NAME . '-'; else $block_class_name .= '-';
+
+      switch ($this->get_alignment_type ()) {
+        case AI_ALIGNMENT_DEFAULT:
+        case AI_ALIGNMENT_LEFT:
+        case AI_ALIGNMENT_RIGHT:
+        case AI_ALIGNMENT_CENTER:
+        case AI_ALIGNMENT_FLOAT_LEFT:
+        case AI_ALIGNMENT_FLOAT_RIGHT:
+        case AI_ALIGNMENT_STICKY_LEFT:
+        case AI_ALIGNMENT_STICKY_RIGHT:
+        case AI_ALIGNMENT_STICKY_TOP:
+        case AI_ALIGNMENT_STICKY_BOTTOM:
+          return $block_class_name . str_replace (' ', '-', strtolower ($this->get_alignment_type_text ()));
+          break;
+        case AI_ALIGNMENT_CUSTOM_CSS:
+          return $block_class_name . str_replace (' ', '-', strtolower (md5 ($this->get_custom_css ())));
+          break;
       }
     }
 

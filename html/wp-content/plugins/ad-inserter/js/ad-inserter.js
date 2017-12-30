@@ -1,4 +1,4 @@
-var javascript_version = "2.2.10";
+var javascript_version = "2.2.13";
 var ignore_key = true;
 var start = 1;
 var end = 16;
@@ -16,7 +16,7 @@ var settings_page = "";
 
 var dateFormat = "yy-mm-dd";
 
-var search_reload = false;
+var list_search_reload = false;
 
 var AI_DISABLED         = 0;
 var AI_BEFORE_POST      = 1;
@@ -1372,7 +1372,7 @@ jQuery(document).ready(function($) {
 
       var window_width = 820;
       var window_height = 870;
-      var window_left  = 120;
+      var window_left  = 100;
       var window_top   = (screen.height / 2) - (870 / 2);
       var nonce = $(this).attr ('nonce');
       var param = {'action': 'ai_ajax_backend', 'preview': 'adb', 'ai_check': nonce, 'code': code, 'php': php};
@@ -1780,9 +1780,9 @@ jQuery(document).ready(function($) {
 
       var window_width = 820;
       var window_height = 820;
-      var window_left  = 120;
+      var window_left  = 100;
       var window_top   = (screen.height / 2) - (820 / 2);
-      var nonce = $(this).attr ('nonce');
+      var nonce = $("#ai-form").attr ('nonce');
 
       var param = {'action': 'ai_ajax_backend', 'preview': block, 'ai_check': nonce, 'name': btoa (name), 'alignment': btoa (alignment), 'alignment_css': btoa (alignment_css), 'custom_css': btoa (custom_css), 'code': code, 'php': php};
       window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
@@ -1860,7 +1860,7 @@ jQuery(document).ready(function($) {
 
       var window_width = 820;
       var window_height = 870;
-      var window_left  = 120;
+      var window_left  = 100;
       var window_top   = (screen.height / 2) - (window_height / 2);
       var nonce = $("#ai-form").attr ('nonce');
       var param = {'action': 'ai_ajax_backend', 'edit': block, 'ai_check': nonce, 'code': code, 'php': php};
@@ -1868,6 +1868,8 @@ jQuery(document).ready(function($) {
     });
 
     $("#open-image-button-"+tab).click (function (event) {
+      $(this).blur ();
+
       var block = $(this).attr('id').replace ("open-image-button-", "");
       var frame;
 
@@ -1887,34 +1889,50 @@ jQuery(document).ready(function($) {
       });
 
       frame.on ('open', function(){
-        var selection = frame.state().get ('selection');
-        var selected = $('#banner-image-' + block).val();
-        if (selected) {
-          selection.add (wp.media.attachment (selected));
-        }
+//        var selected = $('#banner-image-' + block).attr ('src');
+//        if (selected) {
+//          var selection = frame.state().get ('selection');
+//          var id = $('#banner-image-' + block).attr ('data-id');
+//          selection.add (wp.media.attachment (id));
+//        }
       });
 
       frame.on ('select', function() {
         var attachment = frame.state().get('selection').first().toJSON();
+        console.log ('attachment', attachment);
         $('#banner-image-' + block).attr ('src', attachment.url);
-        $('#banner-image-url-' + block).val (attachment.url);
-
+        $('#banner-image-url-' + block).val (attachment.url).trigger ("input");
       });
 
       frame.open();
     });
 
     $("#banner-image-url-" + tab).on ('input', function() {
+
       var block = $(this).attr('id').replace ("banner-image-url-", "");
       var image = $('#banner-image-' + block);
-      image.attr ('src', $(this).val ()).load (function() {
+
+      var new_image_src = $(this).val ();
+      if (new_image_src == '') {
+        new_image_src = '//:0';
+        image.hide ();
+      }
+
+      image.attr ('src', new_image_src).load (function () {
+        image.show ();
         $(this).closest ('.ai-banner').removeClass ('ai-banner-top');
         var width   = this.naturalWidth;
         var height  = this.naturalHeight;
+
         if (width / height > 2 && width > 300) {
           $(this).closest ('.ai-banner').addClass ('ai-banner-top');
         }
-    });
+      })
+      .error (function() {
+        if (image.is(':visible')) {
+          image.hide ().attr ('src', '//:0');
+        }
+      });
 
     });
 
@@ -1943,8 +1961,8 @@ jQuery(document).ready(function($) {
 
             switch (code_type) {
               case AI_CODE_BANNER:
-                $("#banner-image-url-" + block).val (code_data ['image']).trigger('input');
-                $("#banner-url-" + block).val (code_data ['link']).trigger('input');
+                $("#banner-image-url-" + block).val (code_data ['image']).trigger ('input');
+                $("#banner-url-" + block).val (code_data ['link']).trigger ('input');
                 $("#open-new-window-" + block).attr('checked', code_data ['target'] == '_blank');
                 break;
               case AI_CODE_ADSENSE:
@@ -2089,6 +2107,19 @@ jQuery(document).ready(function($) {
     $("#remove-option-"+tab).click (function () {
       var block = $(this).attr('id').replace ("remove-option-", "");
       remove_rotate_option (block, $('#ai-rotation-container-' + block).tabs ("option", "active"));
+    });
+
+//
+    $("#settings-" + tab + " .adsense-list").click (function () {
+      $(this).blur ();
+
+      var container = $("#adsense-list-container");
+
+      container.toggle ();
+
+      if (container.is(':visible')) {
+        reload_adsense_list (false);
+      }
     });
   }
 
@@ -2681,10 +2712,10 @@ jQuery(document).ready(function($) {
 
 
   function reload_list () {
-    search_reload = false;
+    list_search_reload = false;
     var list = encodeURIComponent ($("#ai-list-search").val());
     var all = + !$("#ai-load-all").parent ().find ('.checkbox-icon').hasClass ('on');
-    var nonce = $("#ai-list").attr ('nonce');
+    var nonce = $("#ai-form").attr ('nonce');
 
     var rearrange_controls = $('#list-rearrange-controls');
     var rearrange = rearrange_controls.hasClass ('rearrange')
@@ -2718,15 +2749,164 @@ jQuery(document).ready(function($) {
             $("#ai-tab-container").tabs ({active: tab});
           });
 
-          $("label.ai-load-settings").click (function () {
+          $("label.ai-copy-block").click (function () {
             var block = $(this).closest ('tr').data ('block');
 
             load_saved_settings_to_clipboard (block, true);
           });
 
+          $("label.ai-preview-block").click (function () {
+            var block = $(this).closest ('tr').data ('block');
+
+            var window_width = 820;
+            var window_height = 820;
+            var window_left  = 100;
+            var window_top   = (screen.height / 2) - (820 / 2);
+            var nonce = $("#ai-form").attr ('nonce');
+
+            var param = {'action': 'ai_ajax_backend', 'preview': block, 'ai_check': nonce, 'read_only': 1};
+            window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
+          });
+
+
           data_container.disableSelection();
 
           if (rearrange) reload_settings ();
+        }
+    });
+  }
+
+  function reload_adsense_list (update_ad_units) {
+    adsense_search_reload = false;
+    var list = encodeURIComponent ($("#adsense-list-search").val());
+    var all = + !$("#adsense-load-all").parent ().find ('.checkbox-icon').hasClass ('on');
+    var nonce = $("#ai-form").attr ('nonce');
+
+    var data_container = $("#adsense-list-data");
+
+    data_container.load (ajaxurl+"?action=ai_ajax_backend&adsense-list=" + list + "&all=" + all + "&update_ad_units=" + (update_ad_units ? 1 : 0) + "&ai_check=" + nonce, function (response, status, xhr) {
+      $("#adsense-reload").parent ().find ('.checkbox-icon').removeClass ('on');
+
+      if (status == "error") {
+        var message = "Error downloading AdSense data: " + xhr.status + " " + xhr.statusText;
+        data_container.html (message);
+        if (debug) console.log (message);
+
+
+      } else {
+          if (!$('#adsense-authorization-code', data_container).length) $('#adsense-list-controls').show (); else {
+            $('#adsense-list-controls').hide ();
+            $('button.ai-top-button', data_container).button().show ();
+
+            $("#authorize-adsense").click (function () {
+
+              var authorization_code = $("input#adsense-authorization-code").val ();
+
+              $('#adsense-list-controls').show ();
+              data_container.text ('Loading...');
+
+              update_adsense_authorization (authorization_code);
+            });
+          }
+
+          var publisher_id = $('#adsense-data', data_container).data ('publisher-id');
+          if (typeof publisher_id == 'undefined') publisher_id = '';
+
+          $('label#google-adsense-button').attr ('title', 'Google AdSense Home ' + publisher_id);
+
+          $("label.adsense-copy-code").click (function () {
+            var ad_slot_id = $(this).closest ('tr').data ('id');
+            var ad_name = atob ($(this).closest ('tr').data ('name'));
+            var nonce = $("#ai-form").attr ('nonce');
+
+            if (debug) console.log ('ADSENSE CODE: ', ad_slot_id);
+
+            $('#ai-loading').show ();
+            $.get (ajaxurl + '?action=ai_ajax_backend&adsense-code=' + ad_slot_id + '&ai_check=' + nonce, function (data) {
+
+              var code_data = JSON.parse (data);
+              var error = code_data ['error-message'];
+
+              if (error == '') {
+                var adsense_code = code_data ['code'];
+
+                if (debug) console.log (adsense_code);
+
+                var clipboard_template  = $('#ai-clipboard-template');
+                var clipboard           = $('#ai-clipboard');
+                clipboard.html (clipboard_template.html ());
+                clipboard.find ('input#name-edit-999').attr ('value', ad_name).attr ('default', ad_name);
+
+                clipboard.find ('textarea.simple-editor').text (adsense_code);
+
+                $("#ai-container .ai-copy").each (function () {
+                  $(this).next ("label").find ('.checkbox-icon').addClass("on");
+                });
+
+                var tools_button = $("#tools-button-" + active_tab);
+                if (!tools_button.next ('label').find ('.checkbox-icon').hasClass ("on")) {
+                  tools_button.click ();
+                }
+              } else {
+                  console.log ('AdSense API error:', error);
+                }
+            }).fail (function (xhr, status, error) {
+              var message = "Error downloading AdSense code: " + xhr.status + " " + xhr.statusText ;
+              console.log (message);
+            })
+            .always (function () {
+              $('#ai-loading').hide ();
+            });
+
+          });
+
+          $("label.adsense-preview-code").click (function () {
+            var ad_slot_id = $(this).closest ('tr').data ('id');
+            var ad_name = $(this).closest ('tr').data ('name');
+
+            var window_width = 820;
+            var window_height = 820;
+            var window_left  = 100;
+            var window_top   = (screen.height / 2) - (820 / 2);
+            var nonce = $("#ai-form").attr ('nonce');
+
+            var param = {'action': 'ai_ajax_backend', 'preview': 'adsense', 'ai_check': nonce, 'read_only': 1, 'slot_id': btoa (ad_slot_id), 'name': ad_name};
+            window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
+          });
+
+          $("label.adsense-get-code").click (function () {
+            var ad_slot_id = $(this).closest ('tr').data ('id');
+            var ad_name = atob ($(this).closest ('tr').data ('name'));
+            var nonce = $("#ai-form").attr ('nonce');
+
+            if (debug) console.log ('ADSENSE CODE: ', ad_slot_id);
+
+            $('#ai-loading').show ();
+            $.get (ajaxurl + '?action=ai_ajax_backend&adsense-code=' + ad_slot_id + '&ai_check=' + nonce, function (data) {
+
+              var code_data = JSON.parse (data);
+              var error = code_data ['error-message'];
+
+              if (error == '') {
+                var adsense_code = code_data ['code'];
+
+                if (debug) console.log (adsense_code);
+
+                set_editor_text (active_tab, adsense_code);
+                setTimeout (function() {$("#import-code-"+active_tab).click ();}, 10);
+              } else {
+                  console.log ('AdSense API error:', error);
+                }
+            }).fail (function (xhr, status, error) {
+              var message = "Error downloading AdSense code: " + xhr.status + " " + xhr.statusText ;
+              console.log (message);
+            })
+            .always (function () {
+              $('#ai-loading').hide ();
+            });
+          });
+
+          data_container.disableSelection();
         }
     });
   }
@@ -2856,6 +3036,21 @@ jQuery(document).ready(function($) {
     });
   }
 
+  function update_adsense_authorization (authorization_code) {
+    var nonce = $("#ai-form").attr ('nonce');
+
+    $('#ai-loading').show ();
+    $.get (ajaxurl + '?action=ai_ajax_backend&adsense-authorization-code=' + btoa (authorization_code) + '&ai_check=' + nonce, function (data) {
+      reload_adsense_list (false);
+    }).fail (function (xhr, status, error) {
+      var message = "Error clearing AdSense authorization: " + xhr.status + " " + xhr.statusText ;
+      console.log (message);
+    })
+    .always (function () {
+      $('#ai-loading').hide ();
+    });
+  }
+
 
 
   if (debug) console.log ("READY");
@@ -2963,9 +3158,9 @@ jQuery(document).ready(function($) {
 
 
   $("#ai-list").click (function () {
-    $('#ai-list-container').toggle ();
-
     var container = $("#ai-list-container");
+
+    container.toggle ();
 
     if (container.is(':visible')) {
       reload_list ();
@@ -2973,8 +3168,8 @@ jQuery(document).ready(function($) {
   });
 
   $("#ai-list-search").keyup (function (event) {
-    if (!search_reload) {
-      search_reload = true;
+    if (!list_search_reload) {
+      list_search_reload = true;
       setTimeout (reload_list, 200);
     }
   });
@@ -3008,6 +3203,30 @@ jQuery(document).ready(function($) {
   $("#ai-save-changes").click (function () {
     $('#list-rearrange-controls').addClass ('rearrange')
     reload_list ();
+  });
+
+
+  $("#adsense-load-all").click (function () {
+    $(this).parent ().find ('.checkbox-icon').toggleClass ('on');
+    reload_adsense_list (false);
+  });
+
+  $("#adsense-list-search").keyup (function (event) {
+    if (!adsense_search_reload) {
+      adsense_search_reload = true;
+      setTimeout (function() {reload_adsense_list (false);}, 200);
+
+    }
+  });
+
+  $("#adsense-reload").click (function () {
+    $(this).parent ().find ('.checkbox-icon').addClass ('on');
+    setTimeout (function() {reload_adsense_list (true);}, 200);
+  });
+
+  $("#clear-adsense-authorization").click (function () {
+    $("#adsense-list-data").text ('Updating...');
+    update_adsense_authorization ('');
   });
 
   setTimeout (update_rating, 1000);

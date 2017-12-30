@@ -1,5 +1,5 @@
 #ai-data {
-  font-family: "2.2.10"; /* Used for version number of the file */
+  font-family: "2.2.13"; /* Used for version number of the file */
 }
 
 #blocked-warning {
@@ -45,6 +45,10 @@ button.ai-top-button {
 
 .ai-top-button.ui-button-text-only .ui-button-text {
   padding: .4em 0.6em;
+}
+
+.adsense-list .ui-button-text, .select-image .ui-button-text {
+  padding: 0.4em 0.5em;
 }
 
 .ace_editor {
@@ -384,8 +388,18 @@ div.automatic-insertion img {
   padding: 0 0 0 10px;
 }
 
+.ai-list-button {
+  display: table-cell;
+  margin-right: 2px;
+  width: 20px;
+}
+
 .ai-toolbar-button.text {
   width: auto;
+}
+
+.ai-toolbar-button.small {
+  width: 20px;
 }
 
 .ai-toolbar-button.ai-button-left {
@@ -397,9 +411,9 @@ div.automatic-insertion img {
    background-position: 50% 50%;
    background-color: #e3e3e3;
    border: solid 1px lightgrey;
-   border-radius: 5px;
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
+   border-radius: 4px;
+   -webkit-border-radius: 4px;
+   -moz-border-radius: 4px;
    cursor: pointer;
    padding: 2px 2px;
    display: inline-block;
@@ -412,6 +426,18 @@ div.automatic-insertion img {
    -webkit-box-sizing: border-box;
    -moz-box-sizing: border-box;
    box-sizing: border-box;
+}
+
+.custom-range-controls .checkbox-button {
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+}
+
+.ai-list-button .checkbox-button {
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
 }
 
 .text .checkbox-button {
@@ -433,6 +459,49 @@ div.automatic-insertion img {
    text-indent: -3333px;
    text-align: center;
    vertical-align: middle;
+}
+
+.checkbox-icon.size-16 {
+  width: 16px;
+  height: 16px;
+}
+
+.checkbox-icon.size-img16 {
+  width: 16px;
+  height:16px;
+  background-size: 16px 16px;
+}
+
+.checkbox-icon.size-16w {
+  width: 17px;
+  height: 16px;
+}
+
+.checkbox-icon.size-12 {
+  width: 12px;
+  height: 12px;
+  margin: 3px 0;
+}
+
+.checkbox-icon.size-8 {
+  width: 8px;
+  height: 8px;
+}
+
+.checkbox-icon.icon-none {
+  width: 10px;
+  height: 12px;
+  margin-top: 6px;
+}
+
+.list-button.lb-size-16 {
+  width: 16px;
+  height: 16px;
+}
+
+.list-button {
+  margin: 0;
+  background-image: url(images/ui-icons_888888_256x240.png)
 }
 
 img.automatic-insertion.disabled {
@@ -750,7 +819,7 @@ img.automatic-insertion.preview {
 }
 
 .checkbox-icon.icon-paste-name {
-  background: url('images/icons.png') -140px -40px;
+  background: url('images/icons.png') -180px -40px;
 }
 
 .checkbox-icon.icon-paste-code {
@@ -758,17 +827,14 @@ img.automatic-insertion.preview {
 }
 
 .checkbox-icon.icon-paste-settings {
-  background: url('images/icons.png') -180px -40px;
+  background: url('images/icons.png') -140px -40px;
 }
 
 .checkbox-icon.icon-clear {
   background: url('images/icons.png') -160px -80px;
 }
 
-
 .checkbox-icon.icon-enabled-all {
-  width: 16px;
-  height: 16px;
   background: url('images/icons.png') -142px -22px;
 }
 
@@ -778,8 +844,6 @@ img.automatic-insertion.preview {
 
 
 .checkbox-icon.icon-rearrange {
-  width: 16px;
-  height: 16px;
   background: url('images/icons.png') -140px -80px;
 }
 
@@ -788,20 +852,22 @@ img.automatic-insertion.preview {
 }
 
 .checkbox-icon.icon-loading {
-  width: 12px;
-  height: 12px;
-  margin: 3px 0;
-  background: url('images/icons.png') -160px -20px;
+  background: url('images/icons.png') -163px -23px;
 }
 
 .checkbox-icon.icon-loading.on {
-  background: url('images/icons.png') -160px 0;
+  background: url('images/icons.png') -163px -3px;
+}
+
+.checkbox-icon.icon-reload {
+  background: url('images/icons.png') -161px -22px;
+}
+
+.checkbox-icon.icon-reload.on {
+  background: url('images/icons.png') -161px -2px;
 }
 
 .checkbox-icon.icon-auto-refresh {
-  width: 12px;
-  height: 12px;
-  margin: 3px 0;
   background: url('images/icons.png') -180px -20px;
 }
 
@@ -809,15 +875,30 @@ img.automatic-insertion.preview {
   background: url('images/icons.png') -180px 0;
 }
 
-.checkbox-icon.icon-none {
-  width: 10px;
-  height: 12px;
-  margin-top: 6px;
+.checkbox-icon.size-8.icon-stop {
+  background: #ddd;
 }
 
-.checkbox-icon.icon-none-small {
-  width: 8px;
-  height: 8px;
+.checkbox-icon.size-8.icon-preview {
+  width: 0;
+  height: 0;
+  margin-left: 1px;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 7px solid #bbb;
+}
+
+.checkbox-icon.size-8.icon-get {
+   width: 0;
+   height: 0;
+   border-left: 4px solid transparent;
+   border-right: 4px solid transparent;
+   border-top: 8px solid #888;
+}
+
+.checkbox-icon.icon-adsense {
+  background: url('../images/ga-logo.png') 0px 0px;
+  background-size: 16px 16px;
 }
 
 .banner-preview {
@@ -873,6 +954,41 @@ img.automatic-insertion.preview {
   #wpwrap {
     width: 762px;
   }
+
+   .ai-toolbar-button.small {
+     width: 20px;
+     height: 20px;
+     margin-right: 10px;
+   }
+
+   .ai-toolbar-button.small .checkbox-icon {
+     margin: 4px 0px 0 4px;
+   }
+
+   .checkbox-icon.size-16 {
+     width: 20px;
+     height: 20px;
+   }
+
+   .checkbox-icon.size-img16 {
+     width: 24px;
+     height:24px;
+     background-size: 24px 24px;
+   }
+
+   .ai-toolbar-button.small .checkbox-icon.size-img16 {
+     margin: 0;
+   }
+
+   .checkbox-icon.size-16w {
+     width: 20px;
+     height: 20px;
+   }
+
+   .list-button.lb-size-16 {
+     margin: 6px 0 0 4px;
+     padding: 0px 4px 2px 0px;
+   }
 }
 
 @media(max-width: 768px) {
@@ -900,15 +1016,15 @@ img.automatic-insertion.preview {
      font-size: 12px!important;
      line-height: 18px;
    }
-   .checkbox-icon.icon-enabled-all {
-     width: 20px;
-     height: 20px;
-     background: url('images/icons.png') -140px -20px;
-   }
+/*   .checkbox-icon.icon-enabled-all {*/
+/*     width: 20px;*/
+/*     height: 20px;*/
+/*     background: url('images/icons.png') -140px -20px;*/
+/*   }*/
 
-   .checkbox-icon.icon-enabled-all.on {
-     background: url('images/icons.png') -140px -0px;
-   }
+/*   .checkbox-icon.icon-enabled-all.on {*/
+/*     background: url('images/icons.png') -140px -0px;*/
+/*   }*/
 
    .banner-preview img {
      max-width: 160px;

@@ -6,14 +6,14 @@ Tags: ads, adsense, ad management, advertising manager, advanced contextual ads,
 Requires at least: 4.0
 Tested up to: 4.9
 Requires PHP: 5.2.4
-Stable tag: 2.2.9
+Stable tag: 2.2.12
 License: GPLv3
 
 Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
 
 == Description ==
 
-Ad management plugin with many advanced advertising features. **Supports all kinds of WordPress ads including Google AdSense, contextual Amazon Native Shopping Ads and rotating banners.**
+Ad management plugin with many advanced advertising features. **Supports all kinds of WordPress ads including Google AdSense, contextual Amazon Native Shopping Ads, Media.net and rotating banners.**
 
 Ad Inserter is more than just ad manager plugin. It provides many advanced options to insert any Javascript, CSS, HTML, PHP or advert code anywhere on the page.
 
@@ -23,7 +23,7 @@ Ad Inserter is more than just ad manager plugin. It provides many advanced optio
 > *   Syntax highlighting editor
 > *   Code preview with visual CSS editor
 > *   Automatically inserts ads in posts and pages
-> *   Insert above header (after `<body>` tag)
+> *   Insert above header (after `<body>` tag, needs Output buffering)
 > *   Insert before or after post
 > *   Insert before or after content
 > *   Insert before or after paragraph
@@ -100,6 +100,8 @@ Ad Inserter Wordpress plugin is an advanced advertising manager - it has many fe
 Ad Inserter is not just another plugin for WordPress ads. Do you enjoy finding the right plugin to solve a particular problem on your site? For example:
 
 *   ad management and ad injection
+*   to insert AdSense or Media.net ads
+*   to insert affiliate ads (CJ Affiliate by Conversant, ClickBank, ShareASale, Rakuten LinkShare, etc.)
 *   to insert ads between paragraphs
 *   to insert ads between posts
 *   to insert ads between comments
@@ -117,7 +119,7 @@ Ad Inserter is not just another plugin for WordPress ads. Do you enjoy finding t
 *   to insert header, footer or tracking code
 *   to insert PHP, HTML, CSS, shortcodes
 *   to insert Google analytics code
-*   to insert various opt-in forms
+*   to insert various opt-in forms (MailChimp, AWeber, GetResponse, etc.)
 
 Maintaining several plugins (often from different vendors) is not easy. And each plugin is slowing down the speed of your website.
 
@@ -754,6 +756,20 @@ AD CODE RIGHT
 
 == Changelog ==
 
+= 2.2.13 =
+- Added option to disable inline alignment styles for code blocks (using alignment classes)
+- Fix for custom CSS codes with single quotation marks
+
+= 2.2.12 =
+- Fix for code block styles when block class name was not set
+
+= 2.2.11 =
+- Code block styles moved to classes
+- Code block list moved to the sidebar
+- Added preview buttons in code block list
+- Fix for ad blocking detection when using https (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
 = 2.2.10 =
 - Fix for rotation editor code import/export
 - Fix for errors when using old |rotate| separator
@@ -906,6 +922,19 @@ AD CODE RIGHT
 - Bug fix for IP database update cron event (Pro only)
 
 == Upgrade Notice ==
+
+= 2.2.13 =
+Added option to disable inline alignment styles for code blocks (using alignment classes);
+Fix for custom CSS codes with single quotation marks
+
+= 2.2.12 =
+Fix for code block styles when block class name was not set
+
+= 2.2.11 =
+Code block styles moved to classes;
+Code block list moved to the sidebar;
+Added preview buttons in code block list;
+Fix for ad blocking detection when using https (Pro only)
 
 = 2.2.10 =
 Fix for rotation editor code import/export;

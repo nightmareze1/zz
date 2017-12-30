@@ -11,7 +11,7 @@ function alt_styles_data ($alt_styles_text) {
   }
 }
 
-function generate_code_preview ($block, $name = null, $alignment = null, $alignment_css = null, $custom_css = null, $client_code = null, $process_php = null) {
+function generate_code_preview ($block, $name = null, $alignment = null, $alignment_css = null, $custom_css = null, $client_code = null, $process_php = null, $read_only = false) {
   global $block_object, $ai_wp_data;
 
   $ai_wp_data [AI_WP_DEBUGGING] = 0;
@@ -314,7 +314,7 @@ function generate_code_preview ($block, $name = null, $alignment = null, $alignm
           style = $(id_css_alignment_sticky_bottom).text ();
       } else
       if (alignment == AI_ALIGNMENT_CUSTOM_CSS) {
-        $("#css-code").show();
+//        $("#alignment-editor").show();
         $("#custom-css").show();
         style = $("#custom-css").val ();
       } else
@@ -631,7 +631,9 @@ function generate_code_preview ($block, $name = null, $alignment = null, $alignm
 
     update_width ();
 
+<?php if (!$read_only) : ?>
     load_from_settings ();
+<?php endif; ?>
 
     setTimeout (update_wrapper_size, 500);
 
@@ -887,6 +889,7 @@ div.automatic-insertion img {
     <div style="clear: both;"></div>
   </div>
 
+<?php if (!$read_only) : ?>
   <div style="margin: 10px -8px">
     <table class="screen" cellspacing=0 cellspacing="0">
       <tr>
@@ -898,20 +901,33 @@ div.automatic-insertion img {
       </tr>
     </table>
   </div>
+<?php endif; ?>
 
   <div style="float: right; width: 90px; margin-left: 20px;">
     <button id="highlight-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Highlight inserted code" >Highlight</button>
+<?php if (!$read_only) : ?>
     <button id="use-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Use current settings" >Use</button>
     <button id="reset-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Reset to the block settings" >Reset</button>
+<?php endif; ?>
     <button id="cancel-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Close preview window" >Cancel</button>
   </div>
 
+<?php if (!$read_only) : ?>
   <div style="float: left; max-width: 300px; margin-right: 20px">
+<?php else : ?>
+  <div style="float: left; max-width: 600px; margin-right: 20px">
+<?php endif; ?>
+
     <h1 style="margin: 0;">Preview</h1>
+<?php if ($block != 0) : ?>
     <h2>Block <?php echo $block; ?></h2>
+<?php else : ?>
+    <h2>AdSense ad unit</h2>
+<?php endif; ?>
     <h3 id="block-name" style="text-align: left;"><?php echo $block_name; ?></h3>
   </div>
 
+<?php if (!$read_only) : ?>
   <div style="float: left; min-height: 200px; margin: 0 auto;">
     <table id="demo-box" class="demo-box" style="display: none;" cellspacing=0 cellspacing="0">
       <tr>
@@ -973,10 +989,15 @@ div.automatic-insertion img {
       </tr>
     </table>
   </div>
+<?php endif; ?>
 
   <div style="clear: both;"></div>
 
-  <div id="css-code" style="margin: 20px 0;">
+<?php if (!$read_only) : ?>
+  <div id="alignment-editor" style="margin: 20px 0;">
+<?php else : ?>
+  <div id="alignment-editor" style="margin: 20px 0; display: none;">
+<?php endif; ?>
     <div style="margin: 20px 0 0 0;">
       Alignment and Style:&nbsp;&nbsp;&nbsp;
       <select id="block-alignment" style="border-radius: 5px; width:120px;">
@@ -1020,8 +1041,14 @@ div.automatic-insertion img {
     </table>
   </div>
 
-    <p id="p1">This is a preview of the code between two dummy paragraphs. Here you can test various block alignments, visually edit margin and padding values of the wrapping div
+<?php if (!$read_only) : ?>
+    <p id="p1">This is a preview of the code between dummy paragraphs. Here you can test various block alignments, visually edit margin and padding values of the wrapping div
       or write CSS code directly and watch live preview. Highlight button highlights background, wrapping div margin and code area, while Reset button restores all the values to those of the current block.</p>
+<?php elseif ($block != 0) : ?>
+    <p id="p1">This is a preview of the saved code block between dummy paragraphs. It shows the code with the alignment and style as it is set for this code block. Highlight button highlights background, wrapping div margin and code area.</p>
+<?php else : ?>
+    <p id="p1">This is a preview of AdSense ad between dummy paragraphs. AdSense ad code was loaded from your AdSense account.</p>
+<?php endif; ?>
 
     <div id='padding-background'></div>
     <div id='margin-background'></div>
@@ -1032,14 +1059,25 @@ div.automatic-insertion img {
     <!--    IE bug: use inline CSS: position: absolute;-->
     <div id='code-background-white' class= "code-background-white" style="position: absolute;"></div>
     <div id='code-overlay' class="code-overlay" style="position: absolute;"></div>
+
+<?php if (!$read_only) : ?>
     <p id="p2">You can resize the window (and refresh the page to reload ads) to check display with different screen widths.
       Once you are satisfied with alignment click on the Use button and the settings will be copied to the active block.</p>
-    <p id="p3">Please note that the code displayed here is the code that is saved for this block, while block name, alignment and style are taken from the current block settings (may not be saved).
-      No Wrapping style inserts the code as it is so margin and padding can't be set. However, you can use own HTML code for the block.</p>
-    <p id="p4">Few very important things you need to know in order to insert code and display some ad:
+    <p id="p3">Please note that the code, block name, alignment and style are taken from the current block settings (may not be saved).
+      <strong>No Wrapping</strong> style inserts the code as it is so margin and padding can't be set. However, you can use own HTML code for the block.</p>
+<?php else : ?>
+<?php endif; ?>
+
+    <p id="p4">Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a code block.
+Free Ad Inserter supports 16 code blocks, Ad Inserter Pro supports up to 96 code blocks (depending on the license type).
+The settings page is divided into tabs - 16 code blocks and general plugin settings. Black number means inactive code block (code is not inserted anywhere),
+red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.</p>
+
+    <p id="p5">Few very important things you need to know in order to insert code and display some ad:
 Enable and use at least one display option (Automatic Display, Widget, Shortcode, PHP function call).
 Enable display on at least one Wordpress page type (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages).
-For Posts and static pages select default value On all Posts / On all Static pages unless you really know what are you doing.</p>
+Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.</p>
+
 <?php ai_wp_footer_hook (); ?>
 </body>
 </html>

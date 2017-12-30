@@ -55,6 +55,7 @@ function generate_settings_form (){
 
   $syntax_highlighter_theme = get_syntax_highlighter_theme ();
   $block_class_name         = get_block_class_name ();
+  $inline_styles            = get_inline_styles ();
 
   $default = $block_object [0];
 
@@ -143,7 +144,7 @@ function generate_settings_form (){
       <button type="button" class="ai-top-button" style="display: none; margin: 0 10px 0 0; width: 62px; outline-color: transparent;" onclick="window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4')" title="Support Free Ad Inserter development. If you are making money with Ad Inserter consider donating some small amount. Even 1 dollar counts. Thank you!">Donate</button>
       <button type="button" class="ai-top-button" style="display: none; margin: 0 10px 0 0; width: 62px; outline-color: transparent;" onclick="window.open('https://wordpress.org/support/plugin/ad-inserter/reviews/')" title="If you like Ad Inserter and have a moment, please help me spread the word by reviewing the plugin on WordPres">Review</button>
       <button type="button" class="ai-top-button" style="display: none; margin: 0 10px 0 0; width: 62px; outline-color: transparent;" onclick="window.open('http://adinserter.pro/')" title="Need more code blocks, GEO targeting, impression and click tracking? Upgrade to Ad Inserter Pro">Go&nbsp;Pro</button>
-      <button id="ai-list" type="button" class="ai-top-button" style="width: 62px; display: none; margin-right: 0px; outline-color: transparent;" nonce="<?php echo wp_create_nonce ("adinserter_data"); ?>"><span>List</span></button>
+      <button id="ai-list" type="button" class="ai-top-button" style="width: 62px; display: none; margin-right: 0px; outline-color: transparent;" title="Show list of all code blocks"><span>List</span></button>
     </div>
 
     <div style="clear: both;"></div>
@@ -282,41 +283,41 @@ function generate_settings_form (){
       elseif ($automatic) $style = "font-weight: bold; color: #e44;";
         elseif ($manual [$block]) $style = "font-weight: bold; color: #66f;";
 
-    if (!wp_is_mobile ()) {
-      $ad_name = $obj->get_ad_name();
+//    if (!wp_is_mobile ()) {
+//      $ad_name = $obj->get_ad_name();
 
-      $ad_name_functions = false;
-      if ($automatic) {
-        $ad_name .= ": ".$obj->get_automatic_insertion_text ();
-        $ad_name_functions = true;
-      }
+//      $ad_name_functions = false;
+//      if ($automatic) {
+//        $ad_name .= ": ".$obj->get_automatic_insertion_text ();
+//        $ad_name_functions = true;
+//      }
 
-      if (!empty ($sidebars_with_widget [$block])) $sidebars [$block] = implode (", ", $sidebars_with_widget [$block]);
-      if ($manual_widget [$block]) {
-        if ($sidebars [$block] != "") {
-          $ad_name .= $ad_name_functions ? ", " : ": ";
-          $ad_name .= "Widget used in: [".$sidebars [$block]."]";
-          $ad_name_functions = true;
-        }
-      } else {
-          if (!empty ($sidebars_with_widget [$block])) {
-            $ad_name .= $ad_name_functions ? ", " : ": ";
-            $ad_name .= "Widget DISABLED but used in: [".$sidebars [$block]."]";
-            $ad_name_functions = true;
-          }
-        }
+//      if (!empty ($sidebars_with_widget [$block])) $sidebars [$block] = implode (", ", $sidebars_with_widget [$block]);
+//      if ($manual_widget [$block]) {
+//        if ($sidebars [$block] != "") {
+//          $ad_name .= $ad_name_functions ? ", " : ": ";
+//          $ad_name .= "Widget used in: [".$sidebars [$block]."]";
+//          $ad_name_functions = true;
+//        }
+//      } else {
+//          if (!empty ($sidebars_with_widget [$block])) {
+//            $ad_name .= $ad_name_functions ? ", " : ": ";
+//            $ad_name .= "Widget DISABLED but used in: [".$sidebars [$block]."]";
+//            $ad_name_functions = true;
+//          }
+//        }
 
-      if ($manual_shortcode     [$block]) {
-        $ad_name .= $ad_name_functions ? ", " : ": ";
-        $ad_name .= "Shortcode";
-        $ad_name_functions = true;
-      }
-      if ($manual_php_function  [$block]) {
-        $ad_name .= $ad_name_functions ? ", " : ": ";
-        $ad_name .= "PHP function";
-        $ad_name_functions = true;
-      }
-    }
+//      if ($manual_shortcode     [$block]) {
+//        $ad_name .= $ad_name_functions ? ", " : ": ";
+//        $ad_name .= "Shortcode";
+//        $ad_name_functions = true;
+//      }
+//      if ($manual_php_function  [$block]) {
+//        $ad_name .= $ad_name_functions ? ", " : ": ";
+//        $ad_name .= "PHP function";
+//        $ad_name_functions = true;
+//      }
+//    }
 
     echo "
       <li id=\"ai-tab$block\" class=\"ai-tab\" title=\"$ad_name\"><a href=\"#tab-$block\"><span style=\"", $style, "\">$block</span></a></li>";
@@ -567,7 +568,7 @@ function generate_settings_form (){
 
     <div id="tab-banner-<?php echo $block; ?>" class="ai-banner ai-banner-top responsive-table rounded">
       <div class="banner-preview">
-        <a id="banner-link-<?php echo $block; ?>" href="" target="_blank"><img id="banner-image-<?php echo $block; ?>" src="" /></a>
+        <a id="banner-link-<?php echo $block; ?>" href="" target="_blank"><img id="banner-image-<?php echo $block; ?>" src="//:0" style="display: none;" /></a>
       </div>
       <table class="ai-settings-table">
         <tr>
@@ -592,7 +593,7 @@ function generate_settings_form (){
           </td>
           <td>
             <label for="open-new-window-<?php echo $block; ?>" style="display: inline-block; margin-top: 6px;">Open link in a new tab</label>
-            <button id="open-image-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; float: right; margin: 0;">Select Image</button>
+            <button id="open-image-button-<?php echo $block; ?>" type="button" class='ai-button select-image' style="display: none; float: right; margin: 7px 0 0 0;">Select Image</button>
           </td>
         </tr>
       </table>
@@ -678,9 +679,24 @@ function generate_settings_form (){
           </td>
           <td>
           </td>
-          <td style="padding-left: 7px;">
+          <td>
           </td>
         </tr>
+
+        <tr>
+          <td>
+          </td>
+          <td style="padding-left: 7px;">
+          </td>
+          <td>
+          </td>
+          <td>
+<?php if (defined ('AI_ADSENSE_API')) { ?>
+            <button type="button" class='ai-button adsense-list' style="display: none; float: right; margin: -12px 0 0 0;" title="Show AdSense ad units from your account">AdSense ad units</button>
+<?php } ?>
+          </td>
+        </tr>
+
       </table>
       <div style="clear: both;"></div>
 
@@ -709,7 +725,7 @@ function generate_settings_form (){
       <button id="manual-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; margin-right: 4px;" title="Widget, Shortcode and PHP function call"><span style="<?php echo $manual_style; ?>">Manual</span></button>
       <button id="device-detection-button-<?php echo $block; ?>" class='ai-button' type="button" style="display: none; margin-right: 4px;" title="Client/Server-side Device Detection (Desktop, Tablet, Phone,...)"><span style="<?php echo $devices_style; ?>">Devices</span></button>
       <button id="misc-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; margin-right: 4px;" title="Check for user status, Limit insertions, [error 404 page, Ajax requests, RSS feeds], Filter, Scheduling, General tag"><span style="<?php echo $misc_style; ?>">Misc</span></button>
-      <button id="preview-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; margin-right: 4px;" title="Preview saved code above" nonce="<?php echo wp_create_nonce ("adinserter_data"); ?>" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">Preview</button>
+      <button id="preview-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; margin-right: 4px;" title="Preview saved code above" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">Preview</button>
     </div>
     <div style="float: right;">
 <?php if (function_exists ('ai_settings_bottom_buttons')) ai_settings_bottom_buttons ($start, $end); else { ?>
@@ -770,7 +786,7 @@ function generate_settings_form (){
       <div id="alignment-style-<?php echo $block; ?>" style="margin-bottom: 4px;"></div>
       <div class="max-input">
         <span id="css-label-<?php echo $block; ?>" style="display: table-cell; width: 36px; padding: 0; height: 26px; vertical-align: middle; margin: 4px 0 0 0; font-size: 14px; font-weight: bold;">CSS</span>
-        <input id="custom-css-<?php echo $block; ?>" style="width: 100%; display: none; font-family: Courier, 'Courier New', monospace; font-weight: bold;" type="text" name="<?php echo AI_OPTION_CUSTOM_CSS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_custom_css(); ?>" value="<?php echo $obj->get_custom_css(); ?>" maxlength="160" title="Custom CSS code for wrapping div" />
+        <input id="custom-css-<?php echo $block; ?>" style="width: 100%; display: none; font-family: Courier, 'Courier New', monospace; font-weight: bold;" type="text" name="<?php echo AI_OPTION_CUSTOM_CSS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_custom_css(); ?>" value="<?php echo $obj->get_custom_css(); ?>" maxlength="200" title="Custom CSS code for wrapping div" />
         <span style="display: table-cell; vertical-align: middle; font-family: Courier, 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer;">
           <span id="css-no-wrapping-<?php echo $block; ?>" class='css-code' style="height: 18px; padding-left: 7px; display: none;"></span>
           <span id="css-none-<?php echo $block; ?>" class='css-code-<?php echo $block; ?>' style="height: 18px; padding-left: 7px; display: none;" title="CSS code for wrapping div, click to edit"><?php echo $obj->alignment_style (AI_ALIGNMENT_DEFAULT); ?></span>
@@ -793,7 +809,7 @@ function generate_settings_form (){
           <input type="hidden" name="<?php echo AI_OPTION_DISPLAY_ON_POSTS, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
           <input type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_POSTS, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_display_settings_post(); ?>" id="display-posts-<?php echo $block; ?>" title="Enable or disable insertion on posts" <?php if ($obj->get_display_settings_post()==AI_ENABLED) echo 'checked '; ?> />
 
-          <select style="margin: 0 0 0 10px;" id="enabled-on-which-posts-<?php echo $block; ?>" name="<?php echo AI_OPTION_ENABLED_ON_WHICH_POSTS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_enabled_on_which_posts(); ?>" style="width:160px">
+          <select style="margin: 0 0 0 10px;" id="enabled-on-which-posts-<?php echo $block; ?>" name="<?php echo AI_OPTION_ENABLED_ON_WHICH_POSTS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_enabled_on_which_posts(); ?>" style="width:160px" title="Individual post exceptions (if enabled here) can be configured in post editor. Leave blank for no individual post exceptions.">
              <option value="<?php echo AI_NO_INDIVIDUAL_EXCEPTIONS; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AI_NO_INDIVIDUAL_EXCEPTIONS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NO_INDIVIDUAL_EXCEPTIONS; ?></option>
              <option value="<?php echo AI_INDIVIDUALLY_DISABLED; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AI_INDIVIDUALLY_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_INDIVIDUALLY_DISABLED; ?></option>
              <option value="<?php echo AI_INDIVIDUALLY_ENABLED; ?>" <?php echo ($obj->get_ad_enabled_on_which_posts()==AI_INDIVIDUALLY_ENABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_INDIVIDUALLY_ENABLED; ?></option>
@@ -829,7 +845,7 @@ function generate_settings_form (){
           <input type="hidden" name="<?php echo AI_OPTION_DISPLAY_ON_PAGES, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
           <input type="checkbox" name="<?php echo AI_OPTION_DISPLAY_ON_PAGES, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_display_settings_page(); ?>" id="display-pages-<?php echo $block; ?>" title="Enable or disable insertion on static pages" <?php if ($obj->get_display_settings_page()==AI_ENABLED) echo 'checked '; ?> />
 
-          <select style="margin: 0 0 0 10px;" id="enabled-on-which-pages-<?php echo $block; ?>" name="<?php echo AI_OPTION_ENABLED_ON_WHICH_PAGES, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_enabled_on_which_pages(); ?>" style="width:160px">
+          <select style="margin: 0 0 0 10px;" id="enabled-on-which-pages-<?php echo $block; ?>" name="<?php echo AI_OPTION_ENABLED_ON_WHICH_PAGES, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_enabled_on_which_pages(); ?>" style="width:160px" title="Individual static page exceptions (if enabled here) can be configured in page editor. Leave blank for no individual page exceptions.">
              <option value="<?php echo AI_NO_INDIVIDUAL_EXCEPTIONS; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AI_NO_INDIVIDUAL_EXCEPTIONS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NO_INDIVIDUAL_EXCEPTIONS; ?></option>
              <option value="<?php echo AI_INDIVIDUALLY_DISABLED; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AI_INDIVIDUALLY_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_INDIVIDUALLY_DISABLED; ?></option>
              <option value="<?php echo AI_INDIVIDUALLY_ENABLED; ?>" <?php echo ($obj->get_ad_enabled_on_which_pages()==AI_INDIVIDUALLY_ENABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_INDIVIDUALLY_ENABLED; ?></option>
@@ -1533,7 +1549,7 @@ function generate_settings_form (){
 <?php if (function_exists ('ai_general_settings')) ai_general_settings (); ?>
       <tr>
         <td style="width: 34%;">
-          Syntax highlighter theme
+          Syntax highlighting theme
         </td>
         <td>
           <select
@@ -1589,6 +1605,21 @@ function generate_settings_form (){
         </td>
         <td>
           <input style="margin-left: 0px;" title="CSS Class Name for the wrapping div" type="text" id="block-class-name" name="block-class-name" value="<?php echo $block_class_name; ?>" default="<?php echo DEFAULT_BLOCK_CLASS_NAME; ?>" size="15" maxlength="40" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Inline styles
+        </td>
+        <td>
+          <select
+            id="inline-styles"
+            name="inline-styles"
+            title="Instead of alignment classes generate inline alignment styles for code blocks"
+            default="<?php echo DEFAULT_INLINE_STYLES; ?>">
+              <option value="<?php echo AI_DISABLED; ?>" <?php echo ($inline_styles == AI_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DISABLED; ?></option>
+              <option value="<?php echo AI_ENABLED; ?>" <?php echo ($inline_styles == AI_ENABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_ENABLED; ?></option>
+          </select>
         </td>
       </tr>
       <tr>
@@ -2104,8 +2135,6 @@ function generate_settings_form (){
 
   if (!function_exists ('ai_settings_side'))  {
 
-    code_block_list_container ();
-
     switch ($sidebar) {
       case 0:
         break;
@@ -2137,8 +2166,12 @@ function generate_settings_form (){
 
 <?php
   if ($subpage == 'main') {
+    code_block_list_container ();
+    if (defined ('AI_ADSENSE_API')) {
+      adsense_list_container ();
+    }
+
     if (function_exists ('ai_settings_side')) {
-      code_block_list_container ();
       ai_settings_side ();
     } else {
       switch ($sidebar) {
@@ -2183,7 +2216,7 @@ function generate_settings_form (){
 
     function replace_blocked_image (image_id, image_src, css_display) {
       var image_selector = "#" + image_id;
-      if (!jQuery(image_selector + ":visible").length) {
+      if (jQuery (image_selector).length && !jQuery(image_selector + ":visible").length) {
         blocking_counter ++;
         var image = jQuery(image_selector);
         image.hide ().after (image.clone ().attr ('class', '').attr ("id", image_id + '-ajax').
@@ -2206,7 +2239,6 @@ function generate_settings_form (){
     replace_blocked_image ('ai-stars-img',  'stars.png',          'inline');
     replace_blocked_image ('ai-tw',         'twitter.png',        'inline');
     replace_blocked_image ('ai-fb',         'facebook.png',       'inline');
-    replace_blocked_image ('ai-loading',    'loading.gif',        'none');
     if (blocking_counter > 5) {
       var message = 'Ad blocking test: ' + blocking_counter + ' images not loaded';
       console.log ('AD INSERTER:', message);
@@ -2260,19 +2292,19 @@ function get_sidebar_widgets () {
 function code_block_list_container () {
 ?>
   <div id="ai-list-container" class="ai-form rounded" style="background: #fff; display: none;">
-    <div id='list-controls' class='ui-widget' style='margin: 8px auto;'>
-      <span class="ai-toolbar-button" style="vertical-align: middle; float: left;">
-        <input type="checkbox" value="0" id="ai-load-all" style="display: none;" />
-        <label class="checkbox-button" for="ai-load-all" title="Toggle active/all blocks"><span class="checkbox-icon icon-enabled-all on"></span></label>
-      </span>
-      <span class="ai-toolbar-button" style="vertical-align: middle; float: left;">
+    <div id='ai-list-controls' class='ui-widget' style='margin: 0 auto 8px;'>
+      <span style="vertical-align: middle; float: left;">
         <input id="ai-list-search" type="text" value="" size="40" maxlength="40" />
       </span>
-      <span class="ai-toolbar-button" style="vertical-align: middle; float: right;">
-        <input type="checkbox" value="0" id="ai-rearrange" style="display: none;" />
-        <label class="checkbox-button" for="ai-rearrange" title="Rearrange block order"><span class="checkbox-icon icon-rearrange"></span></label>
+      <span class="ai-toolbar-button small" style="vertical-align: middle; float: right;">
+        <input type="checkbox" value="0" id="ai-load-all" style="display: none;" />
+        <label class="checkbox-button" for="ai-load-all" title="Toggle active/all blocks"><span class="checkbox-icon size-16 icon-enabled-all on"></span></label>
       </span>
-      <span id='list-rearrange-controls' style='float: right; display: none;'>
+      <span class="ai-toolbar-button small" style="vertical-align: middle; float: right;">
+        <input type="checkbox" value="0" id="ai-rearrange" style="display: none;" />
+        <label class="checkbox-button" for="ai-rearrange" title="Rearrange block order"><span class="checkbox-icon size-16 icon-rearrange"></span></label>
+      </span>
+      <span id='list-rearrange-controls' class="ai-toolbar-button text" style='float: right; display: none;'>
         <span id='list-save' class="ai-toolbar-button text" style="vertical-align: middle; display: none;">
           <input type="checkbox" value="0" id="ai-save-changes" style="display: none;" />
           <label class="checkbox-button" for="ai-save-changes" style="padding: 1px 5px 1px 4px; margin-top: 0px;" title="Save new block order">Save Changes</label>
@@ -2288,6 +2320,45 @@ function code_block_list_container () {
 <?php
 }
 
+if (defined ('AI_ADSENSE_API')) {
+
+function adsense_list_container () {
+?>
+  <div id="adsense-list-container" class="ai-form rounded" style="background: #fff; display: none;">
+    <div id='adsense-list-controls' class='ui-widget' style='margin: 0 auto 8px; display: none;'>
+      <span style="vertical-align: middle; float: left;">
+        <input id="adsense-list-search" type="text" value="" size="40" maxlength="40" />
+      </span>
+
+      <span class="ai-toolbar-button small" style="vertical-align: middle; float: right;">
+        <input type="checkbox" value="0" id="adsense-load-all" style="display: none;" />
+        <label class="checkbox-button" for="adsense-load-all" title="Toggle active/all ad units"><span class="checkbox-icon size-16 icon-enabled-all on"></span></label>
+      </span>
+      <span class="ai-toolbar-button small" style="vertical-align: middle; float: right;">
+        <input type="checkbox" value="0" id="adsense-reload" style="display: none;" />
+        <label class="checkbox-button" for="adsense-reload" title="Reload AdSense ad units"><span class="checkbox-icon size-16w icon-reload"></span></label>
+      </span>
+      <span class="ai-toolbar-button small" style="vertical-align: middle; float: right;">
+          <input type="checkbox" value="" id="clear-adsense-authorization" style="display: none;" />
+          <label class="checkbox-button" for="clear-adsense-authorization" title="Clear authorization to access AdSense account"><span class="list-button lb-size-16 ui-icon ui-icon-power"></span></label>
+      </span>
+      <span class="ai-toolbar-button small" style="vertical-align: middle; float: right;">
+        <input type="checkbox" value="0" id="google-adsense" style="display: none;" />
+        <label class="checkbox-button" id="google-adsense-button" for="google-adsense" title="Google AdSense Home" onclick="window.open('https://www.google.com/adsense/login')" ><span class="checkbox-icon size-img16 icon-adsense"></span></label>
+      </span>
+      <div style="clear: both;"></div>
+    </div>
+
+    <div id="adsense-list-data">
+      Loading...
+    </div>
+  </div>
+<?php
+}
+
+}
+
+
 function code_block_list () {
   global $block_object, $wpdb;
 
@@ -2298,7 +2369,7 @@ function code_block_list () {
     if (!empty ($blocks_org) && count ($blocks_org) == count ($blocks_new)) {
       // Uodate widgets
       $current_options = get_option (AI_OPTION_NAME);
-      $new_options = $current_options;
+      $new_options     = $current_options;
 
       $error = false;
       $block_indexes = array ();
@@ -2311,6 +2382,27 @@ function code_block_list () {
       }
 
       if (!$error) {
+        // Update AI_OPTION_FALLBACK and AI_OPTION_ADB_BLOCK_REPLACEMENT
+        for ($block = 1; $block <= AD_INSERTER_BLOCKS; $block ++) {
+          $ai_option_fallback = $new_options [$block][AI_OPTION_FALLBACK];
+          if ($ai_option_fallback != '') {
+            foreach ($blocks_org as $index => $org_block) {
+              if ($ai_option_fallback == $org_block) {
+                $new_options [$block][AI_OPTION_FALLBACK] = $blocks_new [$index];
+              }
+            }
+          }
+
+          $ai_option_adb_block_replacement = $new_options [$block][AI_OPTION_ADB_BLOCK_REPLACEMENT];
+          if ($ai_option_adb_block_replacement != '') {
+            foreach ($blocks_org as $index => $org_block) {
+              if ($ai_option_adb_block_replacement == $org_block) {
+                $new_options [$block][AI_OPTION_ADB_BLOCK_REPLACEMENT] = $blocks_new [$index];
+              }
+            }
+          }
+        }
+
         update_option (AI_OPTION_NAME, $new_options);
         ai_load_settings ();
 
@@ -2389,16 +2481,19 @@ function code_block_list () {
 
 ?>
         <tr style="background: <?php echo $row_color; ?>" data-block="<?php echo $block; ?>">
-          <td style="min-width: 55px; text-align: right; color: <?php echo $block_used ? '#444' : '#ccc'; ?>">
-            <span class="ai-toolbar-button" style="float: left; margin-right: 2px;">
-              <label class="checkbox-button ai-load-settings" style="margin-top: -1px;" title="Copy block"><span class="checkbox-icon icon-none-small"></span></label>
+          <td style="min-width: 55px; color: <?php echo $block_used ? '#444' : '#ccc'; ?>;">
+            <span class="ai-list-button">
+              <label class="checkbox-button ai-copy-block" style="margin-top: -1px;" title="Copy block"><span class="checkbox-icon size-8"></span></label>
             </span>
-            <?php echo $block; ?>
+            <span class="ai-list-button">
+              <label class="checkbox-button ai-preview-block" style="margin-top: -1px;" title="Preview block"><span class="checkbox-icon size-8 icon-preview"></span></label>
+            </span>
+            <span  class="ai-list-button" style="text-align: right; width: 16px;"><?php echo $block; ?></span>
           </td>
 <?php if ($visible_tab): ?>
-          <td class="ai-tab-link" data-tab="<?php echo $block; ?>" style=" min-width: 120px; color: #0073aa; cursor: pointer; text-align: left; padding-left: 10px; max-width: 220px; white-space: nowrap; overflow: hidden;"><?php echo $obj->wp_options [AI_OPTION_BLOCK_NAME]; ?></td>
+          <td class="ai-tab-link" data-tab="<?php echo $block; ?>" style=" min-width: 120px; color: #0073aa; cursor: pointer; text-align: left; padding-left: 5px; max-width: 220px; white-space: nowrap; overflow: hidden;"><?php echo $obj->wp_options [AI_OPTION_BLOCK_NAME]; ?></td>
 <?php else: ?>
-          <td style="min-width: 120px; text-align: left;  padding-left: 10px; max-width: 280px; white-space: nowrap; overflow: hidden;"><a href="<?php echo $edit_url; ?>" style="text-decoration: none; box-shadow: 0 0 0;"><?php echo $obj->wp_options [AI_OPTION_BLOCK_NAME]; ?></a></td>
+          <td style="min-width: 120px; text-align: left;  padding-left: 5px; max-width: 280px; white-space: nowrap; overflow: hidden;"><a href="<?php echo $edit_url; ?>" style="text-decoration: none; box-shadow: 0 0 0;"><?php echo $obj->wp_options [AI_OPTION_BLOCK_NAME]; ?></a></td>
 <?php endif ?>
           <td style="min-width: 180px; text-align: left; padding-left: 10px; max-width: 130px; white-space: nowrap; overflow: hidden; color: <?php echo $automatic_insertion ? '#666' : '#ccc'; ?>"><?php echo $obj->get_automatic_insertion_text(); ?></td>
           <td style="min-width: 110px; text-align: left; padding-left: 10px; max-width: 80px; white-space: nowrap; overflow: hidden; color: <?php echo $block_used ? '#444' : '#ccc'; ?>"><?php echo $obj->get_alignment_type_text (); ?></td>
@@ -2415,8 +2510,8 @@ function code_block_list () {
     <table id="ai-list-table" class="exceptions ai-sortable" cellspacing=0 cellpadding=0 style="width: 100%;" data-blocks="<?php echo json_encode ($blocks); ?>">
       <thead>
         <tr>
-          <th style="text-align: right;">Block</th>
-          <th style="text-align: left; padding-left: 10px;">Name</th>
+          <th style="text-align: left;">Block</th>
+          <th style="text-align: left; padding-left: 5px;">Name</th>
           <th style="text-align: left; padding-left: 10px;">Automatic Insertion</th>
           <th style="text-align: left; padding-left: 10px;">Alignment</th>
           <th style="text-align: center; padding-left: 10px;" title="PHP function call">P</th>
@@ -2434,6 +2529,162 @@ function code_block_list () {
     echo "<div style='margin: 10px 0 0 20px;'>No code block matches search keywords</div>";
   }
 }
+
+if (defined ('AI_ADSENSE_API')) {
+
+function adsense_list () {
+  require_once AD_INSERTER_PLUGIN_DIR.'includes/adsense-api.php';
+
+  if (defined ('AI_ADSENSE_AUTHORIZATION_CODE')) {
+
+    $publisher_id = '';
+    $ad_units = array ();
+    $error = '';
+
+    $update_ad_units = isset ($_GET ["update_ad_units"]) ? $_GET ["update_ad_units"] ==  1 : false;
+
+    $adsense = new adsense_api();
+
+    $ad_data = get_transient (AI_TRANSIENT_ADSENSE_ADS);
+
+    if ($ad_data === false || $update_ad_units) {
+      $ad_units = $adsense->getAdUnits();
+      $error    = $adsense->getError ();
+      if ($error == '' && is_array ($ad_units)) {
+        $ad_data = array ($adsense->getAdSensePublisherID (), $ad_units);
+        set_transient (AI_TRANSIENT_ADSENSE_ADS, $ad_data, AI_TRANSIENT_ADSENSE_ADS_EXPIRATION);
+      }
+    }
+
+    if ($error == '') {
+
+      $publisher_id = $ad_data [0];
+      $ad_units     = $ad_data [1];
+
+      $show_all_ad_units = isset ($_GET ["all"]) && $_GET ["all"];
+?>
+
+    <table id="ai-adsense-ad-units-table" class="exceptions" cellspacing=0 cellpadding=0 style="width: 100%;">
+      <thead>
+        <tr>
+          <th style="text-align: left; width: 66px;">Ad unit</th>
+          <th style="text-align: left;">Name</th>
+          <th style="text-align: left;">Slot ID</th>
+          <th style="text-align: left;">Type</th>
+          <th style="text-align: left;">Size</th>
+        </tr>
+      </thead>
+      <tbody>
+<?php
+      $row_counter = 0;
+      foreach ($ad_units as $ad_unit) {
+
+        if (!$show_all_ad_units && !$ad_unit ['active']) continue;
+
+        $search_text = trim ($_GET ["adsense-list"]);
+        if ($search_text != '') $search_array = explode (' ', $search_text); else $search_array = array ();
+        $block_text = $ad_unit ['name'] . ' ' . $ad_unit ['code'] . ' ' . $ad_unit ['type'] . ' ' . $ad_unit ['size'];
+        foreach ($search_array as $search_item) {
+          if (stripos ($block_text, trim ($search_item)) === false) continue 2;
+        }
+
+        $row_counter ++;
+        $row_color = $row_counter % 2 == 0 ? '#eee' : '#fff';
+
+?>
+        <tr style="background: <?php echo $row_color; ?>" data-id="ca-<?php echo $publisher_id, ':', $ad_unit ['code']; ?>" data-name="<?php echo base64_encode ($ad_unit ['name']); ?>">
+          <td>
+            <span class="ai-list-button">
+              <label class="checkbox-button adsense-copy-code" style="margin-top: -1px;" title="Copy AdSense code"><span class="checkbox-icon size-8"></span></label>
+            </span>
+            <span class="ai-list-button">
+              <label class="checkbox-button adsense-preview-code" style="margin-top: -1px;" title="Preview AdSense ad"><span class="checkbox-icon size-8 icon-preview"></span></label>
+            </span>
+            <span class="ai-list-button">
+              <label class="checkbox-button adsense-get-code" style="margin-top: -1px;" title="Get AdSense code"><span class="checkbox-icon size-8 icon-get"></span></label>
+            </span>
+          </td>
+          <td style="color: <?php echo $ad_unit ['active'] ? '#444' : '#ccc'; ?>;">
+            <?php echo $ad_unit ['name']; ?>
+          </td>
+          <td style="text-align: left; color: <?php echo $ad_unit ['active'] ? '#444' : '#ccc'; ?>;">
+            <?php echo $ad_unit ['code']; ?>
+          </td>
+          <td style="color: <?php echo $ad_unit ['active'] ? '#444' : '#ccc'; ?>;">
+            <?php echo ucwords (strtolower (str_replace ('_', ', ', $ad_unit ['type']))); ?>
+          </td>
+          <td style="color: <?php echo $ad_unit ['active'] ? '#444' : '#ccc'; ?>;">
+            <?php echo ucwords (strtolower ($ad_unit ['size'])); ?>
+          </td>
+        </tr>
+<?php
+     }
+?>
+      </tbody>
+    </table>
+
+    <div id="adsense-data" style="display: none;" data-publisher-id="<?php echo $publisher_id; ?>"></div>
+
+<?php
+    } else echo "<div style='margin: 10px 0 0 20px;'>$error</div>";
+
+  } else {
+      $adsense = new adsense_api();
+?>
+    <table class="responsive-table" cellspacing=0 cellpadding=0 style="width: 100%;">
+      <tbody>
+        <tr>
+          <td colspan="2" style="white-space: inherit;">
+            <div class="rounded" style="margin: 0;">
+              <h2 style="margin: 5px 0; float: left;"><strong><?php echo AD_INSERTER_NAME; ?></strong> AdSense Integration</h2>
+              <a href="https://www.google.com/adsense/login" class="simple-link" style="float: right;" target="_blank" title="Google AdSense Home"><img src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>ga-logo.png" style="margin: 3px 0 -4px 0;"/></a>
+              <div style="clear: both;"></div>
+            </div>
+            <p style="text-align: justify;">Here can <strong><?php echo AD_INSERTER_NAME; ?></strong> list configured AdSense ad units and get code for AdSense ads.
+            To do this you need to authorize <?php echo AD_INSERTER_NAME; ?> to access your AdSense account. Click on the <strong>Get Authorization Code</strong> button to open a new window where you can allow access.
+            When you get the code copy it to the field below and click on the button <strong>Authorize</strong>.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-right: 10px;">
+            <button type="button" class="ai-top-button" style="display: none; width: 162px; outline-color: transparent;" onclick="window.open('<?php echo $adsense->getAuthUrl (); ?>')">Get Authorization Code</button>
+          </td>
+          <td>
+            <input id="adsense-authorization-code" style="width: 100%;" type="text" value="" size="100" maxlength="200" title="Enter Authorization Code"/>
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <button type="button" id="authorize-adsense" class="ai-top-button" style="display: none; float: right; width: 162px; outline-color: transparent;">Authorize</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+<?php
+  }
+}
+
+}
+
+
+function adsense_code ($ad_slot_id) {
+  if (defined ('AI_ADSENSE_API')) {
+    require_once AD_INSERTER_PLUGIN_DIR.'includes/adsense-api.php';
+
+    if (defined ('AI_ADSENSE_AUTHORIZATION_CODE')) {
+      $adsense = new adsense_api();
+      $code = $adsense->getAdCode ($ad_slot_id);
+      echo json_encode (array ('code' => $code, 'error-message' => $adsense->getError ()));
+    }
+  }
+}
+
 
 function sidebar_addense_alternative () { ?>
 
@@ -2550,14 +2801,14 @@ function sidebar_pro () { ?>
           <li>Block <a href="https://adinserter.pro/alignments-and-styles" class="simple-link" target="_blank">alignment and style</a> customizations</li>
           <li><a href="http://adinserter.pro/documentation#paragraphs" class="simple-link" target="_blank">Clearance</a> options to avoid insertion near images or headers (AdSense TOS)</li>
           <li>Options to <a href="http://adinserter.pro/documentation#misc" class="simple-link" target="_blank">disable insertion</a> on Ajax calls, 404 error pages or in RSS feeds</li>
-          <li><a href="http://adinserter.pro/documentation#ad-rotation" class="simple-link" target="_blank">Ad rotation</a> (works also with caching)</li>
+          <li><a href="https://adinserter.pro/code-editing#ad-rotation" class="simple-link" target="_blank">Ad rotation</a> (works also with caching)</li>
           <li>Ad impression and click <a href="https://adinserter.pro/tracking" class="simple-link" target="_blank">tracking</a> (works also with Javascript ads like AdSense)</li>
           <li>Support for <a href="https://adinserter.pro/tracking#ab-testing" class="simple-link" target="_blank">A/B testing</a></li>
           <li>Support for ads on <a href="http://adinserter.pro/settings#amp" class="simple-link" target="_blank">AMP pages</a></li>
           <li>Support for contextual <a href="https://adinserter.pro/settings#amazon" class="simple-link" target="_blank">Amazon Native Shopping Ads</a> (responsive)</li>
           <li>Custom CSS class name for wrapping divs to avoid ad blockers</li>
           <li>PHP code processing</li>
-          <li>Banner code generator</li>
+          <li><a href="https://adinserter.pro/code-editing#banners" class="simple-link" target="_blank">Banner</a> code generator</li>
           <li>Support for <a href="http://adinserter.pro/documentation#header-footer" class="simple-link" target="_blank">header and footer</a> code</li>
           <li>Support for Google Analytics, Piwik or any other web analytics code</li>
           <li>Desktop, tablet and phone server-side <a href="http://adinserter.pro/documentation#devices" class="simple-link" target="_blank">device detection</a></li>
@@ -2567,14 +2818,14 @@ function sidebar_pro () { ?>
           <li><a href="http://adinserter.pro/lists" class="simple-link" target="_blank">Black/White-list </a>categories, tags, taxonomies, users, post IDs, urls, referers</li>
           <li><a href="http://adinserter.pro/lists#geo-targeting" class="simple-link" target="_blank">Black/White-list </a>IP addresses or countries (works also with caching)</li>
           <li><a href="http://adinserter.pro/documentation#multisite" class="simple-link" target="_blank">Multisite options</a> to limit settings on the sites</li>
-          <li>Import/Export block or plugin settings</li>
+          <li><a href="https://adinserter.pro/code-editing#export-import" class="simple-link" target="_blank">Import/Export</a> block or plugin settings</li>
           <li><a href="http://adinserter.pro/documentation#scheduling" class="simple-link" target="_blank">Scheduling</a> with fallback option</li>
           <li>Country-level <a href="http://adinserter.pro/lists#geo-targeting" class="simple-link" target="_blank">GEO targeting</a> (works also with caching)</li>
           <li>Simple troubleshooting with many <a href="http://adinserter.pro/documentation#debugging" class="simple-link" target="_blank">debugging functions</a></li>
           <li><a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of inserted code blocks or ads for easier placement</li>
           <li><a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of available positions for automatic ad insertion</li>
           <li><a href="http://adinserter.pro/documentation#visualization" class="simple-link" target="_blank">Visualization</a> of HTML tags for easier ad placement between paragraphs</li>
-          <li>Clipboard support to easily copy code blocks or settings</li>
+          <li><a href="https://adinserter.pro/code-editing#clipboard" class="simple-link" target="_blank">Clipboard support</a> to easily copy code blocks or settings</li>
           <li>Support via email</li>
         </ul>
 
