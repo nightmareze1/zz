@@ -3,6 +3,11 @@
 require_once AD_INSERTER_PLUGIN_DIR.'constants.php';
 
 function generate_settings_form (){
+
+  if (defined ('AI_ADSENSE_API')) {
+    require_once AD_INSERTER_PLUGIN_DIR.'includes/adsense-api.php';
+  }
+
   global $ai_db_options, $block_object, $ai_wp_data, $ai_db_options_extract;
   global $rating_value, $rating_string, $rating_css, $ai_custom_hooks;
 
@@ -55,6 +60,8 @@ function generate_settings_form (){
 
   $syntax_highlighter_theme = get_syntax_highlighter_theme ();
   $block_class_name         = get_block_class_name ();
+  $block_class              = get_block_class ();
+  $block_number_class       = get_block_number_class ();
   $inline_styles            = get_inline_styles ();
 
   $default = $block_object [0];
@@ -115,9 +122,10 @@ function generate_settings_form (){
 
   if (!isset ($_GET ['settings'])): // start of code only for normal settings
 
+  if (function_exists ('ai_admin_settings_notices')) ai_admin_settings_notices ();
 ?>
 
-<div id="ai-data" style="display: none;" version="<?php echo AD_INSERTER_VERSION; ?>" theme="<?php echo $syntax_highlighter_theme; ?>" javascript_debugging="<?php echo $ai_wp_data [AI_JS_DEBUGGING] ? '1' : '0'; ?>" ></div>
+<div id="ai-data" style="display: none;" version="<?php echo AD_INSERTER_VERSION; ?>" theme="<?php echo $syntax_highlighter_theme; ?>" js_debugging="<?php echo $ai_wp_data [AI_BACKEND_JS_DEBUGGING] ? '1' : '0'; ?>" ></div>
 <?php
   if (function_exists ('ai_data_2')) ai_data_2 ();
 ?>
@@ -144,7 +152,7 @@ function generate_settings_form (){
       <button type="button" class="ai-top-button" style="display: none; margin: 0 10px 0 0; width: 62px; outline-color: transparent;" onclick="window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4')" title="Support Free Ad Inserter development. If you are making money with Ad Inserter consider donating some small amount. Even 1 dollar counts. Thank you!">Donate</button>
       <button type="button" class="ai-top-button" style="display: none; margin: 0 10px 0 0; width: 62px; outline-color: transparent;" onclick="window.open('https://wordpress.org/support/plugin/ad-inserter/reviews/')" title="If you like Ad Inserter and have a moment, please help me spread the word by reviewing the plugin on WordPres">Review</button>
       <button type="button" class="ai-top-button" style="display: none; margin: 0 10px 0 0; width: 62px; outline-color: transparent;" onclick="window.open('http://adinserter.pro/')" title="Need more code blocks, GEO targeting, impression and click tracking? Upgrade to Ad Inserter Pro">Go&nbsp;Pro</button>
-      <button id="ai-list" type="button" class="ai-top-button" style="width: 62px; display: none; margin-right: 0px; outline-color: transparent;" title="Show list of all code blocks"><span>List</span></button>
+      <button id="ai-list" type="button" class="ai-top-button" style="width: 62px; display: none; margin-right: 0px; outline-color: transparent;" title="Show list of all code blocks"><span>Blocks</span></button>
     </div>
 
     <div style="clear: both;"></div>
@@ -266,7 +274,7 @@ function generate_settings_form (){
   $manual               = array ();
   $sidebars             = array ();
 
-  for ($block = $start; $block <= $end; $block ++){
+  for ($block = $start; $block <= $end; $block ++) {
     $obj = $block_object [$block];
 
     $automatic = $obj->get_automatic_insertion() != AI_AUTOMATIC_INSERTION_DISABLED;
@@ -283,6 +291,8 @@ function generate_settings_form (){
       elseif ($automatic) $style = "font-weight: bold; color: #e44;";
         elseif ($manual [$block]) $style = "font-weight: bold; color: #66f;";
 
+    if (!empty ($sidebars_with_widget [$block])) $sidebars [$block] = implode (", ", $sidebars_with_widget [$block]);
+
 //    if (!wp_is_mobile ()) {
 //      $ad_name = $obj->get_ad_name();
 
@@ -292,7 +302,7 @@ function generate_settings_form (){
 //        $ad_name_functions = true;
 //      }
 
-//      if (!empty ($sidebars_with_widget [$block])) $sidebars [$block] = implode (", ", $sidebars_with_widget [$block]);
+//      //if (!empty ($sidebars_with_widget [$block])) $sidebars [$block] = implode (", ", $sidebars_with_widget [$block]);
 //      if ($manual_widget [$block]) {
 //        if ($sidebars [$block] != "") {
 //          $ad_name .= $ad_name_functions ? ", " : ": ";
@@ -344,6 +354,7 @@ function generate_settings_form (){
   </ul>
 
 <?php
+
   for ($block = $start; $block <= $end + 1; $block ++){
 
     if ($block <= $end) {
@@ -354,14 +365,21 @@ function generate_settings_form (){
 
       $obj = $block_object [$block];
     } else {
+        $block = 999;
+
+        $sidebars [$block] = "";
+
+        $manual_widget        [$block] = $obj->get_enable_widget()    == AI_ENABLED;
+        $manual_shortcode     [$block] = $obj->get_enable_manual()    == AI_ENABLED;
+        $manual_php_function  [$block] = $obj->get_enable_php_call()  == AI_ENABLED;
+        $manual               [$block] = ($manual_widget [$block] && !empty ($sidebars_with_widget [$block])) || $manual_shortcode [$block] || $manual_php_function [$block];
+
         $default->number = 0;
         $default->wp_options [AI_OPTION_BLOCK_NAME] = AD_NAME." 0";
 
         $tab_visible = false;
 
         $obj = $default;
-
-        $block = 999;
       }
 
     $client_side_devices = $obj->get_detection_client_side () == AI_ENABLED;
@@ -392,7 +410,8 @@ function generate_settings_form (){
       $obj->get_enable_amp () == AI_ENABLED ||
       $obj->get_enable_ajax () != AI_ENABLED ||
       $obj->get_enable_404 () == AI_ENABLED ||
-      $obj->get_enable_feed () == AI_ENABLED;
+      $obj->get_enable_feed () == AI_ENABLED ||
+      $obj->get_disable_caching ();
 
     $word_count_options =
       intval ($obj->get_minimum_words()) != 0 ||
@@ -404,12 +423,15 @@ function generate_settings_form (){
 
     $adb_block_action_active = $obj->get_adb_block_action () != AI_ADB_BLOCK_ACTION_DO_NOTHING;
 
+    $general_options = $obj->get_close_button ();
+
     $show_misc =
       $insertion_options ||
       $word_count_options ||
       $scheduling_active ||
       $filter_active ||
-      $adb_block_action_active;
+      $adb_block_action_active ||
+      $general_options;
 
     if ($show_misc) $misc_style = "font-weight: bold; color: #66f;"; else $misc_style = "";
 
@@ -418,6 +440,7 @@ function generate_settings_form (){
     if ($scheduling_active)       $scheduling_style = "font-weight: bold; color: #66f;"; else $scheduling_style = "";
     if ($filter_active)           $filter_style     = "font-weight: bold; color: #66f;"; else $filter_style = "";
     if ($adb_block_action_active) $adb_style        = "font-weight: bold; color: #66f;"; else $adb_style = "";
+    if ($general_options)         $general_style    = "font-weight: bold; color: #66f;"; else $general_style = "";
 
     $automatic_insertion = $obj->get_automatic_insertion();
 
@@ -439,6 +462,13 @@ function generate_settings_form (){
     $paragraph_clearance =
       ($obj->get_avoid_text_above() != $default->get_avoid_text_above() && intval ($obj->get_avoid_paragraphs_above()) != 0) ||
       ($obj->get_avoid_text_below() != $default->get_avoid_text_below() && intval ($obj->get_avoid_paragraphs_below()) != 0);
+
+    $html_settings =
+      $automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_HTML_ELEMENT ||
+      $automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_HTML_ELEMENT;
+
+    $html_element_insertion = $obj->get_html_element_insertion ();
+    $server_side_insertion = $obj->get_server_side_insertion ();
 
     $filter_type = $obj->get_filter_type();
 
@@ -465,11 +495,13 @@ function generate_settings_form (){
       </span>
 <?php endif; ?>
 
+<?php if (!is_multisite() || is_main_site () || multisite_php_processing ()) : ?>
       <span class="ai-toolbar-button ai-settings">
         <input type="hidden"   name="<?php echo AI_OPTION_PROCESS_PHP, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
         <input type="checkbox" name="<?php echo AI_OPTION_PROCESS_PHP, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_process_php (); ?>" id="process-php-<?php echo $block; ?>" <?php if ($obj->get_process_php () == AI_ENABLED) echo 'checked '; ?> style="display: none;" />
         <label class="checkbox-button" for="process-php-<?php echo $block; ?>" title="Process PHP code in block"><span class="checkbox-icon icon-php<?php if ($obj->get_process_php () == AI_ENABLED) echo ' on'; ?>"></span></label>
       </span>
+<?php endif; ?>
 <?php if (function_exists ('ai_settings_top_buttons_2')) ai_settings_top_buttons_2 ($block, $obj, $default); ?>
     </div>
 
@@ -489,6 +521,18 @@ function generate_settings_form (){
           <input type="checkbox" id="visual-editor-<?php echo $block; ?>" style="display: none;" />
           <label class="checkbox-button" for="visual-editor-<?php echo $block; ?>" title="Open visual HTML editor"><span class="checkbox-icon icon-edit"></span></label>
         </span>
+
+
+<?php if (defined ('AI_ADSENSE_API')) : ?>
+<?php if (defined ('AI_ADSENSE_AUTHORIZATION_CODE')) : ?>
+        <span style="display: table-cell; width: 6%;"></span>
+
+        <span class="ai-toolbar-button ai-button-left">
+          <input type="checkbox" id="ga-<?php echo $block; ?>" style="display: none;" />
+          <label class="checkbox-button adsense-list" for="ga-<?php echo $block; ?>" title="Show AdSense ad units" ><span class="checkbox-icon icon-adsense ai-bw"></span></label>
+        </span>
+<?php endif; ?>
+<?php endif; ?>
 
         <span style="display: table-cell; width: 100%;"></span>
 
@@ -568,7 +612,8 @@ function generate_settings_form (){
 
     <div id="tab-banner-<?php echo $block; ?>" class="ai-banner ai-banner-top responsive-table rounded">
       <div class="banner-preview">
-        <a id="banner-link-<?php echo $block; ?>" href="" target="_blank"><img id="banner-image-<?php echo $block; ?>" src="//:0" style="display: none;" /></a>
+<!--        <a id="banner-link-<?php echo $block; ?>" class="clear-link" target="_blank"><img id="banner-image-<?php echo $block; ?>" src="//:0" style="display: none;" /></a>-->
+        <a id="banner-link-<?php echo $block; ?>" class="clear-link" target="_blank"><img id="banner-image-<?php echo $block; ?>" src="" style="display: none;" /></a>
       </div>
       <table class="ai-settings-table">
         <tr>
@@ -589,11 +634,12 @@ function generate_settings_form (){
         </tr>
         <tr>
           <td>
-            <input type="checkbox" id="open-new-window-<?php echo $block; ?>" />
+            <input type="checkbox" id="open-new-tab-<?php echo $block; ?>" />
           </td>
           <td>
-            <label for="open-new-window-<?php echo $block; ?>" style="display: inline-block; margin-top: 6px;">Open link in a new tab</label>
-            <button id="open-image-button-<?php echo $block; ?>" type="button" class='ai-button select-image' style="display: none; float: right; margin: 7px 0 0 0;">Select Image</button>
+            <label for="open-new-tab-<?php echo $block; ?>" style="display: inline-block; margin-top: 6px;">Open link in a new tab</label>
+            <button id="select-image-button-<?php echo $block; ?>" type="button" class='ai-button select-image' style="display: none; width: 120px; float: right; margin: 7px 0 0 0;">Select Image</button>
+            <button id="select-placeholder-button-<?php echo $block; ?>" type="button" class='ai-button select-image' style="display: none; width: 120px; float: right; margin: 7px 10px 0 0;">Select Placeholder</button>
           </td>
         </tr>
       </table>
@@ -680,20 +726,11 @@ function generate_settings_form (){
           <td>
           </td>
           <td>
-          </td>
-        </tr>
-
-        <tr>
-          <td>
-          </td>
-          <td style="padding-left: 7px;">
-          </td>
-          <td>
-          </td>
-          <td>
-<?php if (defined ('AI_ADSENSE_API')) { ?>
-            <button type="button" class='ai-button adsense-list' style="display: none; float: right; margin: -12px 0 0 0;" title="Show AdSense ad units from your account">AdSense ad units</button>
-<?php } ?>
+<?php if (defined ('AI_ADSENSE_API')) : ?>
+<?php if (!defined ('AI_ADSENSE_AUTHORIZATION_CODE')) : ?>
+            <button type="button" class='ai-button adsense-list' style="display: none; float: right; margin: 0 -3px -14px 0;" title="Show AdSense ad units from your account">AdSense ad units</button>
+<?php endif; ?>
+<?php endif; ?>
           </td>
         </tr>
 
@@ -716,7 +753,7 @@ function generate_settings_form (){
 <?php endif; ?>
 
   <div style="margin: 8px 0;">
-    <textarea id="block-<?php echo $block; ?>" class="simple-editor" style="background-color:#F9F9F9; font-family: Courier, 'Courier New', monospace; font-weight: bold;" name="<?php echo AI_OPTION_CODE, WP_FORM_FIELD_POSTFIX, $block; ?>"><?php echo esc_textarea ($obj->get_ad_data()); ?></textarea>
+    <textarea id="block-<?php echo $block; ?>" class="simple-editor" style="background-color:#F9F9F9; font-family: Courier, 'Courier New', monospace; font-weight: bold;" name="<?php echo AI_OPTION_CODE, WP_FORM_FIELD_POSTFIX, $block; ?>" default=""><?php echo esc_textarea ($obj->get_ad_data()); ?></textarea>
   </div>
 
   <div style="padding: 0; min-height: 28px;">
@@ -737,8 +774,8 @@ function generate_settings_form (){
 
   <div class="rounded">
     <div style="float: left;">
-      Automatic Insertion:
-      <select class="ai-image-selection" style="margin-bottom: 3px;" id="display-type-<?php echo $block; ?>" name="<?php echo AI_OPTION_AUTOMATIC_INSERTION, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_automatic_insertion(); ?>" style="width:200px;">
+      Automatic Insertion
+      <select class="ai-image-selection" style="width:200px; margin-bottom: 3px;" id="display-type-<?php echo $block; ?>" name="<?php echo AI_OPTION_AUTOMATIC_INSERTION, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_automatic_insertion(); ?>">
          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion disabled" value="<?php echo AI_AUTOMATIC_INSERTION_DISABLED; ?>" data-title="<?php echo AI_TEXT_DISABLED; ?>" <?php echo ($automatic_insertion == AI_AUTOMATIC_INSERTION_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DISABLED; ?></option>
 <?php if (defined ('AI_BUFFERING') && get_output_buffering ()) : ?>
          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion above-header" value="<?php echo AI_AUTOMATIC_INSERTION_ABOVE_HEADER; ?>" data-title="<?php echo AI_TEXT_ABOVE_HEADER; ?>" <?php echo ($automatic_insertion == AI_AUTOMATIC_INSERTION_ABOVE_HEADER) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_ABOVE_HEADER; ?></option>
@@ -756,6 +793,8 @@ function generate_settings_form (){
          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion between-comments" value="<?php echo AI_AUTOMATIC_INSERTION_BETWEEN_COMMENTS; ?>" data-title="<?php echo AI_TEXT_BETWEEN_COMMENTS; ?>" <?php echo ($automatic_insertion == AI_AUTOMATIC_INSERTION_BETWEEN_COMMENTS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_BETWEEN_COMMENTS; ?></option>
          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion after-comments" value="<?php echo AI_AUTOMATIC_INSERTION_AFTER_COMMENTS; ?>" data-title="<?php echo AI_TEXT_AFTER_COMMENTS; ?>" <?php echo ($automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_COMMENTS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_AFTER_COMMENTS; ?></option>
          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion footer" value="<?php echo AI_AUTOMATIC_INSERTION_FOOTER; ?>" data-title="<?php echo AI_TEXT_FOOTER; ?>" <?php echo ($automatic_insertion == AI_AUTOMATIC_INSERTION_FOOTER) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_FOOTER; ?></option>
+         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion before-html" value="<?php echo AI_AUTOMATIC_INSERTION_BEFORE_HTML_ELEMENT; ?>" data-title="<?php echo AI_TEXT_BEFORE_HTML_ELEMENT; ?>" <?php echo ($automatic_insertion == AI_AUTOMATIC_INSERTION_BEFORE_HTML_ELEMENT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_BEFORE_HTML_ELEMENT; ?></option>
+         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion after-html" value="<?php echo AI_AUTOMATIC_INSERTION_AFTER_HTML_ELEMENT; ?>" data-title="<?php echo AI_TEXT_AFTER_HTML_ELEMENT; ?>" <?php echo ($automatic_insertion == AI_AUTOMATIC_INSERTION_AFTER_HTML_ELEMENT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_AFTER_HTML_ELEMENT; ?></option>
 <?php foreach ($ai_custom_hooks as $hook_index => $custom_hook) { ?>
          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion custom-hook" value="<?php echo AI_AUTOMATIC_INSERTION_CUSTOM_HOOK + $custom_hook ['index'] - 1; ?>" data-title="<?php echo $custom_hook ['name']; ?>" <?php echo ($automatic_insertion == AI_AUTOMATIC_INSERTION_CUSTOM_HOOK + $custom_hook ['index'] - 1) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo $custom_hook ['name']; ?></option>
 <?php } ?>
@@ -763,7 +802,7 @@ function generate_settings_form (){
     </div>
 
     <div style="float: right;">
-      Alignment and Style:&nbsp;&nbsp;&nbsp;
+      Alignment and Style&nbsp;&nbsp;&nbsp;
       <select style="width:130px;" id="block-alignment-<?php echo $block; ?>" name="<?php echo AI_OPTION_ALIGNMENT_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_alignment_type(); ?>">
          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion default" value="<?php echo AI_ALIGNMENT_DEFAULT; ?>" data-title="<?php echo AI_TEXT_DEFAULT; ?>" <?php echo ($obj->get_alignment_type() == AI_ALIGNMENT_DEFAULT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DEFAULT; ?></option>
          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', __FILE__); ?>" data-img-class="automatic-insertion align-left" value="<?php echo AI_ALIGNMENT_LEFT; ?>" data-title="<?php echo AI_TEXT_LEFT; ?>" <?php echo ($obj->get_alignment_type() == AI_ALIGNMENT_LEFT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_LEFT; ?></option>
@@ -906,27 +945,68 @@ function generate_settings_form (){
 ?>
   </div>
 
-  <div id="paragraph-settings-<?php echo $block; ?>" class="rounded" style="<?php echo $paragraph_settings ? "" : " display: none;" ?>">
-<!--    <div>-->
-      <div style="float: left; margin-top: 1px;">
-        Paragraph(s)
+  <div id="html-element-settings-<?php echo $block; ?>" class="rounded" style="<?php echo $html_settings ? "" : " display: none;" ?>">
+    <div class="max-input" style="margin: 0 0 8px 0;">
+      <span style="display: table-cell; width: 1px; white-space: nowrap;">
+        HTML element(s)
+        &nbsp;&nbsp;
+      </span>
+      <span style="display: table-cell;">
         <input
           type="text"
-          name="<?php echo AI_OPTION_PARAGRAPH_NUMBER, WP_FORM_FIELD_POSTFIX, $block; ?>"
-          default="<?php echo $default->get_paragraph_number(); ?>"
-          value="<?php echo $obj->get_paragraph_number(); ?>"
-          title="Paragraph number or comma separated paragraph numbers or empty (means all paragraphs): 1 to N means paragraph number, 0 means random paragraph, value between 0 and 1 means relative position on the page (0.2 means paragraph at 20% of page height, 0.5 means paragraph halfway down the page, 0.9 means paragraph at 90% of page paragraphs, etc.)"
-          size="20"
-          maxlength="50" />
-      </div>
+          name="<?php echo AI_OPTION_HTML_SELECTOR, WP_FORM_FIELD_POSTFIX, $block; ?>"
+          default="<?php echo $default->get_html_selector (); ?>"
+          value="<?php echo $obj->get_html_selector (); ?>"
+          title="HTML element selector or comma separated list of selectors (.class, #id)"
+          style="width: 100%;"
+          maxlength="80" />
+      </span>
+    </div>
+    <div class="max-input" style="margin: 8px 0 0 0;">
+      <span style="display: table-cell; width: 1px; white-space: nowrap;">
+        Insertion
+        <select id="html-element-insertion-<?php echo $block; ?>" style="margin-bottom: 3px;" name="<?php echo AI_OPTION_HTML_ELEMENT_INSERTION, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_html_element_insertion (); ?>" title="Client-side insertion uses Javascript to insert code block when the page loads, server-side insertion inserts when the page is generated but needs Output buffering enabled">
+           <option value="<?php echo AI_HTML_INSERTION_CLIENT_SIDE; ?>" <?php echo ($html_element_insertion == AI_HTML_INSERTION_CLIENT_SIDE) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CLIENT_SIDE; ?></option>
+           <option value="<?php echo AI_HTML_INSERTION_CLIENT_SIDE_DOM_READY; ?>" <?php echo ($html_element_insertion == AI_HTML_INSERTION_CLIENT_SIDE_DOM_READY) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CLIENT_SIDE_DOM_READY; ?></option>
+<?php if (defined ('AI_BUFFERING') && get_output_buffering ()) : ?>
+           <option value="<?php echo AI_HTML_INSERTION_SEREVR_SIDE; ?>" <?php echo ($html_element_insertion == AI_HTML_INSERTION_SEREVR_SIDE) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_SERVER_SIDE; ?></option>
+<?php endif; ?>
+        </select>
+      </span>
+      <span id="server-side-insertion-<?php echo $block; ?>" style="display: table-cell; white-space: nowrap;<?php if ($html_element_insertion == AI_HTML_INSERTION_SEREVR_SIDE) echo 'display: none;'; ?>">
+        &nbsp;
+        Javascript code position
+        <select style="max-width: 140px; margin-bottom: 3px;" name="<?php echo AI_OPTION_SERVER_SIDE_INSERTION, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_server_side_insertion (); ?>" title="Page position where the javascript code for client-side insertion will be inserted. Should be after the HTML element if not waiting for DOM ready.">
+           <option value="<?php echo AI_AUTOMATIC_INSERTION_BEFORE_POST; ?>" <?php echo ($server_side_insertion == AI_AUTOMATIC_INSERTION_BEFORE_POST) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_BEFORE_POST; ?></option>
+           <option value="<?php echo AI_AUTOMATIC_INSERTION_AFTER_POST; ?>" <?php echo ($server_side_insertion == AI_AUTOMATIC_INSERTION_AFTER_POST) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_AFTER_POST; ?></option>
+           <option value="<?php echo AI_AUTOMATIC_INSERTION_FOOTER; ?>" <?php echo ($server_side_insertion == AI_AUTOMATIC_INSERTION_FOOTER) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_FOOTER; ?></option>
+<?php foreach ($ai_custom_hooks as $hook_index => $custom_hook) { ?>
+           <option value="<?php echo AI_AUTOMATIC_INSERTION_CUSTOM_HOOK + $custom_hook ['index'] - 1; ?>" <?php echo ($server_side_insertion == AI_AUTOMATIC_INSERTION_CUSTOM_HOOK + $custom_hook ['index'] - 1) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo $custom_hook ['name']; ?></option>
+<?php } ?>
+        </select>
+      </span>
+    </div>
+  </div>
 
-      <div style="float: right;">
-        <button id="counting-button-<?php echo $block; ?>" type="button" class='ai-button' style="min-width: 85px; margin-right: 8px; display: none;">Counting</button>
-        <button id="clearance-button-<?php echo $block; ?>" type="button" class='ai-button' style="min-width: 85px; margin-right: 0px; display: none;">Clearance</button>
-      </div>
+  <div id="paragraph-settings-<?php echo $block; ?>" class="rounded" style="<?php echo $paragraph_settings ? "" : " display: none;" ?>">
+    <div style="float: left; margin-top: 1px;">
+      Paragraph(s)
+      <input
+        type="text"
+        name="<?php echo AI_OPTION_PARAGRAPH_NUMBER, WP_FORM_FIELD_POSTFIX, $block; ?>"
+        default="<?php echo $default->get_paragraph_number(); ?>"
+        value="<?php echo $obj->get_paragraph_number(); ?>"
+        title="Paragraph number or comma separated paragraph numbers or empty (means all paragraphs): 1 to N means paragraph number, 0 means random paragraph, value between 0 and 1 means relative position on the page (0.2 means paragraph at 20% of page height, 0.5 means paragraph halfway down the page, 0.9 means paragraph at 90% of page paragraphs, etc.)"
+        size="20"
+        maxlength="50" />
+    </div>
 
-      <div style="clear: both;"></div>
-<!--    </div>-->
+    <div style="float: right;">
+      <button id="counting-button-<?php echo $block; ?>" type="button" class='ai-button' style="min-width: 85px; margin-right: 8px; display: none;">Counting</button>
+      <button id="clearance-button-<?php echo $block; ?>" type="button" class='ai-button' style="min-width: 85px; margin-right: 0px; display: none;">Clearance</button>
+    </div>
+
+    <div style="clear: both;"></div>
   </div>
 
   <div id="paragraph-counting-<?php echo $block; ?>" class="rounded" style="<?php echo $paragraph_counting ? "" : "display: none;" ?>">
@@ -1264,7 +1344,7 @@ function generate_settings_form (){
       <tr>
         <td style="padding: 4px 10px 4px 0;">
           <input type="hidden" name="<?php echo AI_OPTION_ENABLE_PHP_CALL, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
-          <input id="enable-php-call-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_PHP_CALL, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_php_call(); ?>" <?php if ($obj->get_enable_php_call () == AI_ENABLED) echo 'checked '; ?> />
+          <input id="enable-php-call-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_PHP_CALL, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_php_call(); ?>" <?php if ($manual_php_function [$block] == AI_ENABLED) echo 'checked '; ?> />
           <label for="enable-php-call-<?php echo $block; ?>" title="Enable or disable PHP function call to insert this code block at any position in template file. If function is disabled for block it will return empty string.">
             PHP function
           </label>
@@ -1289,7 +1369,14 @@ function generate_settings_form (){
         <div style="float: left; margin-top: 0px;">
           <input type="hidden" name="<?php echo AI_OPTION_DETECT_CLIENT_SIDE, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
           <input id="client-side-detection-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_DETECT_CLIENT_SIDE, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_detection_client_side(); ?>" <?php if ($obj->get_detection_client_side ()==AI_ENABLED) echo 'checked '; ?> />
-          <label for="client-side-detection-<?php echo $block; ?>" style="vertical-align: baseline;">Use client-side detection to show only on</label>
+          <label for="client-side-detection-<?php echo $block; ?>" style="vertical-align: baseline;">Use client-side detection to </label>
+
+          <select id="client-side-action-<?php echo $block; ?>" name="<?php echo AI_OPTION_CLIENT_SIDE_ACTION, WP_FORM_FIELD_POSTFIX, $block; ?>" style="margin: -4px 1px -2px 1px;" default="<?php echo $default->get_client_side_action (); ?>" title="Either show/hide or inseret when the page is loaded on wanted viewports">
+            <option value="<?php echo AI_CLIENT_SIDE_ACTION_SHOW; ?>" <?php echo ($obj->get_client_side_action () == AI_CLIENT_SIDE_ACTION_SHOW) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo strtolower (AI_TEXT_SHOW); ?></option>
+            <option value="<?php echo AI_CLIENT_SIDE_ACTION_INSERT; ?>" <?php echo ($obj->get_client_side_action () == AI_CLIENT_SIDE_ACTION_INSERT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo strtolower (AI_TEXT_INSERT); ?></option>
+          </select>
+
+          <label style="vertical-align: baseline;"> only on</label>
         </div>
 
         <div style="float: left; margin: -5px 0 -2px 0;">
@@ -1368,44 +1455,67 @@ function generate_settings_form (){
         <li id="ai-misc-filter-<?php echo $block; ?>"><a href="#tab-filter-<?php echo $block; ?>"><span style="<?php echo $filter_style; ?>">Filter</span></a></li>
         <li id="ai-misc-scheduling-<?php echo $block; ?>"><a href="#tab-scheduling-<?php echo $block; ?>"><span style="<?php echo $scheduling_style; ?>">Scheduling</span></a></li>
         <?php if (function_exists ('ai_adb_action_0')) ai_adb_action_0 ($block, $adb_style); ?>
-        <li id="ai-misc-general-<?php echo $block; ?>"><a href="#tab-general-<?php echo $block; ?>">General</a></li>
+        <li id="ai-misc-general-<?php echo $block; ?>"><a href="#tab-general-<?php echo $block; ?>"><span style="<?php echo $general_style; ?>">General</span></a></li>
       </ul>
 
-      <div id="tab-insertion-<?php echo $block; ?>" class="rounded">
-        <div class="max-input">
-          <span style="display: table-cell; width: 1px; white-space: nowrap;">
-            Insert for
-            <select id="display-for-users-<?php echo $block; ?>" style="margin: 0 1px; width:160px" name="<?php echo AI_OPTION_DISPLAY_FOR_USERS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_display_for_users(); ?>">
-               <option value="<?php echo AD_DISPLAY_ALL_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_ALL_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_ALL_USERS; ?></option>
-               <option value="<?php echo AD_DISPLAY_LOGGED_IN_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_LOGGED_IN_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_LOGGED_IN_USERS; ?></option>
-               <option value="<?php echo AD_DISPLAY_NOT_LOGGED_IN_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_NOT_LOGGED_IN_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_NOT_LOGGED_IN_USERS; ?></option>
-               <option value="<?php echo AD_DISPLAY_ADMINISTRATORS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_ADMINISTRATORS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_ADMINISTRATORS; ?></option>
-            </select>
-          </span>
-          <span style="display: table-cell; width: 1px; white-space: nowrap;">
-            &nbsp;&nbsp;
-            Max <input type="text" style="width: 32px;" name="<?php echo AI_OPTION_MAXIMUM_INSERTIONS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_maximum_insertions (); ?>" value="<?php echo $obj->get_maximum_insertions (); ?>" size="1" maxlength="3" title="Empty or 0 means no limit" /> insertions
-          </span>
-          <span style="display: table-cell; width: 1px; white-space: nowrap;">
-            <input type="hidden" name="<?php echo AI_OPTION_ENABLE_AMP, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
-            <input style="margin-left: 10px;" id="enable-amp-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_AMP, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_amp(true); ?>" <?php if ($obj->get_enable_amp (true) == AI_ENABLED) echo 'checked '; ?> />
-            <label for="enable-amp-<?php echo $block; ?>" style="vertical-align: top;<?php if (!$obj->get_enable_amp (true) && $obj->get_enable_amp ()) echo ' color: red;' ?>" title="<?php if (!$obj->get_enable_amp (true) && $obj->get_enable_amp ()) echo "Old settings for AMP pages detected. " ?>To insert different codes on normal and AMP pages separate them with [ADINSERTER AMP] separator. Here you can enable insertion on AMP pages only when you need to insert THE SAME CODE also on AMP pages (no AMP separator).">AMP pages</label>
-          </span>
-          <span style="display: table-cell; width: 1px; white-space: nowrap;">
-            <input type="hidden" name="<?php echo AI_OPTION_ENABLE_AJAX, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
-            <input style="margin-left: 10px;" id="enable-ajax-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_AJAX, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_ajax(); ?>" <?php if ($obj->get_enable_ajax () == AI_ENABLED) echo 'checked '; ?> />
-            <label for="enable-ajax-<?php echo $block; ?>" style="vertical-align: top;" title="Enable or disable insertion for Ajax requests">Ajax</label>
-          </span>
-          <span style="display: table-cell; width: 1px; white-space: nowrap;">
-            <input type="hidden" name="<?php echo AI_OPTION_ENABLE_FEED, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
-            <input style="margin-left: 10px;" id="enable-feed-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_FEED, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_feed(); ?>" <?php if ($obj->get_enable_feed () == AI_ENABLED) echo 'checked '; ?> />
-            <label for="enable-feed-<?php echo $block; ?>" style="vertical-align: top;" title="Enable or disable insertion in RSS feeds">RSS Feed</label>
-          </span>
-          <span style="display: table-cell; width: 1px; white-space: nowrap;">
-            <input type="hidden" name="<?php echo AI_OPTION_ENABLE_404, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
-            <input style="margin-left: 10px;" id="enable-404-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_404, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_404(); ?>" <?php if ($obj->get_enable_404 () == AI_ENABLED) echo 'checked '; ?> />
-            <label for="enable-404-<?php echo $block; ?>" style="vertical-align: top;" title="Enable or disable insertion on page for Error 404: Page not found">Error page</label>
-          </span>
+      <div id="tab-insertion-<?php echo $block; ?>" class="max-input" style="padding: 0";>
+        <div class="rounded">
+          <table class="responsive-table" style="width: 70%">
+            <tbody>
+              <tr>
+                <td>
+                  <input type="hidden" name="<?php echo AI_OPTION_ENABLE_AMP, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
+                  <input style="" id="enable-amp-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_AMP, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_amp(true); ?>" <?php if ($obj->get_enable_amp (true) == AI_ENABLED) echo 'checked '; ?> />
+                  <label for="enable-amp-<?php echo $block; ?>" style="<?php if (!$obj->get_enable_amp (true) && $obj->get_enable_amp ()) echo ' color: red;' ?>" title="<?php if (!$obj->get_enable_amp (true) && $obj->get_enable_amp ()) echo "Old settings for AMP pages detected. " ?>To insert different codes on normal and AMP pages separate them with [ADINSERTER AMP] separator. Here you can enable insertion on AMP pages only when you need to insert THE SAME CODE also on AMP pages (no AMP separator).">AMP pages</label>
+                </td>
+                <td>
+                  <input type="hidden" name="<?php echo AI_OPTION_ENABLE_AJAX, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
+                  <input style="margin-left: 10px;" id="enable-ajax-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_AJAX, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_ajax(); ?>" <?php if ($obj->get_enable_ajax () == AI_ENABLED) echo 'checked '; ?> />
+                  <label for="enable-ajax-<?php echo $block; ?>" title="Enable or disable insertion for Ajax requests">Ajax requests</label>
+                </td>
+                <td>
+                  <input type="hidden" name="<?php echo AI_OPTION_ENABLE_FEED, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
+                  <input style="margin-left: 10px;" id="enable-feed-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_FEED, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_feed(); ?>" <?php if ($obj->get_enable_feed () == AI_ENABLED) echo 'checked '; ?> />
+                  <label for="enable-feed-<?php echo $block; ?>" title="Enable or disable insertion in RSS feeds">RSS Feed</label>
+                </td>
+                <td>
+                  <input type="hidden" name="<?php echo AI_OPTION_ENABLE_404, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
+                  <input style="margin-left: 10px;" id="enable-404-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_ENABLE_404, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_enable_404(); ?>" <?php if ($obj->get_enable_404 () == AI_ENABLED) echo 'checked '; ?> />
+                  <label for="enable-404-<?php echo $block; ?>" title="Enable or disable insertion on page for Error 404: Page not found">Error 404 page</label>
+                </td>
+                <td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+        <div class="rounded">
+
+          <table class="responsive-table" style="width: 100%">
+            <tbody>
+              <tr>
+                <td>
+                  Insert for
+                  <select id="display-for-users-<?php echo $block; ?>" style="margin: 0 1px; width:160px" name="<?php echo AI_OPTION_DISPLAY_FOR_USERS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_display_for_users(); ?>">
+                     <option value="<?php echo AD_DISPLAY_ALL_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_ALL_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_ALL_USERS; ?></option>
+                     <option value="<?php echo AD_DISPLAY_LOGGED_IN_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_LOGGED_IN_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_LOGGED_IN_USERS; ?></option>
+                     <option value="<?php echo AD_DISPLAY_NOT_LOGGED_IN_USERS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_NOT_LOGGED_IN_USERS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_NOT_LOGGED_IN_USERS; ?></option>
+                     <option value="<?php echo AD_DISPLAY_ADMINISTRATORS; ?>" <?php echo ($obj->get_display_for_users()==AD_DISPLAY_ADMINISTRATORS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AD_DISPLAY_ADMINISTRATORS; ?></option>
+                  </select>
+                </td>
+                <td>
+                  Max <input type="text" style="width: 32px;" name="<?php echo AI_OPTION_MAXIMUM_INSERTIONS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_maximum_insertions (); ?>" value="<?php echo $obj->get_maximum_insertions (); ?>" size="1" maxlength="3" title="Empty or 0 means no limit" /> insertions
+                </td>
+                <td style="width: 50%">
+                  <span style="float: right;">
+                    <input type="hidden" name="<?php echo AI_OPTION_DISABLE_CACHING, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
+                    <input id="disable-caching-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_DISABLE_CACHING, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_disable_caching (); ?>" <?php if ($obj->get_disable_caching () == AI_ENABLED) echo 'checked '; ?> />
+                    <label for="disable-caching-<?php echo $block; ?>" title="Disable caching for WP Super Cache, W3 Total Cache and WP Rocket plugins">Disable caching</label>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -1474,9 +1584,10 @@ function generate_settings_form (){
             &nbsp;
           </span>
           <span style="display: table-cell;">
-            <input style="width: 100%;" type="text" name="<?php echo AI_OPTION_GENERAL_TAG, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_general_tag(); ?>" value="<?php echo $obj->get_ad_general_tag(); ?>" size="8" maxlength="40" title="Used for {tags} when no page data is found" />
+            <input style="width: 100%;" type="text" name="<?php echo AI_OPTION_GENERAL_TAG, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_general_tag(); ?>" value="<?php echo $obj->get_ad_general_tag(); ?>" size="8" maxlength="40" title="Used for [adinserter data=''] shortcodes when no data is found" />
           </span>
-          <span style="display: table-cell; width: 400px; white-space: nowrap;">
+          <?php if (function_exists ('ai_tab_general')) ai_tab_general ($block, $obj, $default); ?>
+          <span style="display: table-cell; width: 300px; white-space: nowrap;">
           </span>
         </div>
       </div>
@@ -1524,7 +1635,7 @@ function generate_settings_form (){
   if ($enabled_f) $style_f = "font-weight: bold; color: #66f;"; else $style_f = "";
   if (defined ('AI_ADBLOCKING_DETECTION') && AI_ADBLOCKING_DETECTION) {
     $adb_action = get_adb_action (true);
-    if ($enabled_a) $style_a = "font-weight: bold; color: " . ($adb_action == AI_ADB_ACTION_NONE ? "#66f;" : "#f00;"); else $style_a = "";
+    if ($enabled_a) $style_a = "font-weight: bold; color: " . ($adb_action == AI_ADB_ACTION_NONE ? "#66f;" : "#c0f;"); else $style_a = "";
   }
   if (false) $style_d = "font-weight: bold; color: #e44;"; else $style_d = "";
 ?>
@@ -1543,165 +1654,174 @@ function generate_settings_form (){
       <li id="ai-d" class="ai-plugin-tab"><a href="#tab-debugging"><span style="<?php echo $style_d ?>">Debugging</span></a></li>
     </ul>
 
-    <div id="tab-general" class="rounded">
+    <div id="tab-general" style="padding: 0;">
 
-      <table class="ai-settings-table" style="width: 100%;">
+    <div class="rounded">
+      <table class="ai-settings-table ai-values" style="width: 100%;">
 <?php if (function_exists ('ai_general_settings')) ai_general_settings (); ?>
-      <tr>
-        <td style="width: 34%;">
-          Syntax highlighting theme
-        </td>
-        <td>
-          <select
-              style="width:220px"
-              id="syntax-highlighter-theme"
-              name="syntax-highlighter-theme"
-              value="Value">
-              <optgroup label="None">
-                  <option value="<?php echo AI_OPTION_DISABLED; ?>" <?php echo ($syntax_highlighter_theme == AI_OPTION_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>No Syntax Highlighting</option>
-              </optgroup>
-              <optgroup label="Light">
-                  <option value="chrome" <?php echo ($syntax_highlighter_theme == 'chrome') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Chrome</option>
-                  <option value="clouds" <?php echo ($syntax_highlighter_theme == 'clouds') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Clouds</option>
-                  <option value="crimson_editor" <?php echo ($syntax_highlighter_theme == 'crimson_editor') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Crimson Editor</option>
-                  <option value="dawn" <?php echo ($syntax_highlighter_theme == 'dawn') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Dawn</option>
-                  <option value="dreamweaver" <?php echo ($syntax_highlighter_theme == 'dreamweaver') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Dreamweaver</option>
-                  <option value="eclipse" <?php echo ($syntax_highlighter_theme == 'eclipse') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Eclipse</option>
-                  <option value="github" <?php echo ($syntax_highlighter_theme == 'github') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>GitHub</option>
-                  <option value="katzenmilch" <?php echo ($syntax_highlighter_theme == 'katzenmilch') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Katzenmilch</option>
-                  <option value="kuroir" <?php echo ($syntax_highlighter_theme == 'kuroir') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Kuroir</option>
-                  <option value="solarized_light" <?php echo ($syntax_highlighter_theme == 'solarized_light') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Solarized Light</option>
-                  <option value="textmate" <?php echo ($syntax_highlighter_theme == 'textmate') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Textmate</option>
-                  <option value="tomorrow" <?php echo ($syntax_highlighter_theme == 'tomorrow') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow</option>
-                  <option value="xcode" <?php echo ($syntax_highlighter_theme == 'xcode') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>XCode</option>
-              </optgroup>
-              <optgroup label="Dark">
-                  <option value="ad_inserter" <?php echo ($syntax_highlighter_theme == 'ad_inserter') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Ad Inserter</option>
-                  <option value="chaos" <?php echo ($syntax_highlighter_theme == 'chaos') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Chaos</option>
-                  <option value="clouds_midnight" <?php echo ($syntax_highlighter_theme == 'clouds_midnight') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Clouds Midnight</option>
-                  <option value="cobalt" <?php echo ($syntax_highlighter_theme == 'cobalt') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Cobalt</option>
-                  <option value="idle_fingers" <?php echo ($syntax_highlighter_theme == 'idle_fingers') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Idle Fingers</option>
-                  <option value="kr_theme" <?php echo ($syntax_highlighter_theme == 'kr_theme') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>krTheme</option>
-                  <option value="merbivore" <?php echo ($syntax_highlighter_theme == 'merbivore') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Merbivore</option>
-                  <option value="merbivore_soft" <?php echo ($syntax_highlighter_theme == 'merbivore_soft') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Merbivore Soft</option>
-                  <option value="mono_industrial" <?php echo ($syntax_highlighter_theme == 'mono_industrial') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Mono Industrial</option>
-                  <option value="monokai" <?php echo ($syntax_highlighter_theme == 'monokai') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Monokai</option>
-                  <option value="pastel_on_dark" <?php echo ($syntax_highlighter_theme == 'pastel_on_dark') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Pastel on Dark</option>
-                  <option value="solarized_dark" <?php echo ($syntax_highlighter_theme == 'solarized_dark') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Solarized Dark</option>
-                  <option value="terminal" <?php echo ($syntax_highlighter_theme == 'terminal') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Terminal</option>
-                  <option value="tomorrow_night" <?php echo ($syntax_highlighter_theme == 'tomorrow_night') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow Night</option>
-                  <option value="tomorrow_night_blue" <?php echo ($syntax_highlighter_theme == 'tomorrow_night_blue') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow Night Blue</option>
-                  <option value="tomorrow_night_bright" <?php echo ($syntax_highlighter_theme == 'tomorrow_night_bright') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow Night Bright</option>
-                  <option value="tomorrow_night_eighties" <?php echo ($syntax_highlighter_theme == 'tomorrow_night_eighties') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow Night 80s</option>
-                  <option value="twilight" <?php echo ($syntax_highlighter_theme == 'twilight') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Twilight</option>
-                  <option value="vibrant_ink" <?php echo ($syntax_highlighter_theme == 'vibrant_ink') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Vibrant Ink</option>
-              </optgroup>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          Block class name
-        </td>
-        <td>
-          <input style="margin-left: 0px;" title="CSS Class Name for the wrapping div" type="text" id="block-class-name" name="block-class-name" value="<?php echo $block_class_name; ?>" default="<?php echo DEFAULT_BLOCK_CLASS_NAME; ?>" size="15" maxlength="40" />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          Inline styles
-        </td>
-        <td>
-          <select
-            id="inline-styles"
-            name="inline-styles"
-            title="Instead of alignment classes generate inline alignment styles for code blocks"
-            default="<?php echo DEFAULT_INLINE_STYLES; ?>">
-              <option value="<?php echo AI_DISABLED; ?>" <?php echo ($inline_styles == AI_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DISABLED; ?></option>
-              <option value="<?php echo AI_ENABLED; ?>" <?php echo ($inline_styles == AI_ENABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_ENABLED; ?></option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          Min. user role for ind. exceptions editing
-        </td>
-        <td>
-          <select style="margin-bottom: 3px;" id="minimum-user-role" name="minimum-user-role" selected-value="1" data="<?php echo get_minimum_user_role (); ?>" default="<?php echo DEFAULT_MINIMUM_USER_ROLE; ?>" style="width:300px">
-            <?php wp_dropdown_roles (get_minimum_user_role ()); ?>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Dynamic blocks
-        </td>
-        <td>
-          <select id="dynamic_blocks" name="dynamic_blocks" default="<?php echo DEFAULT_DYNAMIC_BLOCKS; ?>">
-            <option value="<?php echo AI_DYNAMIC_BLOCKS_SERVER_SIDE; ?>" <?php echo get_dynamic_blocks()      == AI_DYNAMIC_BLOCKS_SERVER_SIDE ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_SERVER_SIDE; ?></option>
-            <option value="<?php echo AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC; ?>" <?php echo get_dynamic_blocks() == AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_SERVER_SIDE_W3TC; ?></option>
-            <option value="<?php echo AI_DYNAMIC_BLOCKS_CLIENT_SIDE; ?>" <?php echo get_dynamic_blocks()      == AI_DYNAMIC_BLOCKS_CLIENT_SIDE ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CLIENT_SIDE; ?></option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Functions for paragraph counting
-        </td>
-        <td>
-          <select id="paragraph_counting_functions" name="paragraph_counting_functions"  default="<?php echo DEFAULT_PARAGRAPH_COUNTING_FUNCTIONS; ?>" title="Standard PHP functions are faster and work in most cases, use Multibyte functions if paragraphs are not counted properly on non-english pages.">
-            <option value="<?php echo AI_STANDARD_PARAGRAPH_COUNTING_FUNCTIONS; ?>" <?php echo get_paragraph_counting_functions()  == AI_STANDARD_PARAGRAPH_COUNTING_FUNCTIONS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_STANDARD; ?></option>
-            <option value="<?php echo AI_MULTIBYTE_PARAGRAPH_COUNTING_FUNCTIONS; ?>" <?php echo get_paragraph_counting_functions() == AI_MULTIBYTE_PARAGRAPH_COUNTING_FUNCTIONS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_MULTIBYTE; ?></option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        No paragraph counting inside
-        </td>
-        <td>
-          <input type="text" name="no-paragraph-counting-inside" value="<?php echo get_no_paragraph_counting_inside (); ?>"  default="<?php echo DEFAULT_NO_PARAGRAPH_COUNTING_INSIDE; ?>" size="40" maxlength="80" />
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Sticky widget mode
-        </td>
-        <td>
-          <select name="sticky-widget-mode"  default="<?php echo DEFAULT_STICKY_WIDGET_MODE; ?>" title="CSS mode is the best approach but may not work with all themes. JavaScript mode works with most themes but may reload ads on page load.">
-            <option value="<?php echo AI_STICKY_WIDGET_MODE_CSS; ?>" <?php echo get_sticky_widget_mode()  == AI_STICKY_WIDGET_MODE_CSS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CSS; ?></option>
-            <option value="<?php echo AI_STICKY_WIDGET_MODE_JS; ?>" <?php echo get_sticky_widget_mode() == AI_STICKY_WIDGET_MODE_JS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_JS; ?></option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Sticky widget top margin
-        </td>
-        <td>
-          <input type="text" name="sticky-widget-margin" value="<?php echo get_sticky_widget_margin (); ?>"  default="<?php echo DEFAULT_STICKY_WIDGET_MARGIN; ?>" size="6" maxlength="4" /> px
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Output buffering
-        </td>
-        <td>
-          <select id="output-buffering" name="output-buffering"  default="<?php echo DEFAULT_OUTPUT_BUFFERING; ?>" title="Needed for position Above header but may not work with all themes">
-            <option value="<?php echo AI_OUTPUT_BUFFERING_DISABLED; ?>" <?php echo get_output_buffering()  == AI_OUTPUT_BUFFERING_DISABLED ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DISABLED; ?></option>
-            <option value="<?php echo AI_OUTPUT_BUFFERING_ENABLED; ?>" <?php echo get_output_buffering() == AI_OUTPUT_BUFFERING_ENABLED ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_ENABLED; ?></option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Plugin priority
-        </td>
-        <td>
-          <input type="text" name="plugin_priority" value="<?php echo get_plugin_priority (); ?>"  default="<?php echo DEFAULT_PLUGIN_PRIORITY; ?>" size="6" maxlength="6" />
-        </td>
-      </tr>
+        <tr>
+          <td>
+          Plugin priority
+          </td>
+          <td>
+            <input type="text" name="plugin_priority" value="<?php echo get_plugin_priority (); ?>"  default="<?php echo DEFAULT_PLUGIN_PRIORITY; ?>" size="6" maxlength="6" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+          Output buffering
+          </td>
+          <td>
+            <select id="output-buffering" name="output-buffering"  default="<?php echo DEFAULT_OUTPUT_BUFFERING; ?>" title="Needed for position Above header but may not work with all themes">
+              <option value="<?php echo AI_OUTPUT_BUFFERING_DISABLED; ?>" <?php echo get_output_buffering()  == AI_OUTPUT_BUFFERING_DISABLED ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DISABLED; ?></option>
+              <option value="<?php echo AI_OUTPUT_BUFFERING_ENABLED; ?>" <?php echo get_output_buffering() == AI_OUTPUT_BUFFERING_ENABLED ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_ENABLED; ?></option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Syntax highlighting theme
+          </td>
+          <td>
+            <select
+                id="syntax-highlighter-theme"
+                name="syntax-highlighter-theme"
+                value="Value">
+                <optgroup label="None">
+                    <option value="<?php echo AI_OPTION_DISABLED; ?>" <?php echo ($syntax_highlighter_theme == AI_OPTION_DISABLED) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>No Syntax Highlighting</option>
+                </optgroup>
+                <optgroup label="Light">
+                    <option value="chrome" <?php echo ($syntax_highlighter_theme == 'chrome') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Chrome</option>
+                    <option value="clouds" <?php echo ($syntax_highlighter_theme == 'clouds') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Clouds</option>
+                    <option value="crimson_editor" <?php echo ($syntax_highlighter_theme == 'crimson_editor') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Crimson Editor</option>
+                    <option value="dawn" <?php echo ($syntax_highlighter_theme == 'dawn') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Dawn</option>
+                    <option value="dreamweaver" <?php echo ($syntax_highlighter_theme == 'dreamweaver') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Dreamweaver</option>
+                    <option value="eclipse" <?php echo ($syntax_highlighter_theme == 'eclipse') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Eclipse</option>
+                    <option value="github" <?php echo ($syntax_highlighter_theme == 'github') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>GitHub</option>
+                    <option value="katzenmilch" <?php echo ($syntax_highlighter_theme == 'katzenmilch') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Katzenmilch</option>
+                    <option value="kuroir" <?php echo ($syntax_highlighter_theme == 'kuroir') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Kuroir</option>
+                    <option value="solarized_light" <?php echo ($syntax_highlighter_theme == 'solarized_light') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Solarized Light</option>
+                    <option value="textmate" <?php echo ($syntax_highlighter_theme == 'textmate') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Textmate</option>
+                    <option value="tomorrow" <?php echo ($syntax_highlighter_theme == 'tomorrow') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow</option>
+                    <option value="xcode" <?php echo ($syntax_highlighter_theme == 'xcode') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>XCode</option>
+                </optgroup>
+                <optgroup label="Dark">
+                    <option value="ad_inserter" <?php echo ($syntax_highlighter_theme == 'ad_inserter') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Ad Inserter</option>
+                    <option value="chaos" <?php echo ($syntax_highlighter_theme == 'chaos') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Chaos</option>
+                    <option value="clouds_midnight" <?php echo ($syntax_highlighter_theme == 'clouds_midnight') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Clouds Midnight</option>
+                    <option value="cobalt" <?php echo ($syntax_highlighter_theme == 'cobalt') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Cobalt</option>
+                    <option value="idle_fingers" <?php echo ($syntax_highlighter_theme == 'idle_fingers') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Idle Fingers</option>
+                    <option value="kr_theme" <?php echo ($syntax_highlighter_theme == 'kr_theme') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>krTheme</option>
+                    <option value="merbivore" <?php echo ($syntax_highlighter_theme == 'merbivore') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Merbivore</option>
+                    <option value="merbivore_soft" <?php echo ($syntax_highlighter_theme == 'merbivore_soft') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Merbivore Soft</option>
+                    <option value="mono_industrial" <?php echo ($syntax_highlighter_theme == 'mono_industrial') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Mono Industrial</option>
+                    <option value="monokai" <?php echo ($syntax_highlighter_theme == 'monokai') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Monokai</option>
+                    <option value="pastel_on_dark" <?php echo ($syntax_highlighter_theme == 'pastel_on_dark') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Pastel on Dark</option>
+                    <option value="solarized_dark" <?php echo ($syntax_highlighter_theme == 'solarized_dark') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Solarized Dark</option>
+                    <option value="terminal" <?php echo ($syntax_highlighter_theme == 'terminal') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Terminal</option>
+                    <option value="tomorrow_night" <?php echo ($syntax_highlighter_theme == 'tomorrow_night') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow Night</option>
+                    <option value="tomorrow_night_blue" <?php echo ($syntax_highlighter_theme == 'tomorrow_night_blue') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow Night Blue</option>
+                    <option value="tomorrow_night_bright" <?php echo ($syntax_highlighter_theme == 'tomorrow_night_bright') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow Night Bright</option>
+                    <option value="tomorrow_night_eighties" <?php echo ($syntax_highlighter_theme == 'tomorrow_night_eighties') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Tomorrow Night 80s</option>
+                    <option value="twilight" <?php echo ($syntax_highlighter_theme == 'twilight') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Twilight</option>
+                    <option value="vibrant_ink" <?php echo ($syntax_highlighter_theme == 'vibrant_ink') ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>>Vibrant Ink</option>
+                </optgroup>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Min. user role for ind. exceptions editing
+          </td>
+          <td>
+            <select style="margin-bottom: 3px;" id="minimum-user-role" name="minimum-user-role" selected-value="1" data="<?php echo get_minimum_user_role (); ?>" default="<?php echo DEFAULT_MINIMUM_USER_ROLE; ?>" style="width:300px">
+              <?php wp_dropdown_roles (get_minimum_user_role ()); ?>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          Sticky widget mode
+          </td>
+          <td>
+            <select name="sticky-widget-mode"  default="<?php echo DEFAULT_STICKY_WIDGET_MODE; ?>" title="CSS mode is the best approach but may not work with all themes. JavaScript mode works with most themes but may reload ads on page load.">
+              <option value="<?php echo AI_STICKY_WIDGET_MODE_CSS; ?>" <?php echo get_sticky_widget_mode()  == AI_STICKY_WIDGET_MODE_CSS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CSS; ?></option>
+              <option value="<?php echo AI_STICKY_WIDGET_MODE_JS; ?>" <?php echo get_sticky_widget_mode() == AI_STICKY_WIDGET_MODE_JS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_JS; ?></option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          Sticky widget top margin
+          </td>
+          <td>
+            <input type="text" name="sticky-widget-margin" value="<?php echo get_sticky_widget_margin (); ?>"  default="<?php echo DEFAULT_STICKY_WIDGET_MARGIN; ?>" size="6" maxlength="4" /> px
+          </td>
+        </tr>
+        <tr>
+          <td>
+          Dynamic blocks
+          </td>
+          <td>
+            <select id="dynamic_blocks" name="dynamic_blocks" default="<?php echo DEFAULT_DYNAMIC_BLOCKS; ?>">
+              <option value="<?php echo AI_DYNAMIC_BLOCKS_SERVER_SIDE; ?>" <?php echo get_dynamic_blocks()      == AI_DYNAMIC_BLOCKS_SERVER_SIDE ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_SERVER_SIDE; ?></option>
+              <option value="<?php echo AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC; ?>" <?php echo get_dynamic_blocks() == AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_SERVER_SIDE_W3TC; ?></option>
+              <option value="<?php echo AI_DYNAMIC_BLOCKS_CLIENT_SIDE; ?>" <?php echo get_dynamic_blocks()      == AI_DYNAMIC_BLOCKS_CLIENT_SIDE ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CLIENT_SIDE; ?></option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          Functions for paragraph counting
+          </td>
+          <td>
+            <select id="paragraph_counting_functions" name="paragraph_counting_functions"  default="<?php echo DEFAULT_PARAGRAPH_COUNTING_FUNCTIONS; ?>" title="Standard PHP functions are faster and work in most cases, use Multibyte functions if paragraphs are not counted properly on non-english pages.">
+              <option value="<?php echo AI_STANDARD_PARAGRAPH_COUNTING_FUNCTIONS; ?>" <?php echo get_paragraph_counting_functions()  == AI_STANDARD_PARAGRAPH_COUNTING_FUNCTIONS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_STANDARD; ?></option>
+              <option value="<?php echo AI_MULTIBYTE_PARAGRAPH_COUNTING_FUNCTIONS; ?>" <?php echo get_paragraph_counting_functions() == AI_MULTIBYTE_PARAGRAPH_COUNTING_FUNCTIONS ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_MULTIBYTE; ?></option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          No paragraph counting inside
+          </td>
+          <td>
+            <input type="text" name="no-paragraph-counting-inside" value="<?php echo get_no_paragraph_counting_inside (); ?>"  default="<?php echo DEFAULT_NO_PARAGRAPH_COUNTING_INSIDE; ?>" size="40" maxlength="80" />
+          </td>
+        </tr>
       </table>
+    </div>
+
+    <div class="rounded">
+      <table class="ai-settings-table" style="width: 100%;">
+        <tr>
+          <td>
+            <span title="CSS Class Name for the wrapping div">Block class name</span>
+            <input id="block-class-name" class="ai-block-code-demo" style="margin-left: 5px;" type="text" name="block-class-name" value="<?php echo $block_class_name; ?>" default="<?php echo DEFAULT_BLOCK_CLASS_NAME; ?>" size="15" maxlength="40" />
+          </td>
+          <td>
+            <span title="Include general plugin block class">Block class</span>
+            <input type="hidden" name="block-class" value="0" />
+            <input id="block-class" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="block-class"value="1" default="<?php echo DEFAULT_BLOCK_CLASS; ?>" <?php if ($block_class == AI_ENABLED) echo 'checked '; ?> />
+          </td>
+          <td>
+            <span title="Include block number class">Block number class</span>
+            <input type="hidden" name="block-number-class" value="0" />
+            <input id="block-number-class" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="block-number-class"value="1" default="<?php echo DEFAULT_BLOCK_NUMBER_CLASS; ?>" <?php if ($block_number_class == AI_ENABLED) echo 'checked '; ?> />
+          </td>
+          <td>
+            <span title="Instead of alignment classes generate inline alignment styles for code blocks">Inline styles</span>
+            <input type="hidden" name="inline-styles" value="0" />
+            <input id="inline-styles" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="inline-styles"value="1" default="<?php echo DEFAULT_INLINE_STYLES; ?>" <?php if ($inline_styles == AI_ENABLED) echo 'checked '; ?> />
+          </td>
+        </tr>
+      </table>
+      <div style="margin-top: 8px;">Preview of the block wrapping code</div>
+      <pre style="margin: 0; padding: 5px; background: #eee; color: #00f;" title="Wrapping div"><span id="ai-block-code-demo" ><?php echo ai_block_code_demo ($block_class_name, $block_class, $block_number_class, $inline_styles); ?></span>
+  <span style="color: #222;">BLOCK CODE</span>
+&lt;/div&gt;</pre>
+    </div>
+
     </div>
 
     <div id="tab-viewports" class="rounded">
@@ -1797,7 +1917,7 @@ function generate_settings_form (){
       </div>
 
       <div style="margin: 8px 0;">
-        <textarea id="block-h" name="<?php echo AI_OPTION_CODE, '_block_h'; ?>" class="simple-editor" style="background-color:#F9F9F9; font-family: Courier, 'Courier New', monospace; font-weight: bold;"><?php echo esc_textarea ($adH->get_ad_data()); ?></textarea>
+        <textarea id="block-h" name="<?php echo AI_OPTION_CODE, '_block_h'; ?>" class="simple-editor" style="background-color:#F9F9F9; font-family: Courier, 'Courier New', monospace; font-weight: bold;" default=""><?php echo esc_textarea ($adH->get_ad_data()); ?></textarea>
       </div>
 
       <div id="device-detection-settings-h" class="rounded">
@@ -1853,7 +1973,7 @@ function generate_settings_form (){
       </div>
 
       <div style="margin: 8px 0;">
-        <textarea id="block-f" name="<?php echo AI_OPTION_CODE, '_block_f'; ?>" class="simple-editor" style="background-color:#F9F9F9; font-family: Courier, 'Courier New', monospace; font-weight: bold;"><?php echo esc_textarea ($adF->get_ad_data()); ?></textarea>
+        <textarea id="block-f" name="<?php echo AI_OPTION_CODE, '_block_f'; ?>" class="simple-editor" style="background-color:#F9F9F9; font-family: Courier, 'Courier New', monospace; font-weight: bold;" default=""><?php echo esc_textarea ($adF->get_ad_data()); ?></textarea>
       </div>
 
       <div id="device-detection-settings-f" class="rounded">
@@ -1930,7 +2050,7 @@ function generate_settings_form (){
               Custom Selectors
             </td>
             <td>
-              <input style="width: 100%;" type="text" name="<?php echo AI_OPTION_ADB_SELECTORS; ?>" title="Comma seprarated list of CSS selectors (.class, #id) used for additional ad blocking detection. Invisible or zero height of the element means ad blocking is present." value="<?php echo get_adb_selectors (); ?>"  default="" size="50" maxlength="200" />
+              <input style="width: 100%;" type="text" name="<?php echo AI_OPTION_ADB_SELECTORS; ?>" title="Comma seprarated list of selectors (.class, #id) used for additional ad blocking detection. Invisible or zero height of the element means ad blocking is present." value="<?php echo get_adb_selectors (); ?>"  default="" size="50" maxlength="200" />
             </td>
           </tr>
 <?php if (function_exists ('ai_adb_settings')) ai_adb_settings (); ?>
@@ -1997,7 +2117,7 @@ function generate_settings_form (){
         </div>
 
         <div style="margin: 8px 0;">
-          <textarea id="block-a" name="<?php echo AI_OPTION_CODE, '_block_a'; ?>" class="simple-editor small" style="background-color:#F9F9F9; font-family: Courier, 'Courier New', monospace; font-weight: bold;"><?php echo esc_textarea ($adA->get_ad_data()); ?></textarea>
+          <textarea id="block-a" name="<?php echo AI_OPTION_CODE, '_block_a'; ?>" class="simple-editor small" style="background-color:#F9F9F9; font-family: Courier, 'Courier New', monospace; font-weight: bold;" default="<?php echo esc_textarea (AI_DEFAULT_ADB_MESSAGE); ?>"><?php echo esc_textarea ($adA->get_ad_data()); ?></textarea>
         </div>
 
         <div class="rounded">
@@ -2056,11 +2176,20 @@ function generate_settings_form (){
         </tr>
         <tr class="system-debugging" style="display: none;">
           <td>
-            <label for="javascript-debugging" title="Enable Javascript console output">Javascript debugging</label>
+            <label for="backend-js-debugging" title="Enable backend javascript console output">Backend javascript debugging</label>
           </td>
           <td>
-            <input type="hidden" name="javascript_debugging" value="0" />
-            <input type="checkbox" name="javascript_debugging" id="javascript-debugging" value="1" default="<?php echo DEFAULT_JAVASCRIPT_DEBUGGING; ?>" <?php if (get_javascript_debugging ()==AI_ENABLED) echo 'checked '; ?> />
+            <input type="hidden" name="backend_js_debugging" value="0" />
+            <input type="checkbox" name="backend_js_debugging" id="backend-js-debugging" value="1" default="<?php echo DEFAULT_BACKEND_JS_DEBUGGING; ?>" <?php if (get_backend_javascript_debugging ()==AI_ENABLED) echo 'checked '; ?> />
+          </td>
+        </tr>
+        <tr class="system-debugging" style="display: none;">
+          <td>
+            <label for="frontend-js-debugging" title="Enable frontend javascript console output">Frontend javascript debugging</label>
+          </td>
+          <td>
+            <input type="hidden" name="frontend_js_debugging" value="0" />
+            <input type="checkbox" name="frontend_js_debugging" id="frontend-js-debugging" value="1" default="<?php echo DEFAULT_FRONTEND_JS_DEBUGGING; ?>" <?php if (get_frontend_javascript_debugging ()==AI_ENABLED) echo 'checked '; ?> />
           </td>
         </tr>
         <tr class="system-debugging" style="display: none;">
@@ -2232,13 +2361,14 @@ function generate_settings_form (){
 ?>
 
     var blocking_counter = 0;
-    replace_blocked_image ('ai-media-1',    'contextual-1.gif',   'block');
-    replace_blocked_image ('ai-media-2',    'contextual-2.jpg',   'block');
-    replace_blocked_image ('ai-pro-1',      'icon-256x256.jpg',   'block');
-    replace_blocked_image ('ai-pro-2',      'ai-charts-250.png',  'block');
-    replace_blocked_image ('ai-stars-img',  'stars.png',          'inline');
-    replace_blocked_image ('ai-tw',         'twitter.png',        'inline');
-    replace_blocked_image ('ai-fb',         'facebook.png',       'inline');
+    replace_blocked_image ('ai-media-1',    'contextual-1.gif',     'block');
+    replace_blocked_image ('ai-media-2',    'contextual-2.jpg',     'block');
+    replace_blocked_image ('ai-pro-1',      'icon-256x256.jpg',     'block');
+    replace_blocked_image ('ai-pro-2',      'ai-charts-250.png',    'block');
+    replace_blocked_image ('ai-pro-3',      'ai-countries-250.png', 'block');
+    replace_blocked_image ('ai-stars-img',  'stars.png',            'inline');
+    replace_blocked_image ('ai-tw',         'twitter.png',          'inline');
+    replace_blocked_image ('ai-fb',         'facebook.png',         'inline');
     if (blocking_counter > 5) {
       var message = 'Ad blocking test: ' + blocking_counter + ' images not loaded';
       console.log ('AD INSERTER:', message);
@@ -2384,22 +2514,24 @@ function code_block_list () {
       if (!$error) {
         // Update AI_OPTION_FALLBACK and AI_OPTION_ADB_BLOCK_REPLACEMENT
         for ($block = 1; $block <= AD_INSERTER_BLOCKS; $block ++) {
-          $ai_option_fallback = $new_options [$block][AI_OPTION_FALLBACK];
-          if ($ai_option_fallback != '') {
-            foreach ($blocks_org as $index => $org_block) {
-              if ($ai_option_fallback == $org_block) {
-                $new_options [$block][AI_OPTION_FALLBACK] = $blocks_new [$index];
+          if (isset ($new_options [$block][AI_OPTION_FALLBACK])) {
+            $ai_option_fallback = $new_options [$block][AI_OPTION_FALLBACK];
+            if ($ai_option_fallback != '')
+              foreach ($blocks_org as $index => $org_block) {
+                if ($ai_option_fallback == $org_block) {
+                  $new_options [$block][AI_OPTION_FALLBACK] = $blocks_new [$index];
+                }
               }
-            }
           }
 
-          $ai_option_adb_block_replacement = $new_options [$block][AI_OPTION_ADB_BLOCK_REPLACEMENT];
-          if ($ai_option_adb_block_replacement != '') {
-            foreach ($blocks_org as $index => $org_block) {
-              if ($ai_option_adb_block_replacement == $org_block) {
-                $new_options [$block][AI_OPTION_ADB_BLOCK_REPLACEMENT] = $blocks_new [$index];
+          if (isset ($new_options [$block][AI_OPTION_ADB_BLOCK_REPLACEMENT])) {
+            $ai_option_adb_block_replacement = $new_options [$block][AI_OPTION_ADB_BLOCK_REPLACEMENT];
+            if ($ai_option_adb_block_replacement != '')
+              foreach ($blocks_org as $index => $org_block) {
+                if ($ai_option_adb_block_replacement == $org_block) {
+                  $new_options [$block][AI_OPTION_ADB_BLOCK_REPLACEMENT] = $blocks_new [$index];
+                }
               }
-            }
           }
         }
 
@@ -2411,9 +2543,11 @@ function code_block_list () {
           foreach ($ai_widgets as $widget_index => $ai_widget) {
             if (isset ($ai_widget ['block'])) {
               $widget_block = $ai_widget ['block'];
-              if (isset ($blocks_org [$block_indexes [$widget_block]])) {
-                $new_block = $blocks_new [$block_indexes [$widget_block]];
-                $ai_widgets [$widget_index]['block'] = $new_block;
+              if ($widget_block >= 1 && $widget_block <= AD_INSERTER_BLOCKS) {
+                if (isset ($blocks_org [$block_indexes [$widget_block]])) {
+                  $new_block = $blocks_new [$block_indexes [$widget_block]];
+                  $ai_widgets [$widget_index]['block'] = $new_block;
+                }
               }
             }
           }
@@ -2526,7 +2660,9 @@ function code_block_list () {
     </table>
 <?php
   if ($row_counter == 0) {
-    echo "<div style='margin: 10px 0 0 20px;'>No code block matches search keywords</div>";
+    if ($search_text == '')
+      echo "<div style='margin: 10px 0 0 20px;'>No active code block</div>"; else
+        echo "<div style='margin: 10px 0 0 20px;'>No code block matches search keywords</div>";
   }
 }
 
@@ -2607,8 +2743,8 @@ function adsense_list () {
           <td style="color: <?php echo $ad_unit ['active'] ? '#444' : '#ccc'; ?>;">
             <?php echo $ad_unit ['name']; ?>
           </td>
-          <td style="text-align: left; color: <?php echo $ad_unit ['active'] ? '#444' : '#ccc'; ?>;">
-            <?php echo $ad_unit ['code']; ?>
+          <td class="select" style="text-align: left; color: <?php echo $ad_unit ['active'] ? '#444' : '#ccc'; ?>;">
+            <span><?php echo $ad_unit ['code']; ?></span>
           </td>
           <td style="color: <?php echo $ad_unit ['active'] ? '#444' : '#ccc'; ?>;">
             <?php echo ucwords (strtolower (str_replace ('_', ', ', $ad_unit ['type']))); ?>
@@ -2628,7 +2764,9 @@ function adsense_list () {
 <?php
     } else echo "<div style='margin: 10px 0 0 20px;'>$error</div>";
 
-  } else {
+  }
+
+  elseif (defined ('AI_ADSENSE_CLIENT_ID')) {
       $adsense = new adsense_api();
 ?>
     <table class="responsive-table" cellspacing=0 cellpadding=0 style="width: 100%;">
@@ -2636,13 +2774,13 @@ function adsense_list () {
         <tr>
           <td colspan="2" style="white-space: inherit;">
             <div class="rounded" style="margin: 0;">
-              <h2 style="margin: 5px 0; float: left;"><strong><?php echo AD_INSERTER_NAME; ?></strong> AdSense Integration</h2>
+              <h2 style="margin: 5px 0; float: left;"><strong><?php echo AD_INSERTER_NAME; ?></strong> AdSense Integration - Step 2</h2>
               <a href="https://www.google.com/adsense/login" class="simple-link" style="float: right;" target="_blank" title="Google AdSense Home"><img src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>ga-logo.png" style="margin: 3px 0 -4px 0;"/></a>
               <div style="clear: both;"></div>
             </div>
-            <p style="text-align: justify;">Here can <strong><?php echo AD_INSERTER_NAME; ?></strong> list configured AdSense ad units and get code for AdSense ads.
-            To do this you need to authorize <?php echo AD_INSERTER_NAME; ?> to access your AdSense account. Click on the <strong>Get Authorization Code</strong> button to open a new window where you can allow access.
+            <p style="text-align: justify;">Now you can authorize <?php echo AD_INSERTER_NAME; ?> to access your AdSense account. Click on the <strong>Get Authorization Code</strong> button to open a new window where you can allow access.
             When you get the code copy it to the field below and click on the button <strong>Authorize</strong>.</p>
+            <p style="text-align: justify;">If you get error <strong>invalid client</strong> click on the button <strong>Clear and return to Step 1</strong> to re-enter Client ID and Client Secret.</p>
           </td>
         </tr>
         <tr>
@@ -2658,9 +2796,11 @@ function adsense_list () {
           <td>&nbsp;</td>
         </tr>
         <tr>
-          <td></td>
           <td>
-            <button type="button" id="authorize-adsense" class="ai-top-button" style="display: none; float: right; width: 162px; outline-color: transparent;">Authorize</button>
+            <button type="button" class="ai-top-button authorize-adsense clear-adsense" style="display: none; float: left; width: 162px; outline-color: transparent;">Clear and return to Step 1</button>
+          </td>
+          <td>
+            <button type="button" class="ai-top-button authorize-adsense" style="display: none; float: right; width: 162px; outline-color: transparent;">Authorize</button>
           </td>
         </tr>
       </tbody>
@@ -2668,6 +2808,77 @@ function adsense_list () {
 
 <?php
   }
+
+  else {
+?>
+    <table class="responsive-table" cellspacing=0 cellpadding=0 style="width: 100%;">
+      <tbody>
+        <tr>
+          <td colspan="2" style="white-space: inherit;">
+            <div class="rounded" style="margin: 0;">
+              <h2 style="margin: 5px 0; float: left;"><strong><?php echo AD_INSERTER_NAME; ?></strong> AdSense Integration - Step 1</h2>
+              <a href="https://www.google.com/adsense/login" class="simple-link" style="float: right;" target="_blank" title="Google AdSense Home"><img src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>ga-logo.png" style="margin: 3px 0 -4px 0;"/></a>
+              <div style="clear: both;"></div>
+            </div>
+            <p style="text-align: justify;">Here can <strong><?php echo AD_INSERTER_NAME; ?></strong> list configured AdSense ad units and get code for AdSense ads.
+            To do this you need to authorize <?php echo AD_INSERTER_NAME; ?> to access your AdSense account. The first step is to create a Google API project in order to get Client ID and Client Secret.</p>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" style="white-space: inherit;">
+            <ol>
+              <li>Go to <a href="https://console.developers.google.com/" target="_blank">Google APIs and Services console</a></li>
+              <li>Create <strong>Ad Inserter</strong> project - if the project and IDs are already created click on the <strong>Credentials</strong> in the sidebar and go to step 16</li>
+              <li>Click on <strong>Select a project</strong> selection and then click on the <strong>+</strong> button to create a new project</li>
+              <li>Enter <strong>Ad Inserter</strong> for project name and click on the <strong>Create</strong> button</li>
+              <li>Click on project selection, wait for the project to be created and then and select <strong>Ad Inserter</strong> as the current project</li>
+              <li>Click on <strong>ENABLE APIS AND SERVICES</strong></li>
+              <li>Search for adsense and enable <strong>AdSense Management API</strong></li>
+              <li>Click on <strong>Create credentials</strong></li>
+              <li>For <strong>Where will you be calling the API from?</strong> select <strong>Other UI</strong></li>
+              <li>For <strong>What data will you be accessing?</strong> select <strong>User data</strong></li>
+              <li>Click on <strong>What credentials do I need?</strong></li>
+              <li>Create an OAuth 2.0 client ID: For <strong>OAuth 2.0 client ID</strong> name enter <strong>Ad Inserter client</strong></li>
+              <li>Set up the OAuth 2.0 consent screen: For <strong>Product name shown to users</strong> enter <strong>Ad Inserter</strong></li>
+              <li>Click on <strong>Continue</strong></li>
+              <li>Click on <strong>Done</strong></li>
+              <li>Click on <strong>Ad Inserter client</strong> to get <strong>Client ID</strong> and <strong>Client secret</strong></li>
+              <li>Copy them to the appropriate fields below</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-right: 10px;">
+            Client ID
+          </td>
+          <td>
+            <input id="adsense-client-id" style="width: 100%;" type="text" value="" size="100" maxlength="200" title="Client ID"/>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding-right: 10px;">
+            Client secret
+          </td>
+          <td>
+            <input id="adsense-client-secret" style="width: 100%;" type="text" value="" size="100" maxlength="200" title="Enter Client secret"/>
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>
+            <button type="button" id="save-client-ids" class="ai-top-button" style="display: none; float: right; width: 162px; outline-color: transparent;">Save</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+<?php
+  }
+
 }
 
 }
@@ -2766,18 +2977,38 @@ function sidebar_help () { ?>
 <?php
 }
 
-function sidebar_pro () { ?>
+function sidebar_pro () {
+  $version = rand (0, 1);
+?>
 
       <div class="ai-form rounded no-select feature-list" style="background: #fff;">
         <div style="float: right;" >
           <div>
+<?php switch ($version) {
+        case 0: ?>
             <a href="http://adinserter.pro/" class="clear-link" title="Automate ad placement on posts and pages" target="_blank"><img id="ai-pro-1" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>icon-256x256.jpg" style="margin-top: 10px;" /></a>
-          </div>
-          <div>
-            <a href="https://adinserter.pro/tracking" class="clear-link" title="A/B testing - Track ad impressions and clicks" target="_blank"><img id="ai-pro-2" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>ai-charts-250.png" style="margin-top: 10px;" /></a>
-          </div>
-          <div>
+<?php   break; case 1: ?>
             <a href='http://bit.ly/2oF81Oh' class="clear-link" title="Looking for AdSense alternative?" target="_blank"><img id="ai-media-2" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>contextual-2.jpg" style="margin-top: 10px;" /></a>
+<?php   break;
+      } ?>
+          </div>
+          <div>
+<?php switch ($version) {
+        case 0: ?>
+            <a href="https://adinserter.pro/tracking" class="clear-link" title="A/B testing - Track ad impressions and clicks" target="_blank"><img id="ai-pro-2" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>ai-charts-250.png" style="margin-top: 10px;" /></a>
+<?php   break; case 1: ?>
+            <a href="http://adinserter.pro/" class="clear-link" title="Automate ad placement on posts and pages" target="_blank"><img id="ai-pro-1" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>icon-256x256.jpg" style="margin-top: 10px;" /></a>
+<?php   break;
+      } ?>
+          </div>
+          <div>
+<?php switch ($version) {
+        case 0: ?>
+            <a href='http://bit.ly/2oF81Oh' class="clear-link" title="Looking for AdSense alternative?" target="_blank"><img id="ai-media-2" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>contextual-2.jpg" style="margin-top: 10px;" /></a>
+<?php   break; case 1: ?>
+            <a href="https://adinserter.pro/lists#geo-targeting" class="clear-link" title="Geotargeting - black/white-list countries" target="_blank"><img id="ai-pro-3" src="<?php echo AD_INSERTER_PLUGIN_IMAGES_URL; ?>ai-countries-250.png" style="margin-top: 10px;" /></a>
+<?php   break;
+      } ?>
           </div>
         </div>
 
@@ -2786,6 +3017,7 @@ function sidebar_pro () { ?>
 
         <ul>
           <li>64 code (ad) blocks</li>
+          <li><a href="https://adinserter.pro/adsense-ads" class="simple-link" target="_blank">AdSense Integration</a></li>
           <li>Syntax highlighting editor</li>
           <li><a href="http://adinserter.pro/documentation#code-preview" class="simple-link" target="_blank">Code preview</a> with visual CSS editor</li>
           <li>Simple user interface - all settings on a single page</li>
@@ -2794,6 +3026,7 @@ function sidebar_pro () { ?>
           <li><a href="http://adinserter.pro/documentation#automatic-insertion" class="simple-link" target="_blank">Automatic insertion</a> before, between and after comments</li>
           <li><a href="http://adinserter.pro/documentation#automatic-insertion" class="simple-link" target="_blank">Automatic insertion</a> below <code>&lt;body&gt;</code> or above <code>&lt;/body&gt;</code> tags</li>
           <li>Automatic insertion at <a href="https://adinserter.pro/documentation#custom-hooks" class="simple-link" target="_blank">custom hook positions</a></li>
+          <li>Automatic insertion before or after any HTML element on page</li>
           <li><a href="https://adinserter.pro/exceptions" class="simple-link" target="_blank">Insertion exceptions</a> for individual posts and pages</li>
           <li><a href="http://adinserter.pro/documentation#manual-insertion" class="simple-link" target="_blank">Manual insertion</a>: widgets, shortcodes, PHP function call</li>
           <li><a href="https://adinserter.pro/alignments-and-styles" class="simple-link" target="_blank">Sticky positions</a> (left, top, right, bottom - ads stay fixed when the page scrolls)</li>
@@ -2896,3 +3129,19 @@ function sidebar_pro_small () { ?>
 <?php
 }
 
+function ai_block_code_demo ($block_class_name, $block_class, $block_number_class, $inline_styles) {
+  global $block_object;
+  $default = $block_object [0];
+
+  $block_class_name = sanitize_html_class ($block_class_name);
+
+  $classes = array ();
+  if ($block_class_name != '' && $block_class) $classes []= $block_class_name;
+  if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !$inline_styles) $classes []= $default->generate_alignment_class ($block_class_name);
+  if ($block_class_name != '' && $block_number_class) $classes []= $block_class_name . '-n';
+
+  $class = count ($classes) ? ' class="' . implode (' ', $classes) . '"' : '';
+  $style = $inline_styles || !defined ('AI_NORMAL_HEADER_STYLES') ? ' style="' . AI_ALIGNMENT_CSS_DEFAULT . '"' : '';
+
+  echo "&lt;div$class$style&gt;";
+}

@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Themes - Customizr package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-01-16 16:29:59+0000\n"
+"PO-Revision-Date: 2018-01-17 07:22:00+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1993,8 +1993,8 @@ msgstr "Falta el archivo"
 
 #: core/front/models/modules/featured-pages/class-model-featured_pages.php:146
 #: inc/czr-front-ccat.php:3732
-msgid "Featured page description text : use the page excerpt or set your own custom text in the Customizr screen."
-msgstr "Descripción para página destacada: usar el extracto de la página o especificar tu propio texto personalizado en la pantalla de Customizr."
+msgid "Featured page description text : use the page excerpt or set your own custom text in the customizer screen."
+msgstr "Texto descriptivo para la página destacada: usa el extracto de la página o especifica tu propio texto personalizado en la pantalla del personalizador."
 
 #: core/front/models/modules/featured-pages/class-model-featured_pages.php:142
 #: inc/czr-front-ccat.php:3728

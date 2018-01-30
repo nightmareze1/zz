@@ -2,98 +2,117 @@
 
 Contributors: spacetime
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4
-Tags: ads, adsense, ad management, advertising manager, advanced contextual ads, ad rotation, ad injection, adverts, sticky widgets, sticky sidebar, hook, amazon, banners, automatic insertion, amp, geo targeting, multisite, shortcodes, PHP, Javascript, HTML, header, footer, tracking, ad blocking, custom fields
+Tags: ads, adsense, ad management, advertising manager, advanced contextual ads, ad rotation, ad injection, adverts, sticky widgets, sticky sidebar, hook, amazon, banners, automatic insertion, amp, geo targeting, multisite, shortcodes, PHP, Javascript, HTML, header, footer, tracking, ad blocking, custom fields, custom posts
 Requires at least: 4.0
 Tested up to: 4.9
-Requires PHP: 5.2.4
-Stable tag: 2.2.12
+Requires PHP: 5.3
+Stable tag: 2.3.0
 License: GPLv3
 
 Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
 
 == Description ==
 
-Ad management plugin with many advanced advertising features. **Supports all kinds of WordPress ads including Google AdSense, contextual Amazon Native Shopping Ads, Media.net and rotating banners.**
+Ad management plugin with many advanced advertising features. Supports all kinds of WordPress ads including **Google AdSense**, contextual **Amazon Native Shopping Ads, Media.net** and **rotating banners.**
 
-Ad Inserter is more than just ad manager plugin. It provides many advanced options to insert any Javascript, CSS, HTML, PHP or advert code anywhere on the page.
+Ad Inserter is more than just ad manager plugin. It provides many advanced options to insert any opt-in form, Javascript, CSS, HTML, PHP, analytics, tracking or advert code anywhere on the page.
 
-> **Features**
->
-> *   16 code (ad) blocks
-> *   Syntax highlighting editor
-> *   Code preview with visual CSS editor
-> *   Automatically inserts ads in posts and pages
-> *   Insert above header (after `<body>` tag, needs Output buffering)
-> *   Insert before or after post
-> *   Insert before or after content
-> *   Insert before or after paragraph
-> *   Insert before or after random paragraph
-> *   Insert before or after multiple paragraphs
-> *   Insert before or after comments
-> *   Insert before or after excerpt
-> *   Insert before or after any HTML element in post
-> *   Insert in footer (before `</body>` tag)
-> *   Insert at relative position in posts
-> *   Insert between posts on blog pages (in-feed AdSense ads)
-> *   Insert between excerpts on blog pages
-> *   Insert between comments
-> *   Insert at custom hook positions
-> *   Clearance options to avoid insertion near images or headers
-> *   Insertion exceptions for posts and pages
-> *   Insert header and footer code
-> *   Insert raw HTTP response header lines
-> *   Insert Google Analytics, Piwik or any other web analytics code
-> *   Insert HTML, CSS, Javascript or PHP code
-> *   Code generator for banners
-> *   Visual ad editor
-> *   Manual insertion: widgets, shortcodes, PHP function call
-> *   Sticky (fixed) widgets (sticky sidebar - the sidebar does not move when the page is scrolled)
-> *   Custom block alignments and styles
-> *   Insert (different) ads on AMP pages
-> *   Custom CSS class name for wrapping divs to avoid ad blockers
-> *   Use shortcodes from other plugins
-> *   Use custom fields as defined in posts
-> *   PHP code processing
-> *   Banner code generator
-> *   Ad rotation (server-side and client-side - works with caching)
-> *   Ad blocking detection - popup message, page redirection
-> *   Desktop/mobile device detection (server-side and client-side - works with caching)
-> *   Black/White-list categories, tags, taxonomies, post IDs, urls, url query parameters, cookies, referers
-> *   Clipboard support to easily copy code blocks or settings
-> *   Simple troubleshooting with many debugging functions
-> *   Function to visualize inserted code blocks
-> *   Function to visualize available insertion positions
-> *   Function to visualize HTML tags
+**Ad Inserter can insert ads where other plugins fail**. It's all about the settings.
+
+**Features**
+
+*   16 code (ad) blocks
+*   AdSense integration
+*   Syntax highlighting editor
+*   Code preview with visual CSS editor
+*   Automatically inserts ads in posts and pages
+*   Insert before or after post
+*   Insert before or after content
+*   Insert before or after paragraph
+*   Insert before or after random paragraph
+*   Insert before or after multiple paragraphs
+*   Insert before or after comments
+*   Insert before or after excerpt
+*   Insert before or after any HTML element on page
+*   Insert above header (after `<body>` tag)
+*   Insert in footer (before `</body>` tag)
+*   Insert at relative positions in posts
+*   Insert between posts on blog pages (in-feed AdSense ads)
+*   Insert between excerpts on blog pages
+*   Insert between comments
+*   Insert at custom hook positions (`do_action ()` WP function)
+*   Clearance options to avoid insertion near images or headers
+*   Insertion exceptions for posts and pages
+*   Insert header (`<head>` section) and footer code
+*   Insert raw HTTP response header lines
+*   Insert Google Analytics, Piwik or any other web analytics code
+*   Insert HTML, CSS, Javascript or PHP code
+*   Code generator for banners and placeholders
+*   Visual advert editor
+*   Manual insertion: widgets, shortcodes, PHP function call
+*   Sticky (fixed) widgets (sticky sidebar - the sidebar does not move when the page is scrolled)
+*   Custom block alignments and styles
+*   Insert ads (different ad code) on AMP pages
+*   Custom CSS class name for wrapping divs to avoid ad blockers
+*   Use shortcodes from other plugins
+*   Use custom fields as defined in posts
+*   Use post title, tags or categories to create contextual ads
+*   PHP code processing
+*   Ad rotation (server-side and client-side - works with caching)
+*   Ad blocking detection - popup message, page redirection
+*   Desktop/mobile device detection (server-side and client-side - works with caching)
+*   Black/White-list categories, tags, taxonomies, post IDs, urls, url query parameters, cookies, referers
+*   Easy copying and pasting code blocks or settings using internal clipboard
+*   Simple troubleshooting with many debugging functions
+*   Function to visualize inserted code blocks
+*   Function to visualize available insertion positions
+*   Function to visualize HTML tags
 
 And Ad Inserter Pro - all-in-one <a href="http://adinserter.pro/" target="_blank">WordPress ad management plugin</a> has even more advanced features:
 
-> *   64 code (ad) blocks
-> *   GEO targeting (works also with caching)
-> *   Black/White-list IP addresses or countries (works also with caching)
-> *   Ad impression and click tracking (works also with `<iframe>` Javascript ads like Google AdSense)
-> *   A/B testing
-> *   Sticky ad positions (left, top, right, bottom)
-> *   Scheduling with fallback option
-> *   Ad blocking detection - ad replacement, content protection
-> *   Ad blocking statistics
-> *   Multisite options to limit settings on the sites
-> *   Post/page exception management
-> *   more custom viewports for client-side desktop/mobile device detection
-> *   more custom hooks for custom theme insertions
-> *   Export and import of settings
-> *   Support via email
+*   64 code (ad) blocks
+*   Geolocation using Webnet77 or <a href="http://www.maxmind.com/" target="_blank">MaxMind</a> databases (works also with caching)
+*   Black/White-list IP addresses or countries (works also with caching)
+*   Ad impression and click tracking (works also with `<iframe>` Javascript ads like Google AdSense)
+*   External tracking via Google Analytics or Piwik
+*   A/B testing
+*   Sticky ad positions with optional close button (left, top, right, bottom)
+*   Scheduling with fallback option
+*   Ad blocking detection - ad replacement, content protection
+*   Ad blocking statistics
+*   Multisite options to limit settings on the sites
+*   Post/page exception management
+*   More custom viewports for client-side desktop/mobile device detection
+*   More custom hooks for custom theme insertions
+*   Export and import of settings
+*   Support via email
+
+Run a WordPress related blog? Interested in reviewing Ad Inserter Pro? <a href="https://adinserter.pro/contact" target="_blank">Introduce yourself</a>.
 
 Ad Inserter Wordpress plugin is an advanced advertising manager - it has many features and options to automate ad insertion and to optimally monetize your website on desktop, tablet and phone displays. It provides many simple ways to insert any Javascript, HTML, PHP or advert code anywhere on the page. For best ad placement and to use optimal advertising positions please read the user manual to get the most of the plugin.
 
-> *   Check <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation page</a> for detailed description of all the features and some <a href="http://adinserter.pro/settings" target="_blank">common settings</a> for quick start
-> *   Download **PDF user guide** for Ad Inserter: go to <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro plugin</a> page and below you can find button for free download of Ad Inserter User Guide
+*   Check <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation page</a> for detailed description of all the features and some <a href="http://adinserter.pro/settings" target="_blank">common settings</a> for quick start
+*   Download **PDF user guide** for Ad Inserter: go to <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro plugin</a> page and below you can find button for free download of Ad Inserter User Guide
+
+**AdSense integration**
+
+Get <a href="https://adinserter.pro/adsense-ads#integration">AdSense ad codes</a> from the plugin settings page - no need to copy ad codes from the AdSense admin pages and paste them to code blocks. List ad units, preview AdSense ads and get ad codes where you need them.
+
+**Endorsed by WordPress users**
+
+Average Rating: 5 out of 5 stars
+
+> Perfect plugin to insert anything anywhere on your WordPress website
+
+Check Ad Inserter <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">reviews</a>
 
 **Endorsed by Amazon**
 
-> Amazon suggests to use Ad Inserter to add Native Shopping Ads to Wordpress posts. Native Shopping Ads provide highly relevant and dynamic product recommendations in a stylishly designed and responsive ad unit that can be placed at the end of your content or within your content to create a more compelling visitor experience and shopping opportunity.
->
-> *   Check <a href="https://affiliate-program.amazon.com/help/topic/t405" target="_blank">Wordpress Integration Guide for Native Shopping Ads</a>
-> *   Ad Inserter supports advanced contextual ads: check settings for <a href="https://adinserter.pro/settings#amazon">contextual Native Shopping Ads</a> that show items related to the post content (using post tags)
+Amazon suggests to use Ad Inserter to add Native Shopping Ads to Wordpress posts.
+
+> Native Shopping Ads provide highly relevant and dynamic product recommendations in a stylishly designed and responsive ad unit that can be placed at the end of your content or within your content to create a more compelling visitor experience and shopping opportunity.
+
+Check <a href="https://affiliate-program.amazon.com/help/topic/t405" target="_blank">Wordpress Integration Guide for Native Shopping Ads</a>. Ad Inserter supports also advanced contextual ads: check settings for <a href="https://adinserter.pro/settings#amazon">contextual Native Shopping Ads</a> that show items related to the post content (using post tags).
 
 **Ad Inserter Ad Manager - One Plugin - Many Functions**
 
@@ -105,6 +124,7 @@ Ad Inserter is not just another plugin for WordPress ads. Do you enjoy finding t
 *   to insert ads between paragraphs
 *   to insert ads between posts
 *   to insert ads between comments
+*   to insert ads on custom posts
 *   to insert ads on AMP pages
 *   to insert different ads for mobile devices
 *   to insert ads at custom action hooks (e.g. using <a href="https://genesistutorials.com/visual-hook-guide/" target="_blank">Genesis Theme Framework Hook Guide</a>)
@@ -125,27 +145,34 @@ Maintaining several plugins (often from different vendors) is not easy. And each
 
 **Speed Up Your WordPress: Replace them all with free Ad Inserter!**
 
-**Insert Any Code Anywhere on the Page**
-
-*   Automatic insertion using standard WP hooks (the_content, the_excerpt, loop_start, loop_end, the_post,...)
-*   Automatic insertion using custom WP hooks (e.g. using <a href="https://genesistutorials.com/visual-hook-guide/" target="_blank">Genesis Theme Framework Hook Guide</a>)
-*   Manual insertion with shortcodes
-*   Manual insertion with widgets
-*   Manual insertion by placing PHP function calls in your theme files
-
 **Quick Start**
 
 Few very important things you need to know in order to <a href="http://adinserter.pro/documentation#quick-start">insert code and display some ad</a>:
 
 *   Code block is any code (for example Google AdSense ad) that has to be inserted (and displayed) at some position. Each code block can be configured to insert code at almost any position supported by Wordpress
 *   To rename block click on the name
-*   **Enable and use at least one insertion option** (Automatic insertion, Widget, Shortcode, PHP function call)
+*   Paste ad code into the code window or use <a href="https://adinserter.pro/code-editing" target="_blank">code generator</a> to generate code for banners, AdSense or any other HTML advert
+*   **Enable and use at least one insertion option** (<a href="https://adinserter.pro/documentation#automatic-insertion" target="_blank">Automatic insertion</a>, Widget, <a href="https://adinserter.pro/documentation#manual" target="_blank">Shortcode</a>, PHP function call)
 *   **Enable insertion on at least one <a href="https://adinserter.pro/page-types">Wordpress page type</a>** (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages)
 *   For Posts and Static pages **leave default BLANK selection value** after the checkbox unless you really know what are you doing (using individual exceptions)
 *   If you don't see inserted code block, turn on **debugging functions**: Label inserted blocks, Show available positions for automatic insertion (Ad Inserter menu item in the Wordpress toolbar on the top of every post/page)
-*   If you are using AdSense you may get blank (empty) ad blocks. This might be because there is some error in the code (wrong IDs), your Google AdSense account is not fully approved yet, your website was not accepted or your Google AdSense account is banned. In such case you can try other ad networks for contextual ads. Check <a href="https://adinserter.pro/documentation#ads-not-displayed">Ads Not Displayed</a> for more information.
+*   If you are using <a href="https://adinserter.pro/adsense-ads" target="_blank">AdSense</a> you may get blank (empty) ad blocks. This might be because there is some error in the code (wrong IDs), your Google AdSense account is not fully approved yet, your website was not accepted or your Google AdSense account is banned. In such case you can try other ad networks for contextual ads. Check <a href="https://adinserter.pro/documentation#ads-not-displayed">Ads Not Displayed</a> for more information.
 
-Few typical settings are described on the <a href="https://wordpress.org/plugins/ad-inserter/faq/">FAQ</a> page. Please make sure you have also read <a href="https://wordpress.org/plugins/ad-inserter/installation/">Installation</a> page. For more detailed instructions please read <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation page</a>.
+Few typical settings are described on the <a href="https://adinserter.pro/settings" target="_blank">Common Settings</a> page. Please make sure you have also read <a href="https://wordpress.org/plugins/ad-inserter/installation/">Installation</a> page. For more detailed instructions please read <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation page</a>.
+
+**Insert Any Code Anywhere on the Page**
+
+*   Automatic insertion using standard WP hooks (the_content, the_excerpt, loop_start, loop_end, the_post,...)
+*   Automatic insertion using custom WP hooks provided by themes (e.g. using <a href="https://genesistutorials.com/visual-hook-guide/" target="_blank">Genesis Theme Framework Hooks</a>)
+*   Server-side or client-side (javascript) insertion before or after **any HTML element on page** (using selectors #id, .class)
+*   Manual insertion with shortcodes
+*   Insertion with widgets
+*   Insertion by placing PHP function calls or custom hooks in your theme files
+
+Ad Inserter is the only WordPress plugin that can insert any code anywhere on the page. If standard insertions before/after post, content or paragraph fail you can use advanced insertion before/after arbitrary HTML element.
+If you can create a CSS slector for it (#id, .class) then you can insert before or after that element. By default this approach uses client-side insertion using Javascript to insert code block after the page loads.
+However, if you enable Output buffering (tab * / tab General) you can select also Server-side insertion which will insert code block the same way as other insertions when the plugin is called and the page is created.
+Please note that **Output buffering** may not work with all themes - in such case you can still use client-side insertion.
 
 **Please support plugin development**
 
@@ -155,7 +182,7 @@ Positive reviews are a great way to show your appreciation for my work. Besides 
 
 Support the advancement of this plugin:
 
-*   Write a nice <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">review</a>
+*   Write a short <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">review</a>
 *   <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4">Donate</a>
 *   Buy license for Ad Inserter Pro - all-in-one <a href="http://adinserter.pro/" target="_blank">Wordpress plugin for ads</a>
 
@@ -756,6 +783,37 @@ AD CODE RIGHT
 
 == Changelog ==
 
+= 2.3.1 =
+- Added support for server-side insertion before/after any HTML element
+- Few minor bug fixes
+
+= 2.3.0 =
+- Added support for client-side insertion before/after any HTML element
+- Inplemented AdSense integration
+- Added option to define close button position
+- Fix for code generator import and code preview error with non ASCII characters
+- Fix for post/page exceptions and page types not processed in the header
+- Fix for close button in preview window
+- Fix for errors when rearranging blocks
+- Fix for errors when importing code
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.2.16 =
+- Fix for error when saving settings on multisite installation
+
+= 2.2.15 =
+- Fix for responsive AMP ads using center alignment
+
+= 2.2.14 =
+- Added code generator for placeholders
+- Added option to disable caching (works with WP Super Cache, W3 Total Cache and WP Rocket)
+- Added options to configure classes for wrapping div
+- Added support for external tracking via Google Analytics and Piwik (Pro only)
+- Added support for MaxMind geolocation databases (Pro only)
+- Added option for close button on sticky ads (Pro only)
+- Fix for no paragraph counting inside nested elements
+- Few minor bug fixes, cosmetic changes and code improvements
+
 = 2.2.13 =
 - Added option to disable inline alignment styles for code blocks (using alignment classes)
 - Fix for custom CSS codes with single quotation marks
@@ -922,6 +980,37 @@ AD CODE RIGHT
 - Bug fix for IP database update cron event (Pro only)
 
 == Upgrade Notice ==
+
+= 2.3.1 =
+Added support for server-side insertion before/after any HTML element;
+Few minor bug fixes
+
+= 2.3.0 =
+Added support for client-side insertion before/after any HTML element;
+Inplemented AdSense integration;
+Added option to define close button position;
+Fix for code generator import and code preview error with non ASCII characters;
+Fix for post/page exceptions and page types not processed in the header;
+Fix for close button in preview window;
+Fix for errors when rearranging blocks;
+Fix for errors when importing code;
+Few minor bug fixes, cosmetic changes and code improvements;
+
+= 2.2.16 =
+Fix for error when saving settings on multisite installation
+
+= 2.2.15 =
+Fix for responsive AMP ads using center alignment
+
+= 2.2.14 =
+Added code generator for placeholders;
+Added option to disable caching (works with WP Super Cache, W3 Total Cache and WP Rocket);
+Added options to configure classes for wrapping div;
+Added support for external tracking via Google Analytics and Piwik (Pro only);
+Added support for MaxMind geolocation databases (Pro only);
+Added option for close button on sticky ads (Pro only);
+Fix for no paragraph counting inside nested elements;
+Few minor bug fixes, cosmetic changes and code improvements
 
 = 2.2.13 =
 Added option to disable inline alignment styles for code blocks (using alignment classes);

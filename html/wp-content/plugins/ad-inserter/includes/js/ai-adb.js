@@ -142,8 +142,7 @@
 })(jQuery);
 
 var ai_adb = false;
-var ai_adb_wrapping_div_selector = ".AI_BLOCK_CLASS_NAME";
-var ai_adb_debugging = AI_DATAB_AI_JS_DEBUGGING;
+var ai_adb_debugging = typeof ai_debugging !== 'undefined';
 var ai_adb_active = false;
 var ai_adb_counter = 0;
 var ai_adb_overlay = AI_ADB_OVERLAY_WINDOW;
@@ -256,12 +255,31 @@ var ai_adb_detected = function(n) {
       $(window).ready(function () {
         if (ai_adb_debugging) console.log ("AI ad blocking block actions");
 
+        $(".ai-adb-hide").each (function () {
+          $(this).css ({"display": "none", "visibility": "hidden"});
+
+          var wrapping_div = $(this).closest ('div[data-ai]');
+          if (typeof wrapping_div.data ("ai") != "undefined") {
+            var data = JSON.parse (atob (wrapping_div.data ("ai")));
+            if (typeof data !== "undefined" && data.constructor === Array) {
+              data [1] = "";
+              wrapping_div.data ("ai", btoa (JSON.stringify (data)));
+            }
+          }
+
+          if (ai_adb_debugging) {
+            var debug_info = $(this).data ("ai-debug");
+            console.log ("AI ad blocking HIDE", typeof debug_info != "undefined" ? debug_info : "");
+          }
+        });
+
+        // after hide to update tracking data on replace
         $(".ai-adb-show").each (function () {
           $(this).css ({"display": "block", "visibility": "visible"});
 
           var tracking_data = $(this).data ('ai-tracking');
           if (typeof tracking_data != 'undefined') {
-            var wrapping_div = $(this).closest (ai_adb_wrapping_div_selector);
+            var wrapping_div = $(this).closest ('div[data-ai]');
             if (typeof wrapping_div.data ("ai") != "undefined") {
 
               if ($(this).hasClass ('ai-no-tracking')) {
@@ -279,14 +297,6 @@ var ai_adb_detected = function(n) {
           if (ai_adb_debugging) {
             var debug_info = $(this).data ("ai-debug");
             console.log ("AI ad blocking SHOW", typeof debug_info != "undefined" ? debug_info : "");
-          }
-        });
-
-        $(".ai-adb-hide").each (function () {
-          $(this).css ({"display": "none", "visibility": "hidden"});
-          if (ai_adb_debugging) {
-            var debug_info = $(this).data ("ai-debug");
-            console.log ("AI ad blocking HIDE", typeof debug_info != "undefined" ? debug_info : "");
           }
         });
 

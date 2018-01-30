@@ -2,12 +2,13 @@ jQuery(document).ready(function($) {
   var sticky_widget_mode   = AI_FUNC_GET_STICKY_WIDGET_MODE;
   var sticky_widget_margin = AI_FUNC_GET_STICKY_WIDGET_MARGIN;
   var document_width = $(document).width();
+  var ai_debug = typeof ai_debugging !== 'undefined';
 
   $(".ai-sticky").each (function () {
     var widget = $(this);
     var widget_width = widget.width();
 
-    console.log ("WIDGET:", widget.width (), widget.prop ("tagName"), widget.attr ("id"));
+    if (ai_debug) console.log ("WIDGET:", widget.width (), widget.prop ("tagName"), widget.attr ("id"));
 
     var already_sticky_js = false;
     var sidebar = widget.parent ();
@@ -18,7 +19,7 @@ jQuery(document).ready(function($) {
         break;
       }
 
-      console.log ("SIDEBAR:", sidebar.width (), sidebar.prop ("tagName"), sidebar.attr ("id"));
+      if (ai_debug) console.log ("SIDEBAR:", sidebar.width (), sidebar.prop ("tagName"), sidebar.attr ("id"));
 
       var parent_element = sidebar.parent ();
       var parent_element_width = parent_element.width();
@@ -26,22 +27,22 @@ jQuery(document).ready(function($) {
       sidebar = parent_element;
     }
     if (already_sticky_js) {
-      console.log ("JS STICKY SIDEBAR ALREADY SET");
+      if (ai_debug) console.log ("JS STICKY SIDEBAR ALREADY SET");
       return;
     }
 
     var new_sidebar_top = sidebar.offset ().top - widget.offset ().top + sticky_widget_margin;
 
-    console.log ("NEW SIDEBAR TOP:", new_sidebar_top);
+    if (ai_debug) console.log ("NEW SIDEBAR TOP:", new_sidebar_top);
 
     if (sticky_widget_mode == 0) {
       // CSS
       if (sidebar.css ("position") != "sticky" || isNaN (parseInt (sidebar.css ("top"))) || sidebar.css ("top") < new_sidebar_top) {
         sidebar.css ("position", "sticky").css ("top", new_sidebar_top);
 
-        console.log ("CSS STICKY SIDEBAR, TOP:", new_sidebar_top);
+        if (ai_debug) console.log ("CSS STICKY SIDEBAR, TOP:", new_sidebar_top);
       }
-      else console.log ("CSS STICKY SIDEBAR ALREADY SET");
+      else if (ai_debug) console.log ("CSS STICKY SIDEBAR ALREADY SET");
     } else {
         // Javascript
         sidebar.theiaStickySidebar({
@@ -49,7 +50,7 @@ jQuery(document).ready(function($) {
           sidebarBehavior: 'stick-to-top',
         });
 
-        console.log ("JS STICKY SIDEBAR, TOP:", new_sidebar_top);
+        if (ai_debug) console.log ("JS STICKY SIDEBAR, TOP:", new_sidebar_top);
       }
   });
 });

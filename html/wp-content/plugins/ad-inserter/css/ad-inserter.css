@@ -1,5 +1,5 @@
 #ai-data {
-  font-family: "2.2.13"; /* Used for version number of the file */
+  font-family: "2.3.1"; /* Used for version number of the file */
 }
 
 #blocked-warning {
@@ -21,19 +21,19 @@
 }
 
 .ui-widget-header {
-  border: 1px solid #aaa;
-  background: #ccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x;
+  border: 1px solid #aaa !important;
+  background: #ccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x !important;
 }
 
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
-  background: #fff url(images/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x!important;
+  background: #fff url(images/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x!important !important;
 }
 
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
-  border: 1px solid #d3d3d3;
-  background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x;
-  color: #555;
-}
+/*.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {*/
+/*  border: 1px solid #d3d3d3;*/
+/*  background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x;*/
+/*  color: #555;*/
+/*}*/
 
 .ui-state-highlight {
   background: #ff4;
@@ -95,6 +95,18 @@ a.clear-link, a.clear-link:hover, a.clear-link:focus {
   padding: 8px;
   border: 1px solid rgb(221, 221, 221);
   border-radius: 5px;
+}
+
+.ai-settings-table {
+  border-spacing: 4px;
+}
+
+.ai-settings-table.ai-values td:first-child {
+  width: 35%;
+}
+
+.ai-settings-table.fixed {
+  table-layout: fixed;
 }
 
 /*#editor-1 {*/
@@ -446,6 +458,10 @@ div.automatic-insertion img {
   margin-top: 2px;
 }
 
+.ai-bw {
+  filter: grayscale(100%);
+}
+
 .checkbox-icon {
    background-position: center;
    display: inline-block;
@@ -616,13 +632,13 @@ img.automatic-insertion.above-header {
   background: url('images/insertions-alignmets.png') -168px -168px;
 }
 
-/*img.automatic-insertion.align-right {*/
-/*  background: url('images/insertions-alignmets.png') -224px -168px;*/
-/*}*/
+img.automatic-insertion.before-html {
+  background: url('images/insertions-alignmets.png') -224px -168px;
+}
 
-/*img.automatic-insertion.float-left {*/
-/*  background: url('images/insertions-alignmets.png') -280px -168px;*/
-/*}*/
+img.automatic-insertion.after-html {
+  background: url('images/insertions-alignmets.png') -280px -168px;
+}
 
 /*img.automatic-insertion.float-right {*/
 /*  background: url('images/insertions-alignmets.png') -336px -168px;*/
@@ -684,6 +700,15 @@ img.automatic-insertion.preview.sticky-top {
 img.automatic-insertion.preview.sticky-bottom {
   background: url('images/insertions-alignmets.png') -100px -150px;
 }
+
+/*img.automatic-insertion.preview.before-html {*/
+/*  background: url('images/insertions-alignmets.png') -150px -150px;*/
+/*}*/
+
+/*img.automatic-insertion.preview.after-html {*/
+/*  background: url('images/insertions-alignmets.png') -200px -150px;*/
+/*}*/
+
 
 img.automatic-insertion.preview {
   background-size: 400px!important;
@@ -896,9 +921,9 @@ img.automatic-insertion.preview {
    border-top: 8px solid #888;
 }
 
-.checkbox-icon.icon-adsense {
+.icon-adsense {
   background: url('../images/ga-logo.png') 0px 0px;
-  background-size: 16px 16px;
+  background-size: cover;
 }
 
 .banner-preview {

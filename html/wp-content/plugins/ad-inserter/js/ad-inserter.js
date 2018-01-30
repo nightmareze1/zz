@@ -1,4 +1,4 @@
-var javascript_version = "2.2.13";
+var javascript_version = "2.3.1";
 var ignore_key = true;
 var start = 1;
 var end = 16;
@@ -18,20 +18,23 @@ var dateFormat = "yy-mm-dd";
 
 var list_search_reload = false;
 
-var AI_DISABLED         = 0;
-var AI_BEFORE_POST      = 1;
-var AI_AFTER_POST       = 2;
-var AI_BEFORE_CONTENT   = 3;
-var AI_AFTER_CONTENT    = 4;
-var AI_BEFORE_PARAGRAPH = 5;
-var AI_AFTER_PARAGRAPH  = 6;
-var AI_BEFORE_EXCERPT   = 7;
-var AI_AFTER_EXCERPT    = 8;
-var AI_BETWEEN_POSTS    = 9;
-var AI_BEFORE_COMMENTS  = 10;
-var AI_BETWEEN_COMMENTS = 11;
-var AI_AFTER_COMMENTS   = 12;
-var AI_FOOTER           = 13;
+var AI_DISABLED             = 0;
+var AI_BEFORE_POST          = 1;
+var AI_AFTER_POST           = 2;
+var AI_BEFORE_CONTENT       = 3;
+var AI_AFTER_CONTENT        = 4;
+var AI_BEFORE_PARAGRAPH     = 5;
+var AI_AFTER_PARAGRAPH      = 6;
+var AI_BEFORE_EXCERPT       = 7;
+var AI_AFTER_EXCERPT        = 8;
+var AI_BETWEEN_POSTS        = 9;
+var AI_BEFORE_COMMENTS      = 10;
+var AI_BETWEEN_COMMENTS     = 11;
+var AI_AFTER_COMMENTS       = 12;
+var AI_FOOTER               = 13;
+var AI_BEFORE_HTML_ELEMENT  = 15;
+var AI_AFTER_HTML_ELEMENT   = 16;
+
 
 var AI_ALIGNMENT_DEFAULT        = 0;
 var AI_ALIGNMENT_LEFT           = 1;
@@ -64,6 +67,11 @@ var AI_ADSENSE_LINK             = 1;
 var AI_ADSENSE_IN_ARTICLE       = 2;
 var AI_ADSENSE_IN_FEED          = 3;
 var AI_ADSENSE_MATCHED_CONTENT  = 4;
+
+var AI_HTML_INSERTION_CLIENT_SIDE           = 0;
+var AI_HTML_INSERTION_CLIENT_SIDE_DOM_READY = 1;
+var AI_HTML_INSERTION_SEREVR_SIDE           = 2;
+
 
 
 /**
@@ -254,11 +262,27 @@ function SyntaxHighlight (id, block, settings) {
     if (!editor_disabled) {
       textarea.val (session.getValue());
     }
-    if (textarea.val () == "") {
-      textarea.removeAttr ("name");
-    }
 
+//    if (textarea.val () == "") {
+//      textarea.removeAttr ("name");
+//    }
 //    else textarea.val (jQuery.base64Encode (textarea.val ()));
+
+    var default_value = textarea.attr ("default");
+    var current_value = textarea.val ();
+    var name          = textarea.attr ("name");
+
+    if (typeof name != 'undefined') {
+      if (typeof default_value != 'undefined') {
+//        console.log (textarea.attr ("name"), ": default_value: ", default_value, ", current_value: ", current_value);
+
+        if (current_value == default_value) {
+          textarea.removeAttr ("name");
+//          console.log ("REMOVED: ", name);
+        }
+      }
+//      else console.log ("NO DEFAULT VALUE: ", textarea.attr ("name"));
+    }
 
     jQuery("#ai-active-tab").attr ("value", '[' + active_tab + ',' + active_tab_0 + ']');
   });
@@ -283,7 +307,11 @@ SyntaxHighlight.prototype.applySettings = function () {
 };
 
 function change_block_alignment (block) {
-  jQuery("select#block-alignment-" + block).change ();
+  jQuery ("select#block-alignment-" + block).change ();
+}
+
+function change_banner_image (block) {
+  jQuery ("input#banner-image-url-" + block).trigger ("input");
 }
 
 
@@ -354,7 +382,8 @@ function window_open_post (url, windowoption, name, params) {
    document.body.appendChild(form);
    //note I am using a post.htm page since I did not want to make double request to the page
    //it might have some Page_Load call which might screw things up.
-   window.open("post.htm", name, windowoption);
+//   window.open ("post.htm", name, windowoption);
+   window.open ("admin-ajax.php", name, windowoption);
    form.submit();
    document.body.removeChild(form);
 }
@@ -663,7 +692,7 @@ jQuery(document).ready(function($) {
     geo_groups = parseInt (geo_groups_text);
   }
 
-  debug = parseInt ($('#ai-data').attr ('javascript_debugging'));
+  debug = parseInt ($('#ai-data').attr ('js_debugging'));
 
   if (debug) {
     var start_time = new Date().getTime();
@@ -768,6 +797,28 @@ jQuery(document).ready(function($) {
 //        else console.log ("NO DEFAULT VALUE: ", $(this).attr ("name"));
       }
     });
+
+    // Already removed in SyntaxHighlight
+//    $("#tab-" + block + " textarea").each (function() {
+//      var default_value = $(this).attr ("default");
+//      var current_value = $(this).val ();
+//      var name          = $(this).attr ("name");
+
+//      if (typeof name != 'undefined') {
+//        if (typeof default_value != 'undefined') {
+//          console.log ($(this).attr ("name"), ": default_value: ", default_value, ", current_value: ", current_value);
+
+//          console.log ('#', current_value, '#');
+//          console.log ('#', default_value, '#');
+
+//          if (current_value == default_value) {
+//            $(this).removeAttr ("name");
+//            console.log ("REMOVED: ", name);
+//          }
+//        }
+//        else console.log ("NO DEFAULT VALUE: ", $(this).attr ("name"));
+//      }
+//    });
   }
 
   function configure_editor_language (block) {
@@ -873,7 +924,8 @@ jQuery(document).ready(function($) {
   function process_display_elements (block) {
 
     $("#paragraph-settings-"+block).hide();
-//    $("#content-settings-"+block).hide();
+
+    $("#html-element-settings-"+block).hide();
 
     var automatic_insertion = $("select#display-type-"+block+" option:selected").attr('value');
 
@@ -884,10 +936,11 @@ jQuery(document).ready(function($) {
         $("#paragraph-clearance-"+block).hide();
       }
 
+    if (automatic_insertion == AI_BEFORE_HTML_ELEMENT || automatic_insertion == AI_AFTER_HTML_ELEMENT) {
+      $("#html-element-settings-"+block).show();
+    }
+
     var content_settings = automatic_insertion == AI_BEFORE_PARAGRAPH || automatic_insertion == AI_AFTER_PARAGRAPH || automatic_insertion == AI_BEFORE_CONTENT || automatic_insertion == AI_AFTER_CONTENT;
-//    if (content_settings) {
-//      $("#content-settings-"+block).show();
-//    }
 
     $("#css-label-"+block).css('display', 'table-cell');
     $("#edit-css-button-"+block).css('display', 'table-cell');
@@ -1410,6 +1463,7 @@ jQuery(document).ready(function($) {
       var block = $(this).attr('id').replace ("display-type-", "");
       process_display_elements (block);
     });
+
     $("select#block-alignment-"+tab).change (function() {
       var block = $(this).attr('id').replace ("block-alignment-", "");
       var alignment = $("select#block-alignment-"+block+" option:selected").attr('value');
@@ -1777,6 +1831,7 @@ jQuery(document).ready(function($) {
 
       var code = $.base64Encode (get_editor_text (block));
       var php =  $("input#process-php-"+block).is(":checked") ? 1 : 0;
+      var close_button =  $("#close-button-"+block+" option:selected").attr('value');
 
       var window_width = 820;
       var window_height = 820;
@@ -1784,7 +1839,7 @@ jQuery(document).ready(function($) {
       var window_top   = (screen.height / 2) - (820 / 2);
       var nonce = $("#ai-form").attr ('nonce');
 
-      var param = {'action': 'ai_ajax_backend', 'preview': block, 'ai_check': nonce, 'name': btoa (name), 'alignment': btoa (alignment), 'alignment_css': btoa (alignment_css), 'custom_css': btoa (custom_css), 'code': code, 'php': php};
+      var param = {'action': 'ai_ajax_backend', 'preview': block, 'ai_check': nonce, 'name': $.base64Encode (name), 'alignment': btoa (alignment), 'alignment_css': btoa (alignment_css), 'custom_css': btoa (custom_css), 'code': code, 'php': php, 'close': close_button};
       window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
     });
 
@@ -1867,10 +1922,10 @@ jQuery(document).ready(function($) {
       window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'edit', param);
     });
 
-    $("#open-image-button-"+tab).click (function (event) {
+    $("#select-image-button-"+tab).click (function (event) {
       $(this).blur ();
 
-      var block = $(this).attr('id').replace ("open-image-button-", "");
+      var block = $(this).attr('id').replace ("select-image-button-", "");
       var frame;
 
       event.preventDefault();
@@ -1880,7 +1935,7 @@ jQuery(document).ready(function($) {
         return;
       }
 
-      frame = wp.media({
+      frame = wp.media ({
         title: 'Select or upload banner image',
         button: {
           text: 'Use this image'
@@ -1907,6 +1962,21 @@ jQuery(document).ready(function($) {
       frame.open();
     });
 
+    $("#select-placeholder-button-"+tab).click (function (event) {
+      $(this).blur ();
+
+      var block = $(this).attr('id').replace ("select-placeholder-button-", "");
+      var image_url = $('#banner-image-' + block).attr ('src');
+
+      var window_width = 820;
+      var window_height = 870;
+      var window_left  = 100;
+      var window_top   = (screen.height / 2) - (870 / 2);
+      var nonce = $("#ai-form").attr ('nonce');
+      var param = {'action': 'ai_ajax_backend', 'placeholder': image_url, 'block': block, 'ai_check': nonce};
+      window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
+    });
+
     $("#banner-image-url-" + tab).on ('input', function() {
 
       var block = $(this).attr('id').replace ("banner-image-url-", "");
@@ -1914,12 +1984,14 @@ jQuery(document).ready(function($) {
 
       var new_image_src = $(this).val ();
       if (new_image_src == '') {
-        new_image_src = '//:0';
+//        new_image_src = '//:0';
         image.hide ();
+        $('div#tab-banner-' + block + ' table.ai-settings-table').css ('position', 'relative');
       }
 
       image.attr ('src', new_image_src).load (function () {
         image.show ();
+        $('div#tab-banner-' + block + ' table.ai-settings-table').css ('position', 'inherit');
         $(this).closest ('.ai-banner').removeClass ('ai-banner-top');
         var width   = this.naturalWidth;
         var height  = this.naturalHeight;
@@ -1930,7 +2002,9 @@ jQuery(document).ready(function($) {
       })
       .error (function() {
         if (image.is(':visible')) {
-          image.hide ().attr ('src', '//:0');
+//          image.hide ().attr ('src', '//:0');
+          image.hide ().attr ('src', '');
+          $('div#tab-banner-' + block + ' table.ai-settings-table').css ('position', 'relative');
         }
       });
 
@@ -1938,7 +2012,9 @@ jQuery(document).ready(function($) {
 
     $("#banner-url-" + tab).on ('input', function() {
       var block = $(this).attr('id').replace ("banner-url-", "");
-      $('#banner-link-' + block).attr ('href', $(this).val ());
+      var url = $(this).val ().trim();
+      if (url == '') $('#banner-link-' + block).removeAttr ('href'); else
+        $('#banner-link-' + block).attr ('href', $(this).val ());
     });
 
     $("#import-code-"+tab).click (function () {
@@ -1947,10 +2023,16 @@ jQuery(document).ready(function($) {
       var block = $(this).attr('id').replace ("import-code-", "");
       var nonce = $("#ai-form").attr ('nonce');
 
-      $.post (ajaxurl, {'action': 'ai_ajax_backend', 'ai_check': nonce, 'import-code': btoa (get_editor_text (block))}
+      $.post (ajaxurl, {'action': 'ai_ajax_backend', 'ai_check': nonce, 'import-code': $.base64Encode (get_editor_text (block))}
       ).done (function (data) {
         if (data != '') {
-          var code_data = JSON.parse (data);
+          try {
+            var code_data = JSON.parse (data);
+          } catch (error) {
+            console.log ("AI IMPORT CODE ERROR:", data);
+            $('#ai-error-container').text (data).show ();
+          }
+
           if (typeof code_data !== "undefined" && typeof code_data ['type'] !== "undefined") {
 
             if (debug) console.log ("AI IMPORT CODE:", code_data);
@@ -1963,7 +2045,7 @@ jQuery(document).ready(function($) {
               case AI_CODE_BANNER:
                 $("#banner-image-url-" + block).val (code_data ['image']).trigger ('input');
                 $("#banner-url-" + block).val (code_data ['link']).trigger ('input');
-                $("#open-new-window-" + block).attr('checked', code_data ['target'] == '_blank');
+                $("#open-new-tab-" + block).attr('checked', code_data ['target'] == '_blank');
                 break;
               case AI_CODE_ADSENSE:
                 $("#adsense-publisher-id-" + block).val (code_data ['adsense-publisher-id']);
@@ -2006,7 +2088,7 @@ jQuery(document).ready(function($) {
           code_data ['image'] = $("#banner-image-url-" + block).val ();
           code_data ['link']  = $("#banner-url-" + block).val ();
 
-          if ($("#open-new-window-" + block).is(":checked"))
+          if ($("#open-new-tab-" + block).is(":checked"))
           code_data ['target']  = '_blank';
           break;
         case AI_CODE_ADSENSE:
@@ -2109,8 +2191,7 @@ jQuery(document).ready(function($) {
       remove_rotate_option (block, $('#ai-rotation-container-' + block).tabs ("option", "active"));
     });
 
-//
-    $("#settings-" + tab + " .adsense-list").click (function () {
+    $("#tab-" + tab + " .adsense-list").click (function () {
       $(this).blur ();
 
       var container = $("#adsense-list-container");
@@ -2121,6 +2202,14 @@ jQuery(document).ready(function($) {
         reload_adsense_list (false);
       }
     });
+
+    $("select#html-element-insertion-"+tab).change (function() {
+      var html_element_insertion = $("select#html-element-insertion-"+tab+" option:selected").attr('value');
+
+      if (html_element_insertion == AI_HTML_INSERTION_SEREVR_SIDE)
+        $("#server-side-insertion-"+tab).hide (); else
+          $("#server-side-insertion-"+tab).show ();
+    });
   }
 
   function import_rotation_code (block) {
@@ -2128,7 +2217,7 @@ jQuery(document).ready(function($) {
 
     var nonce = $("#ai-form").attr ('nonce');
 
-    $.post (ajaxurl, {'action': 'ai_ajax_backend', 'ai_check': nonce, 'import-rotation-code': btoa (get_editor_text (block))}
+    $.post (ajaxurl, {'action': 'ai_ajax_backend', 'ai_check': nonce, 'import-rotation-code': $.base64Encode (get_editor_text (block))}
     ).done (function (data) {
       if (data != '') {
         var code_data = JSON.parse (data);
@@ -2203,7 +2292,7 @@ jQuery(document).ready(function($) {
 
     if (debug) console.log ('ROTATION DATA:', rotation_data);
 
-    $.post (ajaxurl, {'action': 'ai_ajax_backend', 'ai_check': nonce, 'generate-rotation-code': btoa (JSON.stringify (rotation_data))}
+    $.post (ajaxurl, {'action': 'ai_ajax_backend', 'ai_check': nonce, 'generate-rotation-code': $.base64Encode (JSON.stringify (rotation_data))}
     ).done (function (data) {
       $('#ai-error-container').hide ();
 
@@ -2794,20 +2883,54 @@ jQuery(document).ready(function($) {
 
 
       } else {
-          if (!$('#adsense-authorization-code', data_container).length) $('#adsense-list-controls').show (); else {
+          if ($('#adsense-client-id', data_container).length) {
             $('#adsense-list-controls').hide ();
             $('button.ai-top-button', data_container).button().show ();
 
-            $("#authorize-adsense").click (function () {
+            $("#save-client-ids").click (function () {
+
+              var client_id = $("input#adsense-client-id").val ();
+              var client_secret = $("input#adsense-client-secret").val ();
+
+              data_container.text ('Loading...');
+
+              var nonce = $("#ai-form").attr ('nonce');
+
+              $('#ai-loading').show ();
+              $.get (ajaxurl + '?action=ai_ajax_backend&adsense-client-id=' + btoa (client_id) + '&adsense-client-secret=' + btoa (client_secret) + '&ai_check=' + nonce, function (data) {
+                reload_adsense_list (false);
+              }).fail (function (xhr, status, error) {
+                var message = "Error saving AdSense client IDs: " + xhr.status + " " + xhr.statusText ;
+                console.log (message);
+              })
+              .always (function () {
+                $('#ai-loading').hide ();
+              });
+            });
+
+            return;
+          } else
+
+          if ($('#adsense-authorization-code', data_container).length) {
+            $('#adsense-list-controls').hide ();
+            $('button.ai-top-button', data_container).button().show ();
+
+            $(".authorize-adsense", data_container).click (function () {
 
               var authorization_code = $("input#adsense-authorization-code").val ();
 
               $('#adsense-list-controls').show ();
               data_container.text ('Loading...');
 
+              if ($(this).hasClass ('clear-adsense')) authorization_code = '';
+
               update_adsense_authorization (authorization_code);
             });
+
+            return;
           }
+
+          $('#adsense-list-controls').show ();
 
           var publisher_id = $('#adsense-data', data_container).data ('publisher-id');
           if (typeof publisher_id == 'undefined') publisher_id = '';
@@ -3043,7 +3166,7 @@ jQuery(document).ready(function($) {
     $.get (ajaxurl + '?action=ai_ajax_backend&adsense-authorization-code=' + btoa (authorization_code) + '&ai_check=' + nonce, function (data) {
       reload_adsense_list (false);
     }).fail (function (xhr, status, error) {
-      var message = "Error clearing AdSense authorization: " + xhr.status + " " + xhr.statusText ;
+      var message = "Error saving AdSense authorization: " + xhr.status + " " + xhr.statusText ;
       console.log (message);
     })
     .always (function () {
@@ -3051,7 +3174,21 @@ jQuery(document).ready(function($) {
     });
   }
 
+  function update_block_code_demo () {
+    var nonce = $("#ai-form").attr ('nonce');
 
+    var block_class_name    = encodeURIComponent ($('#block-class-name').val ());
+    var block_class         = $('#block-class').is(":checked") ? 1 : 0;
+    var block_number_class  = $('#block-number-class').is(":checked") ? 1 : 0;
+    var inline_styles       = $('#inline-styles').is(":checked") ? 1 : 0;
+
+    $.get (ajaxurl + '?action=ai_ajax_backend&update=block-code-demo&block_class_name=' + block_class_name + '&block_class=' + block_class + '&block_number_class=' + block_number_class + '&inline_styles=' + inline_styles + '&ai_check=' + nonce, function (data) {
+      $('span#ai-block-code-demo').html (data);
+    }).fail (function (xhr, status, error) {
+      var message = "Error updating block code demo: " + xhr.status + " " + xhr.statusText ;
+      console.log (message);
+    });
+  }
 
   if (debug) console.log ("READY");
   if (debug_title) $("#plugin_name").css ("color", "#f00");
@@ -3205,6 +3342,29 @@ jQuery(document).ready(function($) {
     reload_list ();
   });
 
+  if ($("#maxmind-db-status").hasClass ('maxmind-db-missing')) {
+    var nonce = $("#ai-form").attr ('nonce');
+    var page = ajaxurl+"?action=ai_ajax_backend&update=maxmind&ai_check=" + nonce;
+
+    $("span.maxmind-db-missing").text ('downloading...');
+    $.get (page, function (update_status) {
+
+      if (update_status == '') {
+        $("span.maxmind-db-missing").closest ('.notice.notice-error').hide ();
+        $("#maxmind-db-status").text ('');
+      } else {
+        console.log (update_status);
+          var status = JSON.parse (update_status);
+        console.log (status);
+          if (typeof status !== "undefined") {
+            $(".notice span.maxmind-db-missing").text (status [0]);
+            $("#maxmind-db-status").text (status [1]);
+          } else $("span.maxmind-db-missing").text ('update error');
+        }
+    }).fail (function(jqXHR, status, err) {
+      $("span.maxmind-db-missing").text ('download error');
+    });
+  }
 
   $("#adsense-load-all").click (function () {
     $(this).parent ().find ('.checkbox-icon').toggleClass ('on');
@@ -3227,6 +3387,12 @@ jQuery(document).ready(function($) {
   $("#clear-adsense-authorization").click (function () {
     $("#adsense-list-data").text ('Updating...');
     update_adsense_authorization ('');
+  });
+
+  $('.ai-block-code-demo').change (function () {
+    update_block_code_demo ();
+  }).on('input',function(e){
+    update_block_code_demo ();
   });
 
   setTimeout (update_rating, 1000);

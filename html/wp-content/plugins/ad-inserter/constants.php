@@ -7,20 +7,24 @@ define ('AI_OPTION_NAME',                'ad_inserter');
 define ('AI_INSTALL_NAME',               'ai-install');
 define ('AI_OPTION_GLOBAL',              'global');
 define ('AI_OPTION_EXTRACT',             'extract');
+define ('AI_ADSENSE_CLIENT_IDS',         'ai-adsense-client-ids');
 define ('AI_ADSENSE_AUTH_CODE',          'ai-adsense-auth-code');
 
 if (!defined ('AD_INSERTER_PLUGIN_DIR'))
   define ('AD_INSERTER_PLUGIN_DIR', plugin_dir_path (__FILE__));
 
-if (file_exists (AD_INSERTER_PLUGIN_DIR.'functions.php')) {
-  include_once AD_INSERTER_PLUGIN_DIR.'functions.php';
+if (!defined ('AD_INSERTER_FILE'))
+  define ('AD_INSERTER_FILE', AD_INSERTER_PLUGIN_DIR.'ad-inserter.php');
+
+if (file_exists (AD_INSERTER_PLUGIN_DIR.'includes/functions.php')) {
+  include_once AD_INSERTER_PLUGIN_DIR.'includes/functions.php';
 }
 
 if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.2.13');
+  define ('AD_INSERTER_VERSION', '2.3.1');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -60,6 +64,7 @@ define ('AI_OPTION_TRACKING',                    'tracking');
 define ('AI_OPTION_ENABLE_AJAX',                 'enable_ajax');
 define ('AI_OPTION_ENABLE_FEED',                 'enable_feed');
 define ('AI_OPTION_ENABLE_404',                  'enable_404');
+define ('AI_OPTION_DISABLE_CACHING',             'disable_caching');
 define ('AI_OPTION_BLOCK_NAME',                  'name');
 define ('AI_OPTION_AUTOMATIC_INSERTION',         'display_type');
 define ('AI_OPTION_PARAGRAPH_NUMBER',            'paragraph_number');
@@ -78,6 +83,9 @@ define ('AI_OPTION_AVOID_TEXT_BELOW',            'avoid_text_below');
 define ('AI_OPTION_AVOID_ACTION',                'avoid_action');
 define ('AI_OPTION_AVOID_TRY_LIMIT',             'avoid_try_limit');
 define ('AI_OPTION_AVOID_DIRECTION',             'avoid_direction');
+define ('AI_OPTION_HTML_SELECTOR',               'html_selector');
+define ('AI_OPTION_SERVER_SIDE_INSERTION',       'server_side_insertion');
+define ('AI_OPTION_HTML_ELEMENT_INSERTION',      'html_insertion');
 define ('AI_OPTION_EXCERPT_NUMBER',              'excerpt_number'); // needs to be renamed
 define ('AI_OPTION_FILTER_TYPE',                 'filter_type');
 define ('AI_OPTION_INVERTED_FILTER',             'inverted_filter');
@@ -124,9 +132,11 @@ define ('AI_OPTION_DISPLAY_FOR_USERS',           'display_for_users');
 define ('AI_OPTION_DISPLAY_FOR_DEVICES',         'display_for_devices');
 define ('AI_OPTION_DETECT_SERVER_SIDE',          'detect_server_side');
 define ('AI_OPTION_DETECT_CLIENT_SIDE',          'detect_client_side');
+define ('AI_OPTION_CLIENT_SIDE_ACTION',          'client_side_action');
 define ('AI_OPTION_DETECT_VIEWPORT',             'detect_viewport');
 define ('AI_OPTION_ADB_BLOCK_ACTION',            'adb-block-action');
 define ('AI_OPTION_ADB_BLOCK_REPLACEMENT',       'adb-block-replacement');
+define ('AI_OPTION_CLOSE_BUTTON',                'close-button');
 
 define ('AI_OPTION_DISABLED',                    'disabled');
 
@@ -193,6 +203,10 @@ define('AI_AUTOMATIC_INSERTION_BETWEEN_COMMENTS',    11);
 define('AI_AUTOMATIC_INSERTION_AFTER_COMMENTS',      12);
 define('AI_AUTOMATIC_INSERTION_FOOTER',              13);
 define('AI_AUTOMATIC_INSERTION_ABOVE_HEADER',        14);
+define('AI_AUTOMATIC_INSERTION_BEFORE_HTML_ELEMENT', 15);
+define('AI_AUTOMATIC_INSERTION_AFTER_HTML_ELEMENT',  16);
+
+define('AI_AUTOMATIC_INSERTION_OUTPUT_BUFFERING',    99);
 define('AI_AUTOMATIC_INSERTION_CUSTOM_HOOK',        100);
 
 define('AI_TEXT_DISABLED',             'Disabled');
@@ -210,6 +224,8 @@ define('AI_TEXT_BETWEEN_COMMENTS',     'Between Comments');
 define('AI_TEXT_AFTER_COMMENTS',       'After Comments');
 define('AI_TEXT_ABOVE_HEADER',         'Above Header');
 define('AI_TEXT_FOOTER',               'Footer');
+define('AI_TEXT_BEFORE_HTML_ELEMENT',  'Before HTML element');
+define('AI_TEXT_AFTER_HTML_ELEMENT',   'After HTML element');
 
 //Display options
 define('AD_DISPLAY_ALL_USERS','all users');
@@ -281,15 +297,19 @@ define('AI_TEXT_STICKY_TOP',          'Sticky Top');
 define('AI_TEXT_STICKY_BOTTOM',       'Sticky Bottom');
 
 define('AI_ALIGNMENT_CSS_DEFAULT',        'margin: 8px 0; clear: both;');
-define('AI_ALIGNMENT_CSS_LEFT',           'margin: 8px 0; text-align: left; clear: both;||margin: 8px 0; text-align: left; clear: both; display: flex; justify-content: flex-start;');
-define('AI_ALIGNMENT_CSS_RIGHT',          'margin: 8px 0; text-align: right; clear: both;||margin: 8px 0; text-align: right; clear: both; display: flex; justify-content: flex-end;');
+define('AI_ALIGNMENT_CSS_LEFT',           'margin: 8px auto 8px 0; text-align: left; clear: both;||margin: 8px 0; text-align: left; clear: both; display: flex; justify-content: flex-start;');
+define('AI_ALIGNMENT_CSS_RIGHT',          'margin: 8px 0 8px auto; text-align: right; clear: both;||margin: 8px 0; text-align: right; clear: both; display: flex; justify-content: flex-end;');
 define('AI_ALIGNMENT_CSS_CENTER',         'margin: 8px auto; text-align: center; clear: both;||margin: 8px 0; text-align: center; clear: both; display: flex; justify-content: center;');
 define('AI_ALIGNMENT_CSS_FLOAT_LEFT',     'margin: 8px 8px 8px 0; float: left;');
 define('AI_ALIGNMENT_CSS_FLOAT_RIGHT',    'margin: 8px 0 8px 8px; float: right;');
 define('AI_ALIGNMENT_CSS_STICKY_LEFT',    'position: fixed; left: 0px; top: 100px; z-index: 9999;');
 define('AI_ALIGNMENT_CSS_STICKY_RIGHT',   'position: fixed; right: 0px; top: 100px; z-index: 9999;');
-define('AI_ALIGNMENT_CSS_STICKY_TOP',     'position: fixed; top: 0; left: 0; width: 100%; text-align: center; z-index: 9999;||position: fixed; top: 0; left: 0; width: 100%; text-align: center; display: flex; justify-content: center; z-index: 9999;');
-define('AI_ALIGNMENT_CSS_STICKY_BOTTOM',  'position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 9999;||position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; display: flex; justify-content: center; z-index: 9999;');
+define('AI_ALIGNMENT_CSS_STICKY_TOP',     'position: fixed; top: 0; text-align: center; left: 50%; transform: translate(-50%); width: 100%; z-index: 9999;||position: fixed; top: 0; left: 0; width: 100%; text-align: center; z-index: 9999;||position: fixed; top: 0; left: 0; width: 100%; text-align: center; display: flex; justify-content: center; z-index: 9999;');
+define('AI_ALIGNMENT_CSS_STICKY_BOTTOM',  'position: fixed; bottom: 0; text-align: center; left: 50%; transform: translate(-50%); width: 100%; z-index: 9999;||position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 9999;||position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; display: flex; justify-content: center; z-index: 9999;');
+
+define('AI_ALIGNMENT_CSS_AMP_LEFT',       'display: flex; justify-content: flex-start;');
+define('AI_ALIGNMENT_CSS_AMP_RIGHT',      'display: flex; justify-content: flex-end;');
+define('AI_ALIGNMENT_CSS_AMP_CENTER',     'display: flex; justify-content: center;');
 
 //List Type
 define('AD_BLACK_LIST','Black List');
@@ -432,6 +452,34 @@ define ('AI_STICKY_WIDGET_MODE_JS',  1);
 define ('AI_TEXT_CSS', 'CSS');
 define ('AI_TEXT_JS',  'JavaScript ');
 
+define ('AI_GEO_DB_WEBNET77',        0);
+define ('AI_GEO_DB_MAXMIND',         1);
+
+define ('AI_TEXT_WEBNET77',        'Webnet77');
+define ('AI_TEXT_MAXMIND',         'MaxMind');
+
+define ('AI_CLOSE_NONE',             0);
+define ('AI_CLOSE_TOP_RIGHT',        1);
+define ('AI_CLOSE_TOP_LEFT',         2);
+define ('AI_CLOSE_BOTTOM_RIGHT',     3);
+define ('AI_CLOSE_BOTTOM_LEFT',      4);
+
+define ('AI_TEXT_TOP_RIGHT',        'Top right');
+define ('AI_TEXT_TOP_LEFT',         'Top left');
+define ('AI_TEXT_BOTTOM_RIGHT',     'Bottom right');
+define ('AI_TEXT_BOTTOM_LEFT',      'Bottom left');
+
+define ('AI_CLIENT_SIDE_ACTION_SHOW',    0);
+define ('AI_CLIENT_SIDE_ACTION_INSERT',  1);
+
+define ('AI_TEXT_INSERT',  'Insert');
+
+define ('AI_HTML_INSERTION_CLIENT_SIDE',            0);
+define ('AI_HTML_INSERTION_CLIENT_SIDE_DOM_READY',  1);
+define ('AI_HTML_INSERTION_SEREVR_SIDE',            2);
+
+define('AI_TEXT_CLIENT_SIDE_DOM_READY',             'Client-side when DOM ready');
+
 //Settings
 define ('AI_ENABLED',                '1');
 define ('AI_DISABLED',               '0');
@@ -459,6 +507,8 @@ define ('AI_TRANSIENT_ADB_FILES_VERSION',       'ai-adb-version');
 define ('AI_SYNTAX_HIGHLIGHTER_THEME',          'ad_inserter');
 define ('DEFAULT_SYNTAX_HIGHLIGHTER_THEME',     AI_SYNTAX_HIGHLIGHTER_THEME);
 define ('DEFAULT_BLOCK_CLASS_NAME',             'code-block');
+define ('DEFAULT_BLOCK_CLASS',                  AI_ENABLED);
+define ('DEFAULT_BLOCK_NUMBER_CLASS',           AI_ENABLED);
 define ('DEFAULT_INLINE_STYLES',                AI_ENABLED);
 define ('DEFAULT_MINIMUM_USER_ROLE',            'administrator');
 define ('DEFAULT_STICKY_WIDGET_MODE',           AI_STICKY_WIDGET_MODE_CSS);
@@ -470,7 +520,8 @@ define ('DEFAULT_NO_PARAGRAPH_COUNTING_INSIDE', 'blockquote, figure, li');
 define ('DEFAULT_PARAGRAPH_TAGS',               'p');
 define ('DEFAULT_ADMIN_TOOLBAR_DEBUGGING',      AI_ENABLED);
 define ('DEFAULT_REMOTE_DEBUGGING',             AI_DISABLED);
-define ('DEFAULT_JAVASCRIPT_DEBUGGING',         AI_DISABLED);
+define ('DEFAULT_BACKEND_JS_DEBUGGING',         AI_DISABLED);
+define ('DEFAULT_FRONTEND_JS_DEBUGGING',        AI_DISABLED);
 define ('DEFAULT_MULTISITE_SETTINGS_PAGE',      AI_ENABLED);
 define ('DEFAULT_MULTISITE_WIDGETS',            AI_ENABLED);
 define ('DEFAULT_MULTISITE_PHP_PROCESSING',     AI_ENABLED);
@@ -486,13 +537,19 @@ define ('DEFAULT_ADB_BLOCK_ACTION',             AI_ADB_BLOCK_ACTION_DO_NOTHING);
 define ('DEFAULT_ADB_DETECTION',                AI_ADB_DETECTION_ADVANCED);
 define ('DEFAULT_CUSTOM_HOOK_PRIORITY',         10);
 define ('DEFAULT_OUTPUT_BUFFERING',             AI_OUTPUT_BUFFERING_DISABLED);
+define ('DEFAULT_GEO_DB',                       AI_GEO_DB_WEBNET77);
+define ('DEFAULT_GEO_DB_UPDATES',               AI_DISABLED);
+define ('DEFAULT_CLOSE_BUTTON',                 AI_CLOSE_NONE);
+define ('DEFAULT_SERVER_SIDE_INSERTION',        AI_AUTOMATIC_INSERTION_FOOTER);
+define ('DEFAULT_HTML_ELEMENT_INSERTION',       AI_HTML_INSERTION_CLIENT_SIDE_DOM_READY);
+define ('DEFAULT_CLIENT_SIDE_ACTION',           AI_CLIENT_SIDE_ACTION_SHOW);
 
 define ('AI_ADBLOCKING_DETECTION',              true);
 define ('AI_NORMAL_HEADER_STYLES',              true);
 define ('AI_AMP_HEADER_STYLES',                 true);
 define ('AI_CODE_GENERATOR',                    true);
 define ('AI_BUFFERING',                         true);
-//define ('AI_ADSENSE_API',                       true);
+define ('AI_ADSENSE_API',                       true);
 define ('AI_ADB_1_NAME',                        'dqwpediwqswqma');
 define ('AI_ADB_2_DEFAULT_NAME',                'lfoswyekaaslsd');
 define ('AI_ADB_CONTENT_CSS_BEGIN',             'ai-adb-content-begin');
@@ -523,6 +580,9 @@ define ('DEFAULT_VIEWPORT_WIDTH_3', 0);
 
 define ('DEFAULT_COUNTRY_GROUP_NAME', "Group");
 
+define ('AI_MARKER_START',              '%##');
+define ('AI_MARKER_END',                '##%');
+
 define ('CONTENT_HOOK_BLOCKS',          'content_hook');
 define ('EXCERPT_HOOK_BLOCKS',          'excerpt_hook');
 define ('LOOP_START_HOOK_BLOCKS',       'loop_start_hook');
@@ -533,6 +593,7 @@ define ('BETWEEN_COMMENTS_HOOK_BLOCKS', 'between_comments_hook');
 define ('AFTER_COMMENTS_HOOK_BLOCKS',   'after_comments_hook');
 define ('FOOTER_HOOK_BLOCKS',           'wp_footer_hook');
 define ('ABOVE_HEADER_HOOK_BLOCKS',     'above_header_hook');
+define ('HTML_ELEMENT_HOOK_BLOCKS',     'html_element_hook');
 define ('CUSTOM_HOOK_BLOCKS',           '_hook');
 define ('AI_EXTRACT_USED_BLOCKS',       'used_blocks');
 
@@ -628,16 +689,21 @@ define ('AI_NUMBER_OF_COMMENTS',         11);
 define ('AI_COMMENTS_SAVED_CALLBACK',    12);
 define ('AI_COMMENTS_SAVED_END_CALLBACK',13);
 define ('AI_ADB_DETECTION',              14);
-define ('AI_JS_DEBUGGING',               15);
-define ('AI_WP_AMP_PAGE',                16);
-define ('AI_INSTALL_TIME_DIFFERENCE',    17);
-define ('AI_DAYS_SINCE_INSTAL',          18);
-define ('AI_TAGS',                       19);
-define ('AI_VIEWPORTS',                  20);
-define ('AI_WORD_COUNT',                 21);
-define ('AI_ADB_SHORTCODE_ACTION',       22);
-define ('AI_SHORTCODES',                 23);
-define ('AI_VIEWPORT_NAMES',             24);
+define ('AI_BACKEND_JS_DEBUGGING',       15);
+define ('AI_FRONTEND_JS_DEBUGGING',      16);
+define ('AI_WP_AMP_PAGE',                17);
+define ('AI_INSTALL_TIME_DIFFERENCE',    18);
+define ('AI_DAYS_SINCE_INSTAL',          19);
+define ('AI_TAGS',                       20);
+define ('AI_VIEWPORTS',                  21);
+define ('AI_WORD_COUNT',                 22);
+define ('AI_ADB_SHORTCODE_ACTION',       23);
+define ('AI_SHORTCODES',                 24);
+define ('AI_VIEWPORT_NAMES',             25);
+define ('AI_CLOSE_BUTTONS',              26);
+define ('AI_DISABLE_CACHING',            27);
+define ('AI_COUNT',                      28);
+define ('AI_CLIENT_SIDE_INSERTION',      29);
 
 define ('AI_CONTEXT_NONE',                0);
 define ('AI_CONTEXT_CONTENT',             1);
@@ -666,6 +732,7 @@ define ('AI_URL_DEBUG_NO_INSERTION',         'ai-debug-no-insertion');
 define ('AI_URL_DEBUG_COUNTRY',              'ai-debug-country');
 define ('AI_URL_DEBUG_AD_BLOCKING' ,         'ai-debug-adb');
 define ('AI_URL_DEBUG_AD_BLOCKING_STATUS',   'ai-debug-adb-status');
+define ('AI_URL_DEBUG_JAVASCRIPT',           'ai-debug-js');
 
 define ('AI_DEBUG_PROCESSING',            0x01); // AI_DEBUG_PROCESSING_
 define ('AI_DEBUG_BLOCKS',                0x02);
@@ -689,6 +756,7 @@ define ('AI_DEBUG_WIDGET_STYLE',         'margin: 0; padding: 0 5px; font-size: 
 define ('AI_DEBUG_TAGS_CLASS',           'ai-debug-tags');
 define ('AI_DEBUG_POSITIONS_CLASS',      'ai-debug-positions');
 define ('AI_DEBUG_PAGE_TYPE_CLASS',      'ai-debug-page-type');
+define ('AI_DEBUG_STATUS_CLASS',         'ai-debug-status');
 define ('AI_DEBUG_ADB_CLASS',            'ai-debug-adb');
 
 define ('AI_CODE_UNKNOWN',               100);
