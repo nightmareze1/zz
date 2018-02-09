@@ -32,6 +32,8 @@ deployment:
       - docker images
       - kubectl get cs
       - kubectl apply -f template/deployment.yml
+      - wget https://github.com/tcnksm/ghr/releases/download/v0.5.2/ghr_v0.5.2_linux_amd64.zip && unzip ghr_v0.5.2_linux_amd64.zip
+      - ./ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME $CIRCLE_TAG circle.yml
   dockerhub_release:
     tag: /a[0-9]+(\.[0-9]+)*/
     commands:
@@ -40,3 +42,5 @@ deployment:
       - docker push
       - kubectl get cs
       - kubectl apply -f template/deployment.yml
+      - wget https://github.com/tcnksm/ghr/releases/download/v0.5.2/ghr_v0.5.2_linux_amd64.zip && unzip ghr_v0.5.2_linux_amd64.zip
+      - ./ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME $CIRCLE_TAG circle.yml
