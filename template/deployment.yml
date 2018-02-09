@@ -48,10 +48,11 @@ spec:
         volumeMounts:
           - name: wordpress-1
             mountPath: /var/www/html
+            subPath: itshellws/html
       volumes:
         - name: wordpress-1
           persistentVolumeClaim:
-           claimName: var-efs
+           claimName: efs
       imagePullSecrets:
         - name: myregistrykey
 
