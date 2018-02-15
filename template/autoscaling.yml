@@ -9,6 +9,6 @@ spec:
     apiVersion: extensions/v1beta1
     kind: Deployment
     name: itshell-app-deployment
-  minReplicas: 3
+  minReplicas: 2
   maxReplicas: 6
   targetCPUUtilizationPercentage: 80
