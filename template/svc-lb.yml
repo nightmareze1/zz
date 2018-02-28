@@ -3,7 +3,11 @@ kind: Service
 metadata:
   name: itshell
 spec:
+  type: LoadBalancer
   ports:
-    - port: 80
+    - nodePort: 31187
+      port: 80
+      protocol: TCP
+      targetPort: 80
   selector:
     app: itshell
