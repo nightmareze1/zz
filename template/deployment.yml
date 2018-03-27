@@ -4,7 +4,7 @@ metadata:
   name: itshell
   namespace: default
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -48,10 +48,11 @@ spec:
         volumeMounts:
           - name: wordpress-1
             mountPath: /var/www/html
+            subPath: itshellws/html
       volumes:
         - name: wordpress-1
           persistentVolumeClaim:
-           claimName: var-efs
+           claimName: efs
       imagePullSecrets:
         - name: myregistrykey
 
@@ -66,7 +67,6 @@ spec:
     apiVersion: extensions/v1beta1
     kind: Deployment
     name: itshell
-  minReplicas: 3
+  minReplicas: 2
   maxReplicas: 6
   targetCPUUtilizationPercentage: 50
-
