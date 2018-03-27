@@ -1690,7 +1690,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       }
 
       $serverside_insertion_code = "<script>
-  {$code_before}  ai_insert ('$insertion', '$selector', atob ('[#AI_CODE#]'));{$code_after}
+  {$code_before}  ai_insert ('$insertion', '$selector', jQuery.base64Decode ('[#AI_CODE#]'));{$code_after}
   </script>\n";
     }
 
@@ -2159,7 +2159,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
         $paragraph_positions = $filtered_paragraph_positions;
       }
 
-      $ai_last_check = AI_CHECK_PARAGRAPHS_AFTER_BLOCKQUOTE_FIGURE;
+      $ai_last_check = AI_CHECK_PARAGRAPHS_AFTER_NO_COUNTING_INSIDE;
       if (count ($paragraph_positions) == 0) return $content;
     }
 
@@ -2754,7 +2754,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
         $paragraph_positions = $filtered_paragraph_positions;
       }
 
-      $ai_last_check = AI_CHECK_PARAGRAPHS_AFTER_BLOCKQUOTE_FIGURE;
+      $ai_last_check = AI_CHECK_PARAGRAPHS_AFTER_NO_COUNTING_INSIDE;
       if (count ($paragraph_positions) == 0) return $content;
     }
 
@@ -3513,17 +3513,20 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
     if ($urls == AD_EMPTY_DATA) return !$return;
 
-    $urls_listed = explode (" ", $urls);
+    $list_separator = ',';
+    if (strpos ($urls, ' ') !== false && strpos ($urls, ',') === false) $list_separator = ' ';
+
+    $urls_listed = explode ($list_separator, $urls);
     foreach ($urls_listed as $index => $url_listed) {
       if (trim ($url_listed) == "") unset ($urls_listed [$index]); else
         $urls_listed [$index] = trim ($url_listed);
     }
 
-  //  print_r ($urls_listed);
-  //  echo "<br />\n";
-  //  echo ' page url: ' . $page_url, "<br />\n";
-  //  echo ' listed urls: ' . $urls, "\n";
-  //  echo "<br />\n";
+//    print_r ($urls_listed);
+//    echo "<br />\n";
+//    echo ' page url: ' . $page_url, "<br />\n";
+//    echo ' listed urls: ' . $urls, "\n";
+//    echo "<br />\n";
 
     foreach ($urls_listed as $url_listed) {
       if ($url_listed == '*') return $return;
@@ -4177,20 +4180,21 @@ class ai_code_generator {
         }
         break;
       case AI_CODE_ADSENSE:
-        if ($data ['adsense-width']  != '') $data ['adsense-width']  = ' width: '. $data ['adsense-width']. 'px;';
-        if ($data ['adsense-height'] != '') $data ['adsense-height'] = ' height: '.$data ['adsense-height'].'px;';
+        $adsense_size = ($data ['adsense-width']  != '' ? ' width: '. $data ['adsense-width']. 'px;' : '') . ($data ['adsense-height'] != '' ? ' height: '.$data ['adsense-height'].'px;' : '');
+
+        $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>';
+        if ($data ['adsense-comment']) $code .= "\n<!-- " . $data ['adsense-comment'] . " -->";
 
         switch ($data ['adsense-type']) {
-
           case AI_ADSENSE_STANDARD:
 
-            switch ($data ['adsense-responsive']) {
-              case 0:
+            switch ($data ['adsense-size']) {
+              case AI_ADSENSE_SIZE_FIXED:
 
                 // Normal
-                $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                $code .= '
 <ins class="adsbygoogle"
-     style="display: inline-block;'.$data ['adsense-width'].$data ['adsense-height'].'"
+     style="display: inline-block;'.$adsense_size.'"
      data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
      data-ad-slot="'.$data ['adsense-ad-slot-id'].'"></ins>
 <script>
@@ -4198,10 +4202,24 @@ class ai_code_generator {
 </script>';
                 break;
 
-              case 1:
+              case AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT:
+
+                $code = $this->adsense_size_styles ($data) . $code;
+
+                // Normal
+                $code .= '
+<ins class="adsbygoogle ' . AI_ADSENSE_BLOCK_CLASS  .$data ['block'].'"
+     data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
+     data-ad-slot="'.$data ['adsense-ad-slot-id'].'"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>';
+                break;
+
+              case AI_ADSENSE_SIZE_RESPONSIVE:
 
                 // Responsive
-                $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                $code .= '
 <ins class="adsbygoogle"
      style="display: block;"
      data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
@@ -4215,13 +4233,13 @@ class ai_code_generator {
             break;
 
           case AI_ADSENSE_LINK:
-            switch ($data ['adsense-responsive']) {
-              case 0:
+            switch ($data ['adsense-size']) {
+              case AI_ADSENSE_SIZE_FIXED:
 
                 // Normal
-                $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                $code .= '
 <ins class="adsbygoogle"
-     style="display: inline-block;'.$data ['adsense-width'].$data ['adsense-height'].'"
+     style="display: inline-block;'.$adsense_size.'"
      data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
      data-ad-slot="'.$data ['adsense-ad-slot-id'].'"
      data-ad-format="link"></ins>
@@ -4230,10 +4248,25 @@ class ai_code_generator {
 </script>';
                 break;
 
-              case 1:
+              case AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT:
+
+                $code = $this->adsense_size_styles ($data) . $code;
+
+                // Normal
+                $code .= '
+<ins class="adsbygoogle ' . AI_ADSENSE_BLOCK_CLASS  .$data ['block'].'"
+     data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
+     data-ad-slot="'.$data ['adsense-ad-slot-id'].'"
+     data-ad-format="link"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>';
+                break;
+
+              case AI_ADSENSE_SIZE_RESPONSIVE:
 
                 // Responsive
-                $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                $code .= '
 <ins class="adsbygoogle"
      style="display: block;"
      data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
@@ -4247,7 +4280,7 @@ class ai_code_generator {
             break;
 
           case AI_ADSENSE_IN_ARTICLE:
-                $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            $code .= '
 <ins class="adsbygoogle"
      style="display: block; text-align: center;"
      data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
@@ -4260,7 +4293,7 @@ class ai_code_generator {
             break;
 
           case AI_ADSENSE_IN_FEED:
-                $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            $code .= '
 <ins class="adsbygoogle"
      style="display: block;"
      data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
@@ -4274,7 +4307,7 @@ class ai_code_generator {
             break;
 
           case AI_ADSENSE_MATCHED_CONTENT:
-            $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            $code .= '
 <ins class="adsbygoogle"
      style="display: block;"
      data-ad-client="ca-'.$data ['adsense-publisher-id'].'"
@@ -4285,7 +4318,7 @@ class ai_code_generator {
 </script>';
             break;
           case AI_ADSENSE_AUTO:
-            $code = '<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            $code .= '
 <script>
    (adsbygoogle = window.adsbygoogle || []).push({
       google_ad_client: "ca-'.$data ['adsense-publisher-id'].'",
@@ -4347,6 +4380,48 @@ class ai_code_generator {
     return $code;
   }
 
+  public function adsense_size_styles ($data){
+    $code = '<style>
+';
+    $display_inline = false;
+    for ($viewport = AD_INSERTER_VIEWPORTS; $viewport >= 1; $viewport --) {
+      $viewport_name  = get_viewport_name ($viewport);
+      $viewport_width = get_viewport_width ($viewport);
+
+      $adsense_width  = $data ['adsense-viewports'][$viewport - 1]['width'];
+      $adsense_height = $data ['adsense-viewports'][$viewport - 1]['height'];
+
+      if ($viewport_name != '') {
+        if ($adsense_width > 0 && $adsense_height > 0) {
+          if (!$display_inline) {
+            $size_style = 'display: inline-block; ';
+            $display_inline = true;
+          } else $size_style = '';
+
+          $size_style .= 'width: ' . $adsense_width . 'px; height: ' .$adsense_height . 'px;';
+        } else {
+            $size_style = 'display: none;';
+            $display_inline = false;
+          }
+
+        switch ($viewport_width) {
+          case 0:
+              $code .= '.' . AI_ADSENSE_BLOCK_CLASS . $data ['block']. ' {' . $size_style . '}';
+            break;
+          default:
+              $code .= '@media (min-width: '.$viewport_width.'px) {.' . AI_ADSENSE_BLOCK_CLASS . $data ['block']. ' {' . $size_style . '}}';
+            break;
+        }
+
+        $code .= ' /* ' . $viewport_name . ($viewport_width == 0 ? ', default' : '') . ' */' . "\n";
+      }
+    }
+    $code .= '</style>
+';
+    return $code;
+  }
+
+
   public function import ($code){
 
     $amp = AI_ADSENSE_AMP_DISABLED;
@@ -4395,11 +4470,12 @@ class ai_code_generator {
           'adsense-publisher-id' => '',
           'adsense-ad-slot-id' => '',
           'adsense-type' => AI_ADSENSE_STANDARD,
-          'adsense-responsive' => 0,
+          'adsense-size' => AI_ADSENSE_SIZE_FIXED,
           'adsense-width' => '',
           'adsense-height' => '',
           'adsense-layout' => '',
           'adsense-layout-key' => '',
+          'adsense-comment' => '',
           'adsense-amp' => $amp,
         );
 
@@ -4417,7 +4493,67 @@ class ai_code_generator {
         $style_height = preg_match ("/height\s*:\s*(\d+)px/", $adsense_style, $height_match);
         if ($style_height) $data ['adsense-height'] = $height_match [1];
 
-        $adsense_responsive = !$style_width && !$style_height;
+        $display = '';
+        $style_display = preg_match ("/display\s*:\s*([a-z\-]+)/", $adsense_style, $display_match);
+        if ($style_display) $display = $display_match [1];
+
+        $adsense_class = trim ($adsense_code->item (0)->getAttribute ('class'));
+        $adsense_classes = explode (' ', $adsense_class);
+
+        $adsense_size = !$style_width && !$style_height && $display == 'block' ? AI_ADSENSE_SIZE_RESPONSIVE : AI_ADSENSE_SIZE_FIXED;
+
+        if (count ($adsense_classes) == 2 && !$style_width && !$style_height) {
+          $adsense_size = AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT;
+
+          $viewport_class = $adsense_classes [1];
+
+          $style  = preg_match ("#<style>(.+?)</style>#s",  $code, $style_match);
+          $style_lines = explode ("\n", trim ($style_match [1]));
+
+          $sizes = array ();
+          $viewport_widths = array ();
+          for ($viewport = 1; $viewport <= AD_INSERTER_VIEWPORTS; $viewport ++) {
+            $viewport_name  = get_viewport_name ($viewport);
+            $viewport_width = get_viewport_width ($viewport);
+            if ($viewport_name != '') {
+              $viewport_widths [] = $viewport_width;
+              $sizes []= array (0 => '', 1 => '');
+            }
+          }
+          $viewport_widths = array_reverse ($viewport_widths);
+
+          if (count ($style_lines) == count ($sizes)) {
+            foreach ($style_lines as $index => $style_line) {
+              if (strpos ($style_line, $viewport_class) !== false) {
+
+                $min_width  = preg_match ("/min-width\s*:\s*(\d+)px/",  $style_line, $min_width_match);
+                $viewport_width = $min_width ? $min_width_match [1] : '';
+
+                if ($viewport_width == $viewport_widths [$index]) {
+                  $styles = explode ($viewport_class, $style_line);
+                  $style_line = $styles [1];
+
+                  $style_width  = preg_match ("/width\s*:\s*(\d+)px/",  $style_line, $width_match);
+                  $adsense_width = $style_width ? $width_match [1] : '';
+
+                  $style_height  = preg_match ("/height\s*:\s*(\d+)px/",  $style_line, $height_match);
+                  $adsense_height = $style_height ? $height_match [1] : '';
+
+                  $sizes [$index] = array (0 => $adsense_width, 1 => $adsense_height);
+                }
+
+              } else $sizes [$index] = array ('', '');
+            }
+            $sizes = array_reverse ($sizes);
+          }
+
+          $data ['adsense-sizes'] = $sizes;
+        }
+
+        $data ['adsense-size'] = $adsense_size;
+
+        $comment = preg_match ("#<!--(.+?)-->#",  $code, $comment_match);
+        if ($comment) $data ['adsense-comment'] = trim ($comment_match [1]);
 
 //        $adsense_ad_format = $adsense_code [0]->getAttribute ('data-ad-format');
         $adsense_ad_format = $adsense_code->item (0)->getAttribute ('data-ad-format');
@@ -4425,14 +4561,12 @@ class ai_code_generator {
           case '':
             break;
           case 'auto':
-            if ($adsense_responsive) $data ['adsense-responsive'] = 1;
             break;
           case 'autorelaxed':
             $data ['adsense-type'] = AI_ADSENSE_MATCHED_CONTENT;
             break;
           case 'link':
             $data ['adsense-type'] = AI_ADSENSE_LINK;
-            if ($adsense_responsive) $data ['adsense-responsive'] = 1;
             break;
           case 'fluid':
 //            $adsense_ad_layout = $adsense_code [0]->getAttribute ('data-ad-layout');
@@ -4466,13 +4600,16 @@ class ai_code_generator {
         'adsense-publisher-id' => '',
         'adsense-ad-slot-id' => '',
         'adsense-type' => AI_ADSENSE_STANDARD,
-        'adsense-responsive' => 0,
+        'adsense-size' => AI_ADSENSE_SIZE_FIXED,
         'adsense-width' => '',
         'adsense-height' => '',
         'adsense-layout' => '',
         'adsense-layout-key' => '',
         'adsense-amp' => $amp,
       );
+
+      $comment = preg_match ("#<!--(.+?)-->#",  $code, $comment_match);
+      if ($comment) $data ['adsense-comment'] = trim ($comment_match [1]);
 
       if (preg_match ("/google_ad_client.+[\"\'](.+?)[\"\']/", $code, $match)) {
         $data ['adsense-publisher-id'] = str_replace ('ca-', '', $match [1]);

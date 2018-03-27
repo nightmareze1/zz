@@ -16,7 +16,7 @@ services:
        - MYSQL_PASSWORD=1
      
   wordpress-itshellws1:
-     image: nightmareze1/zz:v0.0.0.23
+     image: nightmareze1/zz:v0.0.0.31
      container_name: wordpress-itshellws1
      volumes:
        - ./html:/var/www/html 
@@ -26,9 +26,9 @@ services:
        - mysql-test11:itshelldb
      ports:
        - "8088:80"
-     logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: localhost:24224
-        tag: wordpress-itshellws1.access
+#     logging:
+#      driver: "fluentd"
+#      options:
+#        fluentd-address: localhost:24224
+#        tag: wordpress-itshellws1.access
 

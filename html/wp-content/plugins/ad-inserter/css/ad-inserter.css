@@ -1,5 +1,5 @@
 #ai-data {
-  font-family: "2.3.1"; /* Used for version number of the file */
+  font-family: "2.3.3"; /* Used for version number of the file */
 }
 
 #blocked-warning {
@@ -99,6 +99,16 @@ a.clear-link, a.clear-link:hover, a.clear-link:focus {
 
 .ai-settings-table {
   border-spacing: 4px;
+}
+
+.ai-settings-table.left {
+  float: left;
+  width: 52%
+}
+
+.ai-settings-table.right {
+  float: right;
+  width: 48%
 }
 
 .ai-settings-table.ai-values td:first-child {
@@ -926,6 +936,16 @@ img.automatic-insertion.preview {
   background-size: cover;
 }
 
+.ai-button .ui-button-text.ai-button-active {
+   background: #f44;
+   border: 1px solid #f44;
+   border-radius: 8px;
+   width: 5px;
+   height: 5px;
+   padding: 0;
+   margin: 1px 0px 1px 3px;
+}
+
 .banner-preview {
   float: left;
   margin: 0 10px 0 0;
@@ -972,6 +992,24 @@ img.automatic-insertion.preview {
  line-height: 16px;
 }
 
+.ad-size .scombobox {
+   width: 80px;
+   display: inline-block;
+   margin: 1px 0;
+}
+
+.scombobox-list p:hover, .scombobox-list p.scombobox-hovered {
+   background-color: #eaeaea;
+}
+
+.scombobox-list p {
+  padding: 1px;
+}
+
+.scombobox-display {
+  padding-right: 1px;
+}
+
 @media (max-width: 782px) {
   .auto-fold #wpcontent {
       padding-left: 4px;
@@ -1014,6 +1052,14 @@ img.automatic-insertion.preview {
      margin: 6px 0 0 4px;
      padding: 0px 4px 2px 0px;
    }
+
+   .ad-size .scombobox {
+      width: 100px;
+   }
+
+   .scombobox-list p {
+     font-size: 16px;
+   }
 }
 
 @media(max-width: 768px) {
@@ -1041,19 +1087,18 @@ img.automatic-insertion.preview {
      font-size: 12px!important;
      line-height: 18px;
    }
-/*   .checkbox-icon.icon-enabled-all {*/
-/*     width: 20px;*/
-/*     height: 20px;*/
-/*     background: url('images/icons.png') -140px -20px;*/
-/*   }*/
-
-/*   .checkbox-icon.icon-enabled-all.on {*/
-/*     background: url('images/icons.png') -140px -0px;*/
-/*   }*/
 
    .banner-preview img {
      max-width: 160px;
      max-height: 160px;
+   }
+
+   .ai-settings-table.left {
+     width: 60%
+   }
+
+   .ai-settings-table.right {
+     width: 40%
    }
 }
 

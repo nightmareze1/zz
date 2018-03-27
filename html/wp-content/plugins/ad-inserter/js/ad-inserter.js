@@ -1,4 +1,4 @@
-var javascript_version = "2.3.1";
+var javascript_version = "2.3.3";
 var ignore_key = true;
 var start = 1;
 var end = 16;
@@ -67,6 +67,10 @@ var AI_ADSENSE_LINK             = 1;
 var AI_ADSENSE_IN_ARTICLE       = 2;
 var AI_ADSENSE_IN_FEED          = 3;
 var AI_ADSENSE_MATCHED_CONTENT  = 4;
+
+var AI_ADSENSE_SIZE_FIXED             = 0;
+var AI_ADSENSE_SIZE_RESPONSIVE        = 1;
+var AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT = 2;
 
 var AI_HTML_INSERTION_CLIENT_SIDE           = 0;
 var AI_HTML_INSERTION_CLIENT_SIDE_DOM_READY = 1;
@@ -1046,21 +1050,29 @@ jQuery(document).ready(function($) {
   }
 
   function process_adsense_elements (block) {
-    var adsense_type = parseInt ($("select#adsense-type-" + block +" option:selected").attr ('value'));
-    var adsense_responsive = $("#adsense-responsive-" + block).is(":checked");
+    var adsense_type  = parseInt ($("select#adsense-type-" + block +" option:selected").attr ('value'));
+    var adsense_size  = parseInt ($("select#adsense-size-" + block +" option:selected").attr ('value'));
+
+    if ((adsense_type == AI_ADSENSE_STANDARD || adsense_type == AI_ADSENSE_LINK) && adsense_size == AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT) {
+      $('#adsense-layout-' + block).hide ();
+      $('#adsense-viewports-' + block).show ();
+    } else {
+        $('#adsense-layout-' + block).show ();
+        $('#adsense-viewports-' + block).hide ();
+      }
 
     $('#tab-adsense-' + block + ' .adsense-layout').css ('visibility', 'hidden');
+    $('#tab-adsense-' + block + ' .adsense-fixed-size').css ('visibility', 'hidden');
     $('#tab-adsense-' + block + ' .adsense-size').css ('visibility', 'hidden');
-    $('#tab-adsense-' + block + ' .adsense-responsive').css ('visibility', 'hidden');
 
     switch (adsense_type) {
       case AI_ADSENSE_STANDARD:
-        $('#tab-adsense-' + block + ' .adsense-responsive').css ('visibility', 'visible');
-        if (!adsense_responsive) $('#tab-adsense-' + block + ' .adsense-size').css ('visibility', 'visible');
+        $('#tab-adsense-' + block + ' .adsense-size').css ('visibility', 'visible');
+        if (adsense_size == AI_ADSENSE_SIZE_FIXED) $('#tab-adsense-' + block + ' .adsense-fixed-size').css ('visibility', 'visible');
         break;
       case AI_ADSENSE_LINK:
-        $('#tab-adsense-' + block + ' .adsense-responsive').css ('visibility', 'visible');
-        if (!adsense_responsive) $('#tab-adsense-' + block + ' .adsense-size').css ('visibility', 'visible');
+        $('#tab-adsense-' + block + ' .adsense-size').css ('visibility', 'visible');
+        if (adsense_size == AI_ADSENSE_SIZE_FIXED) $('#tab-adsense-' + block + ' .adsense-fixed-size').css ('visibility', 'visible');
         break;
       case AI_ADSENSE_IN_ARTICLE:
         break;
@@ -1295,7 +1307,7 @@ jQuery(document).ready(function($) {
 
     $('#tab-0').addClass ('configured');
 
-    $('#tab-0 input[type=submit]').button().show ();
+    $('#tab-0 input[type=submit], #tab-0 button.ai-button').button().show ();
 
     configure_editor ('h');
     configure_editor ('f');
@@ -1340,7 +1352,7 @@ jQuery(document).ready(function($) {
     if (syntax_highlighting) configure_editor_language ('a');
 
     for (var index = 1; index <= geo_groups; index ++) {
-      generate_country_list ('group-country', index);
+      create_list_selector ('group-country', index);
     }
 
     $('#enable-header').checkboxButton ();
@@ -1536,11 +1548,6 @@ jQuery(document).ready(function($) {
     });
 
     process_display_elements (tab);
-
-    $("#widgets-button-"+tab).button ({
-    }).click (function () {
-      window.location.href = "widgets.php";
-    });
 
     $("#exceptions-button-"+tab).button ({
     }).click (function () {
@@ -1843,7 +1850,15 @@ jQuery(document).ready(function($) {
       window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
     });
 
-    generate_country_list ('country', tab);
+    create_list_selector ('category',     tab);
+    create_list_selector ('tag',          tab);
+    create_list_selector ('taxonomy',     tab);
+    create_list_selector ('id',           tab);
+    create_list_editor   ('url',          tab);
+    create_list_editor   ('url-parameter',tab);
+    create_list_editor   ('referer',      tab);
+    create_list_editor   ('ip-address',   tab);
+    create_list_selector ('country',      tab);
 
     $('#tracking-' + tab).checkboxButton ();
     $('#simple-editor-' + tab).checkboxButton ().click (function () {
@@ -1894,8 +1909,8 @@ jQuery(document).ready(function($) {
       process_adsense_elements (block);
     });
 
-    $("input#adsense-responsive-"+tab).change (function() {
-      var block = $(this).attr('id').replace ("adsense-responsive-", "");
+    $("select#adsense-size-"+tab).change (function() {
+      var block = $(this).attr('id').replace ("adsense-size-", "");
       process_adsense_elements (block);
     });
 
@@ -2026,6 +2041,8 @@ jQuery(document).ready(function($) {
       $.post (ajaxurl, {'action': 'ai_ajax_backend', 'ai_check': nonce, 'import-code': $.base64Encode (get_editor_text (block))}
       ).done (function (data) {
         if (data != '') {
+          $('#ai-error-container').hide ();
+
           try {
             var code_data = JSON.parse (data);
           } catch (error) {
@@ -2048,18 +2065,37 @@ jQuery(document).ready(function($) {
                 $("#open-new-tab-" + block).attr('checked', code_data ['target'] == '_blank');
                 break;
               case AI_CODE_ADSENSE:
+                $("#adsense-comment-" + block).val (code_data ['adsense-comment']);
                 $("#adsense-publisher-id-" + block).val (code_data ['adsense-publisher-id']);
                 $("#adsense-ad-slot-id-" + block).val (code_data ['adsense-ad-slot-id']);
 
                 $("#adsense-type-" + block).val (code_data ['adsense-type']);
-                $("#adsense-responsive-" + block).prop ('checked', code_data ['adsense-responsive']);
-                $("#adsense-width-" + block).val (code_data ['adsense-width']);
-                $("#adsense-height-" + block).val (code_data ['adsense-height']);
+                $("#adsense-size-" + block).val (code_data ['adsense-size']);
+
+                var ad_size = '';
+                if (code_data ['adsense-width'] != '' && code_data ['adsense-height'] != '') {
+                  ad_size = code_data ['adsense-width'] + 'x' + code_data ['adsense-height'];
+                }
+                $('#tab-adsense-' + block + ' .adsense-ad-size.fixed').parent ().find ('.scombobox-display').val (ad_size);
+
                 $("#adsense-amp-" + block).val (code_data ['adsense-amp']);
 
                 $("#adsense-layout-" + block).val (code_data ['adsense-layout']);
-                $("#adsense-layout-key-" + block).val (code_data ['adsense-layout-key']);
+                $("#adsense-layout-key-" + block).val (decodeURIComponent (code_data ['adsense-layout-key']));
 
+                if ($("#adsense-size-" + block).val () == AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT) {
+                  $('#tab-adsense-' + block + ' tr.adsense-viewport').each (function (index) {
+                    var width  = code_data ['adsense-sizes'][index][0];
+                    var height = code_data ['adsense-sizes'][index][1];
+
+                    var ad_size = '';
+                    if (width != '' && height != '') {
+                      ad_size = width + 'x' + height;
+                    }
+
+                    $(this).find ('.adsense-ad-size').parent ().find ('.scombobox-display').val (ad_size);
+                  });
+                }
                 process_adsense_elements (block);
                 break;
               case AI_CODE_UNKNOWN:
@@ -2076,6 +2112,7 @@ jQuery(document).ready(function($) {
     });
 
     $("#generate-code-"+tab).click (function () {
+      $('#ai-error-container').hide ();
       $(this).next ("label").find ('.checkbox-icon').addClass("on");
 
       var block = $(this).attr('id').replace ("generate-code-", "");
@@ -2092,15 +2129,37 @@ jQuery(document).ready(function($) {
           code_data ['target']  = '_blank';
           break;
         case AI_CODE_ADSENSE:
+          code_data ['block']                 = block;
+          code_data ['adsense-comment']       = $("#adsense-comment-" + block).val ();
           code_data ['adsense-publisher-id']  = $("#adsense-publisher-id-" + block).val ();
           code_data ['adsense-ad-slot-id']    = $("#adsense-ad-slot-id-"   + block).val ();
           code_data ['adsense-type']          = parseInt ($("select#adsense-type-" + block +" option:selected").attr ('value'));
-          code_data ['adsense-responsive']    = $("#adsense-responsive-"   + block).is(":checked") ? 1 : 0;
-          code_data ['adsense-width']         = $("#adsense-width-"        + block).val ();
-          code_data ['adsense-height']        = $("#adsense-height-"       + block).val ();
+          code_data ['adsense-size']          = parseInt ($("select#adsense-size-" + block +" option:selected").attr ('value'));
+
+          var ad_size = $('#tab-adsense-' + block + ' .adsense-ad-size.fixed').parent ().find ('.scombobox-display').val ().trim ().toLowerCase ().split ('x');
+          code_data ['adsense-width']         = '';
+          code_data ['adsense-height']        = '';
+          if (ad_size.length == 2) {
+            code_data ['adsense-width']         = parseInt (ad_size [0]);
+            code_data ['adsense-height']        = parseInt (ad_size [1]);
+          }
+
           code_data ['adsense-amp']           = parseInt ($("select#adsense-amp-" + block +" option:selected").attr ('value'));
           code_data ['adsense-layout']        = $("#adsense-layout-"       + block).val ();
           code_data ['adsense-layout-key']    = $("#adsense-layout-key-"   + block).val ();
+
+          if (code_data ['adsense-size'] == AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT) {
+            var viewport_sizes = new Array();
+            $('#tab-adsense-' + block + ' tr.adsense-viewport').each (function (index) {
+              var ad_size = $(this).find ('.adsense-ad-size').parent ().find ('.scombobox-display').val ().trim ().toLowerCase ().split ('x');
+              var adsense_size = {'width': '', 'height': ''};
+              if (ad_size.length == 2) {
+                adsense_size = {'width': parseInt (ad_size [0]), 'height': parseInt (ad_size [1])};
+              }
+              viewport_sizes.push (adsense_size);
+            });
+            code_data ['adsense-viewports'] = viewport_sizes;
+          }
           break;
         case AI_CODE_UNKNOWN:
 //          if (debug) console.log ("AI GENERATE CODE:", code_type);
@@ -2209,6 +2268,14 @@ jQuery(document).ready(function($) {
       if (html_element_insertion == AI_HTML_INSERTION_SEREVR_SIDE)
         $("#server-side-insertion-"+tab).hide (); else
           $("#server-side-insertion-"+tab).show ();
+    });
+
+    $("#tab-" + tab + " .adsense-ad-size").scombobox({
+      showDropDown: false,
+      invalidAsValue: true,
+      animation: {
+        duration: 50,
+      }
     });
   }
 
@@ -2388,73 +2455,246 @@ jQuery(document).ready(function($) {
     ul.closest ('.ai-rotate').data ('option', new_option + 1);
   }
 
-  function generate_country_list (element_name_prefix, index) {
-    if ($('#'+element_name_prefix+'-select-'+index).length !== 0) {
+  function create_list_selector (element_name_prefix, index) {
+    var select = $('#'+element_name_prefix+'-select-'+index);
+    if (select.length !== 0) {
+      var button = $('#'+element_name_prefix+'-button-'+index);
+      button.click (function () {
 
-      $('#'+element_name_prefix+'-list-'+index).click (function () {
+        if (!select.hasClass ('multi-select')) {
+          var options = select.find ('option');
+          if (options.length == 0) {
+            var nonce = $("#ai-form").attr ('nonce');
 
-        if (!$('#'+element_name_prefix+'-select-'+index).hasClass ('multi-select')) {
-          $('#'+element_name_prefix+'-select-'+index).addClass ('multi-select');
-          $('#'+element_name_prefix+'-select-'+index).multiSelect({
-            selectableHeader: "<input type='text' class='search-input' autocomplete='off' placeholder='Search...'>",
-            selectedHeader: "Selected Countries",
-            afterInit: function(ms){
-              var that = this,
-                  $selectableSearch = that.$selectableUl.prev(),
-                  $selectionSearch = that.$selectionUl.prev(),
-                  selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)',
-                  selectionSearchString = '#'+that.$container.attr('id')+' .ms-elem-selection.ms-selected';
+            var select_data = select.data ('select');
+            var data = typeof select_data == 'undefined' ? '' : select_data;
 
-              that.qs1 = $selectableSearch.quicksearch (selectableSearchString)
-              .on('keydown', function(e){
-                if (e.which === 40){
-                  that.$selectableUl.focus();
-                  return false;
-                }
-              });
+            $('#ai-loading').show ();
+            button.find ('span.ui-button-text').addClass ('ai-button-active');
+            $.get (ajaxurl + '?action=ai_ajax_backend&list-options=' + element_name_prefix + '&data=' + data + '&ai_check=' + nonce, function (data) {
+              if (data != '') {
+                select.html (data);
+                create_multi_select (select, element_name_prefix, index);
+                update_selection_from_list ($('#'+element_name_prefix+'-list-'+index), element_name_prefix, true);
+              }
 
-              that.qs2 = $selectionSearch.quicksearch (selectionSearchString)
-              .on('keydown', function(e){
-                if (e.which == 40){
-                  that.$selectionUl.focus();
-                  return false;
-                }
-              });
-            },
-            afterSelect: function(values){
-              update_country_list (this, element_name_prefix);
-            },
-            afterDeselect: function(values){
-              update_country_list (this, element_name_prefix);
-            }
-          });
-          $('#ms-'+element_name_prefix+'-select-'+index).hide();
+            }).fail (function (xhr, status, error) {
+              var message = "Error loading " + element_name_prefix + " options: " + xhr.status + " " + xhr.statusText ;
+              console.log (message);
+            })
+            .always (function () {
+              $('#ai-loading').hide ();
+              button.find ('span.ui-button-text').removeClass ('ai-button-active');
+            });
+
+          } else create_multi_select (select, element_name_prefix, index);
+
         }
-        update_country_selection ($(this), element_name_prefix, true)
-//        $(this).focus ();
-      }).focusout (function () {
-        update_country_selection ($(this), element_name_prefix, false)
+        update_selection_from_list ($('#'+element_name_prefix+'-list-'+index), element_name_prefix, true);
+      });
+
+      $('#'+element_name_prefix+'-list-'+index).focusout (function () {
+        update_selection_from_list ($(this), element_name_prefix, false);
       });
     }
   }
 
-  function update_country_list (select_element, element_name_prefix) {
+  function update_list_from_selection (select_element, element_name_prefix) {
+
     var ms = select_element.$element;
     var ms_val = ms.val();
+    if (ms_val != null) var ms_val = ms_val.join (', ');
     var index = ms.attr ('id').replace (element_name_prefix+'-select-','');
-    $('#'+element_name_prefix+'-list-'+index).attr ('value', ms_val);
+    var list = $('#'+element_name_prefix+'-list-'+index);
+
+    var custom_data = list.attr ('data-custom');
+
+    if (typeof custom_data != 'undefined' && custom_data != '') {
+      if (ms_val != null) {
+        if (ms_val != '') ms_val = ms_val + ', ';
+        ms_val = ms_val + custom_data;
+      } else ms_val = custom_data;
+    }
+
+    list.attr ('value', ms_val);
     select_element.qs1.cache();
     select_element.qs2.cache();
   }
 
-  function update_country_selection (select_element, element_name_prefix, toggle) {
-    var index = select_element.attr ('id');
-    var index = index.replace (element_name_prefix+'-list-','');
-    if (toggle) $('#ms-'+element_name_prefix+'-select-'+index).toggle();
-    if ($('#ms-'+element_name_prefix+'-select-'+index).is(':visible')) {
-      var country_array = $('#'+element_name_prefix+'-list-'+index).attr ('value').replace(/ /g , '').toUpperCase().split (',');
-      $('#'+element_name_prefix+'-select-'+index).multiSelect ('deselect_all').multiSelect ('select', country_array).multiSelect('refresh');
+  function update_selection_from_list (list_element, element_name_prefix, toggle) {
+
+    Array.prototype.diff = function (a) {
+        return this.filter(function (i) {
+            return a.indexOf(i) === -1;
+        });
+    };
+
+    var index = list_element.attr ('id').replace (element_name_prefix+'-list-','');
+    var selection_container = $('#ms-'+element_name_prefix+'-select-'+index);
+    if (toggle) selection_container.toggle();
+    if (selection_container.is(':visible')) {
+      var list_items = list_element.attr ('value').split (',').map (Function.prototype.call, String.prototype.trim);
+
+      if (list_element.hasClass ('ai-list-filter'))
+        for (var i = 0; i < list_items.length; i++) {
+          list_items [i] = list_items [i].replace (/ /g , '-').replace (/[\!\@\#\$%\^&\*\(\)\=\+\{\}\|\[\]\\\;\'\:\"\.\/\?]/g , '');
+        }
+
+      if (list_element.hasClass ('ai-list-uppercase'))
+        list_items = list_items.map (Function.prototype.call, String.prototype.toUpperCase); else
+          list_items = list_items.map (Function.prototype.call, String.prototype.toLowerCase);
+
+      // Set multiSelect
+      $('#'+element_name_prefix+'-select-'+index).multiSelect ('deselect_all').multiSelect ('select', list_items).multiSelect('refresh');
+
+      if (list_element.hasClass ('ai-list-custom')) {
+        var custom_values = list_items;
+        var selected_values = $('#'+element_name_prefix+'-select-'+index).val ();
+        if (selected_values != null) custom_values = list_items.diff (selected_values);
+
+        if (custom_values != null) var custom_values = custom_values.join (', ');
+
+        list_element.attr ('data-custom', custom_values);
+
+        // Set multiSelect again to add custom items
+        $('#'+element_name_prefix+'-select-'+index).multiSelect ('deselect_all').multiSelect ('select', list_items).multiSelect('refresh');
+      }
+    }                                               }
+
+  function create_multi_select (select, element_name_prefix, index) {
+    select.addClass ('multi-select');
+
+    select.multiSelect ({
+      selectableHeader: "<input type='text' class='search-input' autocomplete='off' placeholder='Search...'>",
+      selectedHeader: "Selected Countries",
+      afterInit: function(ms){
+        var that = this,
+            $selectableSearch = that.$selectableUl.prev(),
+            $selectionSearch = that.$selectionUl.prev(),
+            selectableSearchString = '#'+that.$container.attr('id')+' .ms-elem-selectable:not(.ms-selected)',
+            selectionSearchString = '#'+that.$container.attr('id')+' .ms-elem-selection.ms-selected';
+
+        that.qs1 = $selectableSearch.quicksearch (selectableSearchString)
+        .on('keydown', function(e){
+          if (e.which === 40){
+            that.$selectableUl.focus();
+            return false;
+          }
+        });
+
+        that.qs2 = $selectionSearch.quicksearch (selectionSearchString)
+        .on('keydown', function(e){
+          if (e.which == 40){
+            that.$selectionUl.focus();
+            return false;
+          }
+        });
+      },
+      afterSelect: function(values){
+        update_list_from_selection (this, element_name_prefix);
+      },
+      afterDeselect: function(values){
+        update_list_from_selection (this, element_name_prefix);
+      }
+    });
+    $('#ms-'+element_name_prefix+'-select-' + index).hide();
+  }
+
+  function create_list_editor (element_name_prefix, index) {
+    var editor  = $('#'+element_name_prefix+'-editor-'+index);
+    var list    = $('#'+element_name_prefix+'-list-'+index);
+    if (editor.length !== 0) {
+      $('#'+element_name_prefix+'-button-'+index).click (function () {
+        update_editor_from_list (list, element_name_prefix, true);
+      });
+
+      editor.focusout (function () {
+        update_list_from_editor (editor, element_name_prefix)
+      });
+
+      list.focusout (function () {
+        if (editor.is(':visible'))
+          update_editor_from_list ($(this), element_name_prefix, false);
+      });
     }
+  }
+
+  function clean_url_list (list_element, list_items) {
+
+    var clean_protocol = list_element.hasClass ('ai-clean-protocol');
+    var clean_domain   = list_element.hasClass ('ai-clean-domain');
+    var only_domain    = list_element.hasClass ('ai-only-domain');
+    var sort_list      = list_element.hasClass ('ai-list-sort');
+
+    function onlyUnique (value, index, self) {
+        return self.indexOf (value) === index;
+    }
+
+    list_items = list_items.filter (onlyUnique);
+
+    var clean_list_items = [];
+
+    for (var i = 0; i < list_items.length; i++) {
+      var list_item = list_items [i];
+
+      if (clean_protocol && list_item.indexOf ('http') == 0) {
+        list_item = list_item.replace ('http://', '');
+        list_item = list_item.replace ('https://', '');
+
+        var slash = list_item.indexOf ("/");
+
+        if (clean_domain) {
+          if (slash > 0) {
+            list_item = list_item.substring (slash);
+          } else list_item = '';
+        } else
+        if (only_domain) {
+          if (slash > 0) {
+            list_item = list_item.substring (0, slash);
+          }
+        }
+      }
+
+      if (list_item != '') clean_list_items.push (list_item);
+    }
+
+    if (sort_list) {
+      clean_list_items.sort();
+    }
+
+    return clean_list_items;
+  }
+
+  function update_editor_from_list (list_element, element_name_prefix, toggle) {
+    var index = list_element.attr ('id').replace (element_name_prefix+'-list-','');
+    var editor = $('#'+element_name_prefix+'-editor-'+index);
+    if (toggle) editor.toggle();
+    if (editor.is(':visible')) {
+
+      var list = list_element.attr ('value');
+      var list_separator = ',';
+
+      if (list_element.hasClass ('ai-list-space')) {
+        if (list.indexOf (' ') > - 1 && list.indexOf (',') == - 1) list_separator = ' ';
+      }
+
+      var list_items = list.split (list_separator).map (Function.prototype.call, String.prototype.trim);
+
+      clean_list_items = clean_url_list (list_element, list_items);
+
+      editor.val (clean_list_items.join ("\n"));
+    } else update_list_from_editor (editor, element_name_prefix)
+  }
+
+  function update_list_from_editor (editor, element_name_prefix) {
+    var list_items = editor.val ().split ("\n").map (Function.prototype.call, String.prototype.trim);
+
+    var index = editor.attr ('id').replace (element_name_prefix+'-editor-','');
+    var list_element = $('#'+element_name_prefix+'-list-'+index);
+
+    clean_list_items = clean_url_list (list_element, list_items);
+
+    list_element.attr ('value', clean_list_items.join (', '));
   }
 
   function configure_hidden_tab () {

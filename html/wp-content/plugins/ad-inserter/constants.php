@@ -24,7 +24,7 @@ if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.3.1');
+  define ('AD_INSERTER_VERSION', '2.3.3');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -639,7 +639,7 @@ define ('AI_CHECK_PARAGRAPHS_MIN_NUMBER', 32);
 define ('AI_CHECK_DEBUG_NO_INSERTION',    33);
 define ('AI_CHECK_PARAGRAPH_TAGS',        34);
 define ('AI_CHECK_PARAGRAPHS_WITH_TAGS',  35);
-define ('AI_CHECK_PARAGRAPHS_AFTER_BLOCKQUOTE_FIGURE',    36);
+define ('AI_CHECK_PARAGRAPHS_AFTER_NO_COUNTING_INSIDE',  36);
 define ('AI_CHECK_PARAGRAPHS_AFTER_MIN_MAX_WORDS', 37);
 define ('AI_CHECK_PARAGRAPHS_AFTER_TEXT', 38);
 define ('AI_CHECK_PARAGRAPHS_AFTER_CLEARANCE',     39);
@@ -704,6 +704,7 @@ define ('AI_CLOSE_BUTTONS',              26);
 define ('AI_DISABLE_CACHING',            27);
 define ('AI_COUNT',                      28);
 define ('AI_CLIENT_SIDE_INSERTION',      29);
+define ('AI_USER_AGENT',                 30);
 
 define ('AI_CONTEXT_NONE',                0);
 define ('AI_CONTEXT_CONTENT',             1);
@@ -758,6 +759,7 @@ define ('AI_DEBUG_POSITIONS_CLASS',      'ai-debug-positions');
 define ('AI_DEBUG_PAGE_TYPE_CLASS',      'ai-debug-page-type');
 define ('AI_DEBUG_STATUS_CLASS',         'ai-debug-status');
 define ('AI_DEBUG_ADB_CLASS',            'ai-debug-adb');
+define ('AI_ADSENSE_BLOCK_CLASS',        'ai-adsense-');
 
 define ('AI_CODE_UNKNOWN',               100);
 define ('AI_CODE_BANNER',                0);
@@ -774,6 +776,10 @@ define ('AI_ADSENSE_AMP_DISABLED',       0);
 define ('AI_ADSENSE_AMP_ABOVE_THE_FOLD', 1);
 define ('AI_ADSENSE_AMP_BELOW_THE_FOLD', 2);
 
+define ('AI_ADSENSE_SIZE_FIXED',              0);
+define ('AI_ADSENSE_SIZE_RESPONSIVE',         1);
+define ('AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT',  2);
+
 define ('AI_TEXT_LINK',                 'Link');
 define ('AI_TEXT_IN_ARTICLE',           'In-article');
 define ('AI_TEXT_IN_FEED',              'In-feed');
@@ -781,3 +787,7 @@ define ('AI_TEXT_MATCHED_CONTENT',      'Matched content');
 
 define ('AI_TEXT_ABOVE_THE_FOLD', 'Above the fold');
 define ('AI_TEXT_BELOW_THE_FOLD', 'Below the fold');
+
+define ('AI_TEXT_FIXED',              'Fixed');
+define ('AI_TEXT_RESPONSIVE',         'Responsive');
+define ('AI_TEXT_FIXED_BY_VIEWPORT',  'Fixed by viewport');

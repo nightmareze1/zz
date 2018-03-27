@@ -6,7 +6,7 @@ Tags: ads, adsense, ad management, advertising manager, advanced contextual ads,
 Requires at least: 4.0
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 2.3.0
+Stable tag: 2.3.2
 License: GPLv3
 
 Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
@@ -17,7 +17,29 @@ Ad management plugin with many advanced advertising features. Supports all kinds
 
 Ad Inserter is more than just ad manager plugin. It provides many advanced options to insert any opt-in form, Javascript, CSS, HTML, PHP, analytics, tracking or advert code anywhere on the page.
 
-**Ad Inserter can insert ads where other plugins fail**. It's all about the settings.
+**Ad Inserter can insert ads where other plugins fail**.
+It's all about the settings.
+
+**Endorsed by WordPress users**
+
+Average Rating: 5 out of 5 stars
+
+> Perfect plugin to insert anything anywhere on your WordPress website
+
+Check Ad Inserter <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">reviews</a>
+
+**AdSense integration**
+
+Get <a href="https://adinserter.pro/adsense-ads#integration">AdSense ad codes</a> from the plugin settings page - no need to copy ad codes from the AdSense admin pages and paste them to code blocks. List ad units, preview AdSense ads and get ad codes where you need them.
+
+**Endorsed by Amazon**
+
+Amazon suggests to use Ad Inserter to add Native Shopping Ads to Wordpress posts.
+
+> Native Shopping Ads provide highly relevant and dynamic product recommendations in a stylishly designed and responsive ad unit that can be placed at the end of your content or within your content to create a more compelling visitor experience and shopping opportunity.
+
+Check <a href="https://affiliate-program.amazon.com/help/topic/t405" target="_blank">Wordpress Integration Guide for Native Shopping Ads</a>. Ad Inserter supports also advanced contextual ads: check settings for <a href="https://adinserter.pro/settings#amazon">contextual Native Shopping Ads</a> that show items related to the post content (using post tags).
+
 
 **Features**
 
@@ -25,7 +47,7 @@ Ad Inserter is more than just ad manager plugin. It provides many advanced optio
 *   AdSense integration
 *   Syntax highlighting editor
 *   Code preview with visual CSS editor
-*   Automatically inserts ads in posts and pages
+*   Automatically inserts ads on posts and pages
 *   Insert before or after post
 *   Insert before or after content
 *   Insert before or after paragraph
@@ -91,34 +113,14 @@ Run a WordPress related blog? Interested in reviewing Ad Inserter Pro? <a href="
 
 Ad Inserter Wordpress plugin is an advanced advertising manager - it has many features and options to automate ad insertion and to optimally monetize your website on desktop, tablet and phone displays. It provides many simple ways to insert any Javascript, HTML, PHP or advert code anywhere on the page. For best ad placement and to use optimal advertising positions please read the user manual to get the most of the plugin.
 
-*   Check <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation page</a> for detailed description of all the features and some <a href="http://adinserter.pro/settings" target="_blank">common settings</a> for quick start
+*   Check <a href="http://adinserter.pro/documentation" target="_blank">Ad Inserter documentation pages</a> for detailed description of all the features and some <a href="http://adinserter.pro/settings" target="_blank">common settings</a> for quick start
 *   Download **PDF user guide** for Ad Inserter: go to <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro plugin</a> page and below you can find button for free download of Ad Inserter User Guide
-
-**AdSense integration**
-
-Get <a href="https://adinserter.pro/adsense-ads#integration">AdSense ad codes</a> from the plugin settings page - no need to copy ad codes from the AdSense admin pages and paste them to code blocks. List ad units, preview AdSense ads and get ad codes where you need them.
-
-**Endorsed by WordPress users**
-
-Average Rating: 5 out of 5 stars
-
-> Perfect plugin to insert anything anywhere on your WordPress website
-
-Check Ad Inserter <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">reviews</a>
-
-**Endorsed by Amazon**
-
-Amazon suggests to use Ad Inserter to add Native Shopping Ads to Wordpress posts.
-
-> Native Shopping Ads provide highly relevant and dynamic product recommendations in a stylishly designed and responsive ad unit that can be placed at the end of your content or within your content to create a more compelling visitor experience and shopping opportunity.
-
-Check <a href="https://affiliate-program.amazon.com/help/topic/t405" target="_blank">Wordpress Integration Guide for Native Shopping Ads</a>. Ad Inserter supports also advanced contextual ads: check settings for <a href="https://adinserter.pro/settings#amazon">contextual Native Shopping Ads</a> that show items related to the post content (using post tags).
 
 **Ad Inserter Ad Manager - One Plugin - Many Functions**
 
 Ad Inserter is not just another plugin for WordPress ads. Do you enjoy finding the right plugin to solve a particular problem on your site? For example:
 
-*   ad management and ad injection
+*   for ad management and ad injection
 *   to insert AdSense or Media.net ads
 *   to insert affiliate ads (CJ Affiliate by Conversant, ClickBank, ShareASale, Rakuten LinkShare, etc.)
 *   to insert ads between paragraphs
@@ -783,6 +785,15 @@ AD CODE RIGHT
 
 == Changelog ==
 
+= 2.3.3 =
+- Added list editors
+- Added Label blocks debugging function for AdSense Auto ads
+
+= 2.3.2 =
+- Added AdSense code generator for ad sizes using CSS media queries
+- Fix for slow updates caused by changed user agent (Pro only, credits Olivier Langlois)
+- Fix for client-side insertion of non-English characters before/after HTML element
+
 = 2.3.1 =
 - Added support for server-side insertion before/after any HTML element
 - Few minor bug fixes
@@ -980,6 +991,15 @@ AD CODE RIGHT
 - Bug fix for IP database update cron event (Pro only)
 
 == Upgrade Notice ==
+
+= 2.3.3 =
+Added list editors;
+Added Label blocks debugging function for AdSense Auto ads
+
+= 2.3.2 =
+Added AdSense code generator for ad sizes using CSS media queries;
+Fix for slow updates caused by changed user agent (Pro only, credits Olivier Langlois);
+Fix for client-side insertion of non-English characters before/after HTML element
 
 = 2.3.1 =
 Added support for server-side insertion before/after any HTML element;

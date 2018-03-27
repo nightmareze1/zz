@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: Ad Inserter
-Version: 2.3.1
+Version: 2.3.3
 Description: Ad management plugin with advanced advertising options to automatically insert ad codes on your website
 Author: Igor Funa
 Author URI: http://igorfuna.com/
@@ -12,6 +12,15 @@ Plugin URI: http://adinserter.pro/documentation
 /*
 
 Change Log
+
+Ad Inserter 2.3.3 - 2018-02-08
+- Added list editors
+- Added Label blocks debugging function for AdSense Auto ads
+
+Ad Inserter 2.3.2 - 2018-02-01
+- Added AdSense code generator for ad sizes using CSS media queries
+- Fix for slow updates caused by changed user agent (Pro only, credits Olivier Langlois, https://juicingforyourmanhood.com/affiliate_tools.html)
+- Fix for client-side insertion of non-English characters before/after HTML element
 
 Ad Inserter 2.3.1 - 2018-01-25
 - Added support for server-side insertion before/after any HTML element
@@ -725,6 +734,15 @@ if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_PROCESSING) != 0) {
 
 
 
+//add_filter ('the_generator', 'ai_the_generator');
+
+//function ai_the_generator ($generator) {
+//  return preg_replace ('/content="(.*?)"/', 'content="$1, '.AD_INSERTER_NAME.' '. AD_INSERTER_VERSION.'"', $generator);
+//}
+
+
+
+
 function ai_wp_default_editor () {
   return 'tinymce';
 }
@@ -1012,7 +1030,7 @@ function ai_block_insertion_status ($block, $ai_last_check) {
     case AI_CHECK_DEBUG_NO_INSERTION:       $status .= "DEBUG NO INSERTION"; break;
     case AI_CHECK_PARAGRAPH_TAGS:           $status .= "PARAGRAPH TAGS"; break;
     case AI_CHECK_PARAGRAPHS_WITH_TAGS:     $status .= "PARAGRAPHS WITH TAGS"; break;
-    case AI_CHECK_PARAGRAPHS_AFTER_BLOCKQUOTE_FIGURE:       $status .= "PARAGRAPHS AFTER BLOCKQUOTE / FIGURE"; break;
+    case AI_CHECK_PARAGRAPHS_AFTER_NO_COUNTING_INSIDE:       $status .= "PARAGRAPHS AFTER NO COUNTING INSIDE"; break;
     case AI_CHECK_PARAGRAPHS_AFTER_MIN_MAX_WORDS:    $status .= "PARAGRAPHS AFTER MIN MAX WORDS"; break;
     case AI_CHECK_PARAGRAPHS_AFTER_TEXT:             $status .= "PARAGRAPHS AFTER TEXT"; break;
     case AI_CHECK_PARAGRAPHS_AFTER_CLEARANCE:        $status .= "PARAGRAPHS AFTER CLEARANCE"; break;
@@ -1578,13 +1596,20 @@ function ai_admin_enqueue_scripts ($hook_suffix) {
 
     if (function_exists ('ai_admin_enqueue_scripts_1')) ai_admin_enqueue_scripts_1 ();
 
+    wp_enqueue_style  ('ai-admin-multi-select', plugins_url ('css/multi-select.css', AD_INSERTER_FILE),     array (), AD_INSERTER_VERSION);
     wp_enqueue_style  ('ai-image-picker',    plugins_url ('css/image-picker.css', __FILE__),                array (), AD_INSERTER_VERSION);
     wp_add_inline_style ('ai-image-picker', '.thumbnail {border-radius: 6px;}');
+
+    wp_enqueue_style  ('ai-combobox-css',    plugins_url ('css/jquery.scombobox.min.css', __FILE__),        array (), AD_INSERTER_VERSION);
+
     wp_enqueue_style  ('ai-admin-css',       plugins_url ('css/ad-inserter.css', __FILE__),                 array (), AD_INSERTER_VERSION);
 
     wp_add_inline_style ('ai-admin-css', '.notice {margin: 5px 15px 15px 0;}');
 
     if (function_exists ('ai_admin_enqueue_scripts_2')) ai_admin_enqueue_scripts_2 ();
+
+    wp_enqueue_script ('ai-multi-select',    plugins_url ('includes/js/jquery.multi-select.js', AD_INSERTER_FILE ),  array (), AD_INSERTER_VERSION, true);
+    wp_enqueue_script ('ai-quicksearch',     plugins_url ('includes/js/jquery.quicksearch.js', AD_INSERTER_FILE ),   array (), AD_INSERTER_VERSION, true);
 
     // Located in the header to load  datepicker js file to prevent error when async tags used
     wp_enqueue_script ('ai-image-picker-js', plugins_url ('includes/js/image-picker.min.js', __FILE__ ),    array (
@@ -1610,6 +1635,11 @@ function ai_admin_enqueue_scripts ($hook_suffix) {
       'jquery-ui-datepicker',
       'jquery-ui-dialog',
      ), AD_INSERTER_VERSION, true);
+
+    wp_enqueue_script  ('ai-combobox',       plugins_url ('includes/js/jquery.scombobox.min.js', __FILE__), array (
+      'jquery',
+    ), AD_INSERTER_VERSION , true);
+    wp_enqueue_script  ('ai-missed',         plugins_url ('includes/js/missed.js', __FILE__), array (), AD_INSERTER_VERSION , true);
   }
 
   wp_enqueue_style  ('ai-admin-css-gen',   plugins_url ('css/ai-admin.css', __FILE__),                      array (), AD_INSERTER_VERSION);
@@ -1625,7 +1655,7 @@ function ai_wp_enqueue_scripts_hook () {
     $ai_wp_data [AI_STICKY_WIDGETS] ||
     (defined ('AI_ADBLOCKING_DETECTION') && AI_ADBLOCKING_DETECTION && $ai_wp_data [AI_ADB_DETECTION]);
 
-  if ($footer_inline_scripts || $ai_wp_data [AI_CLIENT_SIDE_INSERTION] || $ai_wp_data [AI_FRONTEND_JS_DEBUGGING]) {
+  if ($footer_inline_scripts || $ai_wp_data [AI_CLIENT_SIDE_INSERTION] || $ai_wp_data [AI_FRONTEND_JS_DEBUGGING] || ($ai_wp_data [AI_WP_DEBUGGING] & (AI_DEBUG_POSITIONS | AI_DEBUG_BLOCKS)) != 0) {
 //  force loading of jquery on frontend
     wp_enqueue_script ('ai-jquery-js', plugins_url ('includes/js/ai-jquery.js', __FILE__ ),    array (
       'jquery',
@@ -2348,12 +2378,22 @@ function ai_wp_head_hook () {
   }
 
   // No scripts on AMP pages
-//  if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_POSITIONS) != 0 && !$ai_wp_data [AI_WP_AMP_PAGE]) {
-  if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_POSITIONS) != 0 /*&& !$ai_wp_data [AI_WP_AMP_PAGE]*/) {
+  if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_POSITIONS) != 0) {
     echo "<script>
   jQuery(document).ready(function($) {
     $('body').prepend (\"", get_page_type_debug_info () , "\");
   });
+</script>\n";
+  }
+
+  if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0) {
+    echo "<script>
+jQuery(document).ready(function($) {
+  setTimeout (function() {
+    var google_auto_placed = jQuery ('.google-auto-placed');
+    google_auto_placed.before ('<section class=\"ai-debug-bar ai-debug-adsense\">Automatically placed by AdSense Auto ads code</section>');
+  }, 3000);
+});
 </script>\n";
   }
 
@@ -3955,6 +3995,10 @@ function ai_ajax_backend () {
     generate_settings_form ();
   }
 
+  elseif (isset ($_GET ["list-options"])) {
+    generate_list_options ($_GET ["list-options"]);
+  }
+
   elseif (isset ($_GET ["update"])) {
     if ($_GET ["update"] == 'block-code-demo') {
       ai_block_code_demo (urldecode ($_GET ["block_class_name"]), $_GET ["block_class"], $_GET ["block_number_class"], $_GET ["inline_styles"]);
@@ -4404,6 +4448,9 @@ a.ai-debug-center {text-align: center; font-size: 10px; text-decoration: none; c
 
 .ai-debug-block.ai-debug-adb-status {border-color: #000;}
 .ai-debug-bar.ai-debug-adb-status {background: #000;}
+
+.ai-debug-block.ai-debug-adsense {border-color: #e0a;}
+.ai-debug-bar.ai-debug-adsense {background: #e0a;}
 
 .ai-debug-adb-status.on {color: #f00;}
 .ai-debug-adb-status.off {color: #0f0;}

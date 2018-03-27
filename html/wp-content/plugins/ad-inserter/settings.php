@@ -66,7 +66,6 @@ function generate_settings_form (){
 
   $default = $block_object [0];
 
-
   $exceptions = false;
   $block_exceptions = array ();
   if (ai_current_user_role_ok () && (!is_multisite() || is_main_site () || multisite_exceptions_enabled ())) {
@@ -647,19 +646,23 @@ function generate_settings_form (){
     </div>
 
     <div id="tab-adsense-<?php echo $block; ?>" class="responsive-table rounded">
-      <table class="ai-settings-table" style="">
+
+      <table class="ai-settings-table left">
+        <tr>
+          <td>
+            Comment
+          </td>
+          <td style="width: 100%; padding-left: 7px;">
+            <input id="adsense-comment-<?php echo $block; ?>" style="width: 100%;" type="text" size="30" maxlength="50" />
+          </td>
+        </tr>
+
         <tr>
           <td>
             Publisher ID
           </td>
-          <td style="width: 50%; padding-left: 7px;">
+          <td style="width: 100%; padding-left: 7px;">
             <input id="adsense-publisher-id-<?php echo $block; ?>" style="width: 100%;" type="text" size="30" maxlength="30" />
-          </td>
-          <td class="adsense-layout" style="padding-left: 7px;">
-            Layout
-          </td>
-          <td class="adsense-layout" style="width: 50%; padding-left: 7px;">
-            <input id="adsense-layout-<?php echo $block; ?>" style="width: 100%;" type="text" size="80" maxlength="100" />
           </td>
         </tr>
 
@@ -667,14 +670,8 @@ function generate_settings_form (){
           <td>
             Ad Slot ID
           </td>
-          <td style="width: 50%; padding-left: 7px;">
+          <td style="padding-left: 7px;">
             <input id="adsense-ad-slot-id-<?php echo $block; ?>" style="width: 100%;" type="text" size="30" maxlength="30" />
-          </td>
-          <td class="adsense-layout" style="padding-left: 7px;">
-            Layout Key
-          </td>
-          <td class="adsense-layout" style="width: 50%; padding-left: 7px;">
-            <input id="adsense-layout-key-<?php echo $block; ?>" style="width: 100%;" type="text" size="80" maxlength="100" />
           </td>
         </tr>
 
@@ -691,24 +688,14 @@ function generate_settings_form (){
                <option value="<?php echo AI_ADSENSE_MATCHED_CONTENT; ?>"><?php echo AI_TEXT_MATCHED_CONTENT; ?></option>
                <option value="<?php echo AI_ADSENSE_AUTO; ?>"><?php echo AI_TEXT_AUTO; ?></option>
             </select>
-            <div class="adsense-responsive" style="float: right; margin-top: 3px;">
-              <input type="checkbox" id="adsense-responsive-<?php echo $block; ?>" />
-              <label for="adsense-responsive-<?php echo $block; ?>">Responsive</label>
+            <div class="adsense-size" style="float: right;">
+              Size
+              <select id="adsense-size-<?php echo $block; ?>">
+                 <option value="<?php echo AI_ADSENSE_SIZE_FIXED; ?>" selected><?php echo AI_TEXT_FIXED; ?></option>
+                 <option value="<?php echo AI_ADSENSE_SIZE_FIXED_BY_VIEWPORT; ?>"><?php echo AI_TEXT_FIXED_BY_VIEWPORT; ?></option>
+                 <option value="<?php echo AI_ADSENSE_SIZE_RESPONSIVE; ?>"><?php echo AI_TEXT_RESPONSIVE; ?></option>
+              </select>
             </div>
-          </td>
-          <td>
-          </td>
-          <td style="padding-left: 7px;">
-            <span class="adsense-size">
-              Width
-              <input id="adsense-width-<?php echo $block; ?>" style="width: 50px;" type="text" size="5" maxlength="5" />
-              px
-              <span style="float: right;">
-                Height
-                <input id="adsense-height-<?php echo $block; ?>" style="width: 50px;" type="text" size="5" maxlength="5" />
-                px
-              </span>
-            </span>
           </td>
         </tr>
 
@@ -723,18 +710,115 @@ function generate_settings_form (){
               <option value="<?php echo AI_ADSENSE_AMP_BELOW_THE_FOLD; ?>"><?php echo AI_TEXT_BELOW_THE_FOLD; ?></option>
             </select>
           </td>
+        </tr>
+
+        <tr>
           <td>
           </td>
           <td>
 <?php if (defined ('AI_ADSENSE_API')) : ?>
 <?php if (!defined ('AI_ADSENSE_AUTHORIZATION_CODE')) : ?>
-            <button type="button" class='ai-button adsense-list' style="display: none; float: right; margin: 0 -3px -14px 0;" title="Show AdSense ad units from your account">AdSense ad units</button>
+            <button type="button" class='ai-button adsense-list' style="display: none; margin: 2px 0px 0px 7px;" title="Show AdSense ad units from your account">AdSense ad units</button>
 <?php endif; ?>
 <?php endif; ?>
           </td>
         </tr>
+      </table>
+
+      <table id="adsense-layout-<?php echo $block; ?>" class="ai-settings-table right">
+        <tr>
+          <td></td>
+          <td>
+            <input style="visibility: hidden;" type="text" size="1" maxlength="1" />
+          </td>
+        </tr>
+
+        <tr>
+          <td class="adsense-layout" style="padding-left: 7px;">
+            Layout
+          </td>
+          <td class="adsense-layout" style="width: 100%; padding-left: 7px;">
+            <input id="adsense-layout-<?php echo $block; ?>" style="width: 100%;" type="text" size="80" maxlength="100" />
+          </td>
+        </tr>
+
+        <tr>
+          <td class="adsense-layout" style="padding-left: 7px;">
+            Layout Key
+          </td>
+          <td class="adsense-layout" style="padding-left: 7px;">
+            <input id="adsense-layout-key-<?php echo $block; ?>" style="width: 100%;" type="text" size="80" maxlength="100" />
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-left: 7px; padding-top: 1px; float: left;">
+            <span class="adsense-fixed-size ad-size">
+              <select class="adsense-ad-size fixed">
+                 <option value="&nbsp;" selected></option>
+                 <option value="300x250">300x250</option>
+                 <option value="336x280">336x280</option>
+                 <option value="728x90" >728x90</option>
+                 <option value="300x600">300x600</option>
+                 <option value="320x100">320x100</option>
+                 <option value="468x60" >468x60</option>
+                 <option value="234x60" >234x60</option>
+                 <option value="125x125">125x125</option>
+                 <option value="250x250">250x250</option>
+                 <option value="200x200">200x200</option>
+                 <option value="120x600">120x600</option>
+                 <option value="160x600">160x600</option>
+                 <option value="300x1050">300x1050</option>
+                 <option value="320x50">320x50</option>
+                 <option value="970x90">970x90</option>
+                 <option value="970x250">970x250</option>
+              </select>
+            </span>
+          </td>
+          <td>
+          </td>
+        </tr>
 
       </table>
+
+      <table id="adsense-viewports-<?php echo $block; ?>" class="ai-settings-table right" style="display: none; width: auto;">
+<?php
+      for ($viewport = 1; $viewport <= AD_INSERTER_VIEWPORTS; $viewport ++) {
+        $viewport_name  = get_viewport_name ($viewport);
+        $viewport_width = get_viewport_width ($viewport);
+        if ($viewport_name != '') { ?>
+        <tr class="adsense-viewport ad-size">
+          <td style="max-width: 210px; padding-left: 10px; overflow: hidden;">
+            <?php echo $viewport_name; ?>
+          </td>
+          <td style="padding-left: 7px;">
+              <select class="adsense-ad-size">
+                 <option value="&nbsp;" selected></option>
+                 <option value="300x250">300x250</option>
+                 <option value="336x280">336x280</option>
+                 <option value="728x90" >728x90</option>
+                 <option value="300x600">300x600</option>
+                 <option value="320x100">320x100</option>
+                 <option value="468x60" >468x60</option>
+                 <option value="234x60" >234x60</option>
+                 <option value="125x125">125x125</option>
+                 <option value="250x250">250x250</option>
+                 <option value="200x200">200x200</option>
+                 <option value="120x600">120x600</option>
+                 <option value="160x600">160x600</option>
+                 <option value="300x1050">300x1050</option>
+                 <option value="320x50">320x50</option>
+                 <option value="970x90">970x90</option>
+                 <option value="970x250">970x250</option>
+              </select>
+            </span>
+          </td>
+        </tr>
+<?php   }
+      }
+?>
+      </table>
+
       <div style="clear: both;"></div>
 
     </div>
@@ -758,11 +842,11 @@ function generate_settings_form (){
 
   <div style="padding: 0; min-height: 28px;">
     <div style="float: left;">
-      <button id="lists-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; margin-right: 4px;" title="White/Black-list Category, Tag, Url, Referer (domain) or Country"><span style="<?php echo $lists_style; ?>">Lists</span></button>
-      <button id="manual-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; margin-right: 4px;" title="Widget, Shortcode and PHP function call"><span style="<?php echo $manual_style; ?>">Manual</span></button>
-      <button id="device-detection-button-<?php echo $block; ?>" class='ai-button' type="button" style="display: none; margin-right: 4px;" title="Client/Server-side Device Detection (Desktop, Tablet, Phone,...)"><span style="<?php echo $devices_style; ?>">Devices</span></button>
-      <button id="misc-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; margin-right: 4px;" title="Check for user status, Limit insertions, [error 404 page, Ajax requests, RSS feeds], Filter, Scheduling, General tag"><span style="<?php echo $misc_style; ?>">Misc</span></button>
-      <button id="preview-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; margin-right: 4px;" title="Preview saved code above" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">Preview</button>
+      <button id="lists-button-<?php echo $block; ?>" type="button" class='ai-button2' style="display: none; margin-right: 4px;" title="White/Black-list Category, Tag, Url, Referer (domain) or Country"><span style="<?php echo $lists_style; ?>">Lists</span></button>
+      <button id="manual-button-<?php echo $block; ?>" type="button" class='ai-button2' style="display: none; margin-right: 4px;" title="Widget, Shortcode and PHP function call"><span style="<?php echo $manual_style; ?>">Manual</span></button>
+      <button id="device-detection-button-<?php echo $block; ?>" class='ai-button2' type="button" style="display: none; margin-right: 4px;" title="Client/Server-side Device Detection (Desktop, Tablet, Phone,...)"><span style="<?php echo $devices_style; ?>">Devices</span></button>
+      <button id="misc-button-<?php echo $block; ?>" type="button" class='ai-button2' style="display: none; margin-right: 4px;" title="Check for user status, Limit insertions, [error 404 page, Ajax requests, RSS feeds], Filter, Scheduling, General tag"><span style="<?php echo $misc_style; ?>">Misc</span></button>
+      <button id="preview-button-<?php echo $block; ?>" type="button" class='ai-button2' style="display: none; margin-right: 4px;" title="Preview saved code above" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">Preview</button>
     </div>
     <div style="float: right;">
 <?php if (function_exists ('ai_settings_bottom_buttons')) ai_settings_bottom_buttons ($start, $end); else { ?>
@@ -1192,11 +1276,14 @@ function generate_settings_form (){
     <table>
       <tbody>
         <tr>
-          <td style="padding-right: 7px;">
+          <td>
             Categories
           </td>
-          <td style="padding-right: 7px; width: 70%;">
-            <input style="width: 100%;" title="Comma separated category slugs" type="text" name="<?php echo AI_OPTION_CATEGORY_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_block_cat(); ?>" value="<?php echo $cat_list; ?>" size="54" maxlength="500" />
+          <td>
+            <button id="category-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; outline: transparent; float: right; margin-top: 1px; width: 15px; height: 15px;" title="Toggle category editor"></button>
+          </td>
+          <td style="padding-right: 7px; width: 65%;">
+            <input id="category-list-<?php echo $block; ?>" class="ai-list-filter ai-list-custom" style="width: 100%;" title="Comma separated category slugs" type="text" name="<?php echo AI_OPTION_CATEGORY_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_block_cat(); ?>" value="<?php echo $cat_list; ?>" size="54" maxlength="500" />
           </td>
           <td style="padding-right: 7px;">
             <input type="radio" name="<?php echo AI_OPTION_CATEGORY_LIST_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" id="category-blacklist-<?php echo $block; ?>" default="<?php echo $default->get_ad_block_cat_type() == AD_BLACK_LIST; ?>" value="<?php echo AD_BLACK_LIST; ?>" <?php if ($obj->get_ad_block_cat_type() == AD_BLACK_LIST) echo 'checked '; ?> />
@@ -1208,11 +1295,21 @@ function generate_settings_form (){
           </td>
         </tr>
         <tr>
-          <td style="padding-right: 7px;">
+          <td colspan="5">
+            <select id="category-select-<?php echo $block; ?>" multiple="multiple" style="display: none;">
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
             Tags
           </td>
+          <td>
+            <button id="tag-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; outline: transparent; float: right; margin-top: 1px; width: 15px; height: 15px;" title="Toggle tag editor"></button>
+          </td>
           <td style="padding-right: 7px;">
-            <input style="width: 100%;" title="Comma separated tags" type="text" name="<?php echo AI_OPTION_TAG_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_block_tag(); ?>" value="<?php echo $tag_list; ?>" size="54" maxlength="500"/>
+            <input id="tag-list-<?php echo $block; ?>" class="ai-list-filter ai-list-custom" style="width: 100%;" title="Comma separated tag slugs" type="text" name="<?php echo AI_OPTION_TAG_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_block_tag(); ?>" value="<?php echo $tag_list; ?>" size="54" maxlength="500"/>
           </td>
           <td style="padding-right: 7px;">
             <input type="radio" name="<?php echo AI_OPTION_TAG_LIST_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" id="tag-blacklist-<?php echo $block; ?>" default="<?php echo $default->get_ad_block_tag_type() == AD_BLACK_LIST; ?>" value="<?php echo AD_BLACK_LIST; ?>" <?php if ($obj->get_ad_block_tag_type() == AD_BLACK_LIST) echo 'checked '; ?> />
@@ -1224,11 +1321,21 @@ function generate_settings_form (){
           </td>
         </tr>
         <tr>
-          <td style="padding-right: 7px;">
+          <td colspan="5">
+            <select id="tag-select-<?php echo $block; ?>" multiple="multiple" style="display: none;">
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
             Taxonomies
           </td>
-          <td style="padding-right: 7px; width: 70%;">
-            <input style="width: 100%;" title="Comma separated slugs: taxonomy, term or taxonomy:term" type="text" name="<?php echo AI_OPTION_TAXONOMY_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_block_taxonomy(); ?>" value="<?php echo $taxonomy_list; ?>" size="54" maxlength="500" />
+          <td>
+            <button id="taxonomy-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; outline: transparent; float: right; margin-top: 1px; width: 15px; height: 15px;" title="Toggle taxonomy editor"></button>
+          </td>
+          <td style="padding-right: 7px;">
+            <input id="taxonomy-list-<?php echo $block; ?>" class="ai-list-custom" style="width: 100%;" title="Comma separated slugs: taxonomy, term or taxonomy:term" type="text" name="<?php echo AI_OPTION_TAXONOMY_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_block_taxonomy(); ?>" value="<?php echo $taxonomy_list; ?>" size="54" maxlength="500" />
           </td>
           <td style="padding-right: 7px;">
             <input type="radio" name="<?php echo AI_OPTION_TAXONOMY_LIST_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" id="taxonomy-blacklist-<?php echo $block; ?>" default="<?php echo $default->get_ad_block_taxonomy_type() == AD_BLACK_LIST; ?>" value="<?php echo AD_BLACK_LIST; ?>" <?php if ($obj->get_ad_block_taxonomy_type() == AD_BLACK_LIST) echo 'checked '; ?> />
@@ -1240,11 +1347,21 @@ function generate_settings_form (){
           </td>
         </tr>
         <tr>
-          <td style="padding-right: 7px;">
+          <td colspan="5">
+            <select id="taxonomy-select-<?php echo $block; ?>" multiple="multiple" style="display: none;">
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
             Post IDs
           </td>
+          <td>
+            <button id="id-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; outline: transparent; float: right; margin-top: 1px; width: 15px; height: 15px;" title="Toggle post/page ID editor"></button>
+          </td>
           <td style="padding-right: 7px;">
-            <input style="width: 100%;" title="Comma separated post/page IDs" type="text" name="<?php echo AI_OPTION_ID_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_id_list(); ?>" value="<?php echo $id_list; ?>" size="54" maxlength="500"/>
+            <input id="id-list-<?php echo $block; ?>" class="ai-list-custom" style="width: 100%;" title="Comma separated post/page IDs" type="text" name="<?php echo AI_OPTION_ID_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_id_list(); ?>" value="<?php echo $id_list; ?>" size="54" maxlength="500"/>
           </td>
           <td style="padding-right: 7px;">
             <input type="radio" name="<?php echo AI_OPTION_ID_LIST_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" id="id-blacklist-<?php echo $block; ?>" default="<?php echo $default->get_id_list_type() == AD_BLACK_LIST; ?>" value="<?php echo AD_BLACK_LIST; ?>" <?php if ($obj->get_id_list_type() == AD_BLACK_LIST) echo 'checked '; ?> />
@@ -1256,13 +1373,21 @@ function generate_settings_form (){
           </td>
         </tr>
         <tr>
-          <td style="padding-right: 7px;">
+          <td colspan="5">
+            <select id="id-select-<?php echo $block; ?>" multiple="multiple" style="display: none;">
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
             Urls
           </td>
+          <td>
+            <button id="url-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; outline: transparent; float: right; margin-top: 1px; width: 15px; height: 15px;" title="Toggle url editor"></button>
+          </td>
           <td style="padding-right: 7px;">
-            <input style="width: 100%;" type="text" name="<?php echo AI_OPTION_URL_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_url_list(); ?>" value="<?php echo $url_list; ?>" size="54" maxlength="500" title="SPACE separated urls (page addresses) starting with / after domain name (e.g. /permalink-url, use only when you need to taget a specific url not accessible by other means). You can also use partial urls with * (/url-start*. *url-pattern*, *url-end)" />
-            <br />
-<!--            <textarea id="urls2-<?php echo $block; ?>" style="width: 100%; height: 100px; font-family: Courier, 'Courier New', monospace; font-weight: bold;" name="XX_<?php echo AI_OPTION_CODE, WP_FORM_FIELD_POSTFIX, $block; ?>"><?php echo esc_textarea (str_replace (' ', "\n", $url_list)); ?></textarea>-->
+            <input id="url-list-<?php echo $block; ?>" class="ai-list-space ai-clean-protocol ai-clean-domain" style="width: 100%;" type="text" name="<?php echo AI_OPTION_URL_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_url_list(); ?>" value="<?php echo $url_list; ?>" size="54" maxlength="500" title="Comma separated urls (page addresses) starting with / after domain name (e.g. /permalink-url, use only when you need to taget a specific url not accessible by other means). You can also use partial urls with * (/url-start*. *url-pattern*, *url-end)" />
           </td>
           <td style="padding-right: 7px;">
             <input type="radio" name="<?php echo AI_OPTION_URL_LIST_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" id="url-blacklist-<?php echo $block; ?>" default="<?php echo $default->get_ad_url_list_type() == AD_BLACK_LIST; ?>" value="<?php echo AD_BLACK_LIST; ?>" <?php if ($obj->get_ad_url_list_type() == AD_BLACK_LIST) echo 'checked '; ?> />
@@ -1274,11 +1399,21 @@ function generate_settings_form (){
           </td>
         </tr>
         <tr>
-          <td style="padding-right: 7px;">
+          <td colspan="5">
+            <textarea id="url-editor-<?php echo $block; ?>" style="width: 100%; height: 220px; font-family: Courier, 'Courier New', monospace; font-weight: bold; display: none;"></textarea>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
             Url parameters
+            &nbsp;
+          </td>
+          <td>
+            <button id="url-parameter-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; outline: transparent; float: right; margin-top: 1px; width: 15px; height: 15px;" title="Toggle url parameter editor"></button>
           </td>
           <td style="padding-right: 7px;">
-            <input style="width: 100%;" title="Comma separated url query parameters or cookies with optional values (use 'prameter', 'prameter=value', 'cookie' or 'cookie=value')" type="text" name="<?php echo AI_OPTION_URL_PARAMETER_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_url_parameter_list(); ?>" value="<?php echo $url_parameter_list; ?>" size="54" maxlength="500"/>
+            <input id="url-parameter-list-<?php echo $block; ?>" style="width: 100%;" title="Comma separated url query parameters or cookies with optional values (use 'prameter', 'prameter=value', 'cookie' or 'cookie=value')" type="text" name="<?php echo AI_OPTION_URL_PARAMETER_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_url_parameter_list(); ?>" value="<?php echo $url_parameter_list; ?>" size="54" maxlength="500"/>
           </td>
           <td style="padding-right: 7px;">
             <input type="radio" name="<?php echo AI_OPTION_URL_PARAMETER_LIST_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" id="url-parameter-blacklist-<?php echo $block; ?>" default="<?php echo $default->get_url_parameter_list_type() == AD_BLACK_LIST; ?>" value="<?php echo AD_BLACK_LIST; ?>" <?php if ($obj->get_url_parameter_list_type() == AD_BLACK_LIST) echo 'checked '; ?> />
@@ -1290,11 +1425,20 @@ function generate_settings_form (){
           </td>
         </tr>
         <tr>
-          <td style="padding-right: 7px;">
+          <td colspan="5">
+            <textarea id="url-parameter-editor-<?php echo $block; ?>" style="width: 100%; height: 220px; font-family: Courier, 'Courier New', monospace; font-weight: bold; display: none;"></textarea>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
             Referers
           </td>
+          <td>
+            <button id="referer-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; outline: transparent; float: right; margin-top: 1px; width: 15px; height: 15px;" title="Toggle referer editor"></button>
+          </td>
           <td style="padding-right: 7px;">
-            <input style="width: 100%;" title="Comma separated domains, use # for no referer" type="text" name="<?php echo AI_OPTION_DOMAIN_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_domain_list(); ?>" value="<?php echo $domain_list; ?>" size="54" maxlength="500"/>
+            <input id="referer-list-<?php echo $block; ?>" class="ai-clean-protocol ai-only-domain ai-list-sort" style="width: 100%;" title="Comma separated domains, use # for no referer" type="text" name="<?php echo AI_OPTION_DOMAIN_LIST, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_domain_list(); ?>" value="<?php echo $domain_list; ?>" size="54" maxlength="500"/>
           </td>
           <td style="padding-right: 7px;">
             <input type="radio" name="<?php echo AI_OPTION_DOMAIN_LIST_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" id="referer-blacklist-<?php echo $block; ?>" default="<?php echo $default->get_ad_domain_list_type() == AD_BLACK_LIST; ?>" value="<?php echo AD_BLACK_LIST; ?>" <?php if ($obj->get_ad_domain_list_type() == AD_BLACK_LIST) echo 'checked '; ?> />
@@ -1305,6 +1449,12 @@ function generate_settings_form (){
             <label for="referer-whitelist-<?php echo $block; ?>" title="Whitelist referers"><?php echo AD_WHITE_LIST; ?></label>
           </td>
         </tr>
+        <tr>
+          <td colspan="5">
+            <textarea id="referer-editor-<?php echo $block; ?>" style="width: 100%; height: 220px; font-family: Courier, 'Courier New', monospace; font-weight: bold; display: none;"></textarea>
+          </td>
+        </tr>
+
 <?php if (function_exists ('ai_list_rows')) ai_list_rows ($block, $default, $obj); ?>
       </tbody>
     </table>
@@ -1322,7 +1472,6 @@ function generate_settings_form (){
         </td>
         <td>
           <pre class="ai-sidebars" style= "margin: 0; display: inline; color: blue; white-space: pre-wrap; word-wrap: break-word;" title="Sidebars (or widget positions) where this widged is used"><?php echo $sidebars [$block], !empty ($sidebars [$block]) ? " &nbsp;" : ""; ?></pre>
-          <button id="widgets-button-<?php echo $block; ?>" type="button" class='ai-button' style="display: none; width: 15px; height: 15px;" title="Manage Widgets"></button>
         </td>
       </tr>
       <tr>
@@ -2883,7 +3032,6 @@ function adsense_list () {
 
 }
 
-
 function adsense_code ($ad_slot_id) {
   if (defined ('AI_ADSENSE_API')) {
     require_once AD_INSERTER_PLUGIN_DIR.'includes/adsense-api.php';
@@ -2893,6 +3041,109 @@ function adsense_code ($ad_slot_id) {
       $code = $adsense->getAdCode ($ad_slot_id);
       echo json_encode (array ('code' => $code, 'error-message' => $adsense->getError ()));
     }
+  }
+}
+
+function generate_list_options ($options) {
+  $max_items = 2000;
+
+  switch ($options) {
+    case 'category':
+      $category_data = get_categories ();
+      $category_data = array_slice ($category_data, 0, $max_items);
+      foreach ($category_data as $category) {
+        echo "              <option value='{$category->slug}'>{$category->slug} ({$category->name})</option>\n";
+      }
+      break;
+
+    case 'tag':
+      $tag_data = get_tags ();
+      $tag_data = array_slice ($tag_data, 0, $max_items);
+      foreach ($tag_data as $tag) {
+        echo "              <option value='{$tag->slug}'>{$tag->slug} ({$tag->name})</option>\n";
+      }
+      break;
+
+    case 'taxonomy':
+      $term_data = get_terms ();
+      $taxonomies = array ();
+      foreach ($term_data as $term) {
+        if ($term->taxonomy == 'category') continue;
+        if ($term->taxonomy == 'post_tag') continue;
+        $taxonomies [strtolower ($term->taxonomy) . ':' . strtolower ($term->slug)] = $term->name;
+        if (count ($taxonomies) >= $max_items) break;
+      }
+
+      $args = array (
+        'public'    => true,
+    //    '_builtin'  => false,
+      );
+      $custom_post_types = get_post_types ($args, 'objects', 'and');
+      foreach ($custom_post_types as $custom_post_type => $custom_post_data) {
+        $taxonomies ['post-type:' . strtolower ($custom_post_type)] = $custom_post_data->labels->singular_name;
+      }
+
+      $editable_roles = get_editable_roles ();
+      foreach ($editable_roles as $editable_role_slug => $editable_role) {
+        $taxonomies ['user-role:' . strtolower ($editable_role_slug)] = $editable_role ['name'];
+      }
+
+      $users = get_users ();
+      foreach ($users as $user) {
+        $taxonomies ['user:' . strtolower ($user->data->user_login)] = $user->data->display_name;
+        if (count ($taxonomies) >= $max_items) break;
+      }
+
+      ksort ($taxonomies);
+
+      foreach ($taxonomies as $taxonomy => $taxonomy_name) {
+        if ($taxonomy_name != '')
+          echo "              <option value='{$taxonomy}'>{$taxonomy} ({$taxonomy_name})</option>\n"; else
+            echo "              <option value='{$taxonomy}'>{$taxonomy}</option>\n";
+      }
+      break;
+
+    case 'id':
+      $args = array (
+        'public'    => true,
+        '_builtin'  => false
+      );
+      $custom_post_types = get_post_types ($args, 'names', 'and');
+      $screens = array_values (array_merge (array ('post', 'page'), $custom_post_types));
+
+      $args = array (
+        'posts_per_page'   => 3 * $max_items,
+        'offset'           => 0,
+        'category'         => '',
+        'category_name'    => '',
+        'orderby'          => 'ID',
+        'order'            => 'ASC',
+        'include'          => '',
+        'exclude'          => '',
+        'meta_key'         => '',
+        'meta_value'       => '',
+        'post_type'        => $screens,
+        'post_mime_type'   => '',
+        'post_parent'      => '',
+        'author'           => '',
+        'author_name'      => '',
+        'post_status'      => '',
+        'suppress_filters' => true,
+      );
+      $posts_pages = get_posts ($args);
+
+      $counter = 0;
+      foreach ($posts_pages as $post_page) {
+        if ($post_page->post_title == '') continue;
+        echo "              <option value='{$post_page->ID}'>{$post_page->ID} ({$post_page->post_type} \"{$post_page->post_title}\")</option>\n";
+        $counter ++;
+        if ($counter >= $max_items) break;
+      }
+      break;
+
+    default:
+      if (function_exists ('ai_generate_list_options')) ai_generate_list_options ($options);
+      break;
   }
 }
 
