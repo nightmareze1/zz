@@ -16,11 +16,11 @@ jQuery (function ($) {
     var debug_block_frame = $(this).closest ('.ai-debug-block');
     if (typeof debug_block_frame != "undefined") {
       var option_name = atob (option.data ('name'));
-      var name_tag = debug_block_frame.find ('span.ai-option-name');
+      var name_tag = debug_block_frame.find ('kbd.ai-option-name');
       // Do not set option name in nested debug blocks
       var nested_debug_block = debug_block_frame.find ('.ai-debug-block');
       if (typeof nested_debug_block != 'undefined') {
-        var name_tag2 = nested_debug_block.find ('span.ai-option-name');
+        var name_tag2 = nested_debug_block.find ('kbd.ai-option-name');
         name_tag = name_tag.slice (0, name_tag.length - name_tag2.length);
       }
       if (typeof name_tag != 'undefined') {

@@ -24,7 +24,7 @@ if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.3.3');
+  define ('AD_INSERTER_VERSION', '2.3.7');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -60,6 +60,7 @@ define ('AI_OPTION_ENABLE_MANUAL',               'enable_manual');
 define ('AI_OPTION_ENABLE_AMP',                  'enable_amp');
 define ('AI_OPTION_ENABLE_WIDGET',               'enable_widget');
 define ('AI_OPTION_PROCESS_PHP',                 'process_php');
+define ('AI_OPTION_SHOW_LABEL',                  'show_label');
 define ('AI_OPTION_TRACKING',                    'tracking');
 define ('AI_OPTION_ENABLE_AJAX',                 'enable_ajax');
 define ('AI_OPTION_ENABLE_FEED',                 'enable_feed');
@@ -91,6 +92,8 @@ define ('AI_OPTION_FILTER_TYPE',                 'filter_type');
 define ('AI_OPTION_INVERTED_FILTER',             'inverted_filter');
 define ('AI_OPTION_DIRECTION_TYPE',              'direction_type');
 define ('AI_OPTION_ALIGNMENT_TYPE',              'alignment_type');
+define ('AI_OPTION_HORIZONTAL_POSITION',         'horizontal_position');
+define ('AI_OPTION_VERTICAL_POSITION',           'vertical_position');
 define ('AI_OPTION_GENERAL_TAG',                 'general_tag');
 define ('AI_OPTION_SCHEDULING',                  'scheduling');
 define ('AI_OPTION_AFTER_DAYS',                  'after_days');
@@ -281,6 +284,7 @@ define('AI_ALIGNMENT_STICKY_LEFT',    8);
 define('AI_ALIGNMENT_STICKY_RIGHT',   9);
 define('AI_ALIGNMENT_STICKY_TOP',    10);
 define('AI_ALIGNMENT_STICKY_BOTTOM', 11);
+define('AI_ALIGNMENT_STICKY',        12);
 
 // Used also for alignment class names
 define('AI_TEXT_DEFAULT',             'Default');
@@ -295,17 +299,57 @@ define('AI_TEXT_STICKY_LEFT',         'Sticky Left');
 define('AI_TEXT_STICKY_RIGHT',        'Sticky Right');
 define('AI_TEXT_STICKY_TOP',          'Sticky Top');
 define('AI_TEXT_STICKY_BOTTOM',       'Sticky Bottom');
+define('AI_TEXT_STICKY',              'Sticky');
+
+define('AI_STICK_TO_THE_LEFT',          0);
+define('AI_STICK_TO_THE_CONTENT_LEFT',  1);
+define('AI_STICK_HORIZONTAL_CENTER',    2);
+define('AI_STICK_TO_THE_CONTENT_RIGHT', 3);
+define('AI_STICK_TO_THE_RIGHT',         4);
+
+define('AI_TEXT_STICK_TO_THE_LEFT',           'Stick to the left');
+define('AI_TEXT_STICK_TO_THE_CONTENT_LEFT',   'Stick to the content left');
+define('AI_TEXT_STICK_TO_THE_CONTENT_RIGHT',  'Stick to the content right');
+define('AI_TEXT_STICK_TO_THE_RIGHT',          'Stick to the right');
+
+define('AI_STICK_TO_THE_TOP',           0);
+define('AI_STICK_VERTICAL_CENTER',      1);
+define('AI_SCROLL_WITH_THE_CONTENT',    2);
+define('AI_STICK_TO_THE_BOTTOM',        3);
+
+define('AI_TEXT_STICK_TO_THE_TOP',        'Stick to the top');
+define('AI_TEXT_SCROLL_WITH_THE_CONTENT', 'Scroll with the content');
+define('AI_TEXT_STICK_TO_THE_BOTTOM',     'Stick to the bottom');
+
+define('AI_STICKY_Z_INDEX',               9995);   // update ad-inserter.js
 
 define('AI_ALIGNMENT_CSS_DEFAULT',        'margin: 8px 0; clear: both;');
-define('AI_ALIGNMENT_CSS_LEFT',           'margin: 8px auto 8px 0; text-align: left; clear: both;||margin: 8px 0; text-align: left; clear: both; display: flex; justify-content: flex-start;');
-define('AI_ALIGNMENT_CSS_RIGHT',          'margin: 8px 0 8px auto; text-align: right; clear: both;||margin: 8px 0; text-align: right; clear: both; display: flex; justify-content: flex-end;');
-define('AI_ALIGNMENT_CSS_CENTER',         'margin: 8px auto; text-align: center; clear: both;||margin: 8px 0; text-align: center; clear: both; display: flex; justify-content: center;');
+define('AI_ALIGNMENT_CSS_LEFT',           'margin: 8px auto 8px 0; text-align: left; clear: both;||margin: 8px 0; text-align: left; clear: both; display: flex; justify-content: flex-start; flex-direction: column; align-items: flex-start;');
+define('AI_ALIGNMENT_CSS_RIGHT',          'margin: 8px 0 8px auto; text-align: right; clear: both;||margin: 8px 0; text-align: right; clear: both; display: flex; justify-content: flex-end; flex-direction: column; align-items: flex-end;');
+define('AI_ALIGNMENT_CSS_CENTER',         'margin: 8px auto; text-align: center; clear: both;||margin: 8px 0; text-align: center; clear: both; display: flex; justify-content: center; flex-direction: column; align-items: center;');
 define('AI_ALIGNMENT_CSS_FLOAT_LEFT',     'margin: 8px 8px 8px 0; float: left;');
 define('AI_ALIGNMENT_CSS_FLOAT_RIGHT',    'margin: 8px 0 8px 8px; float: right;');
 define('AI_ALIGNMENT_CSS_STICKY_LEFT',    'position: fixed; left: 0px; top: 100px; z-index: 9999;');
 define('AI_ALIGNMENT_CSS_STICKY_RIGHT',   'position: fixed; right: 0px; top: 100px; z-index: 9999;');
 define('AI_ALIGNMENT_CSS_STICKY_TOP',     'position: fixed; top: 0; text-align: center; left: 50%; transform: translate(-50%); width: 100%; z-index: 9999;||position: fixed; top: 0; left: 0; width: 100%; text-align: center; z-index: 9999;||position: fixed; top: 0; left: 0; width: 100%; text-align: center; display: flex; justify-content: center; z-index: 9999;');
 define('AI_ALIGNMENT_CSS_STICKY_BOTTOM',  'position: fixed; bottom: 0; text-align: center; left: 50%; transform: translate(-50%); width: 100%; z-index: 9999;||position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 9999;||position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; display: flex; justify-content: center; z-index: 9999;');
+define('AI_ALIGNMENT_CSS_STICKY',         'position: fixed; z-index: '.AI_STICKY_Z_INDEX.';');
+
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_TOP',           ' top: 0px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_TOP_OFFSET',    ' top: 100px;');
+define('AI_ALIGNMENT_CSS_CENTER_VERTICAL',            ' top: 50%; transform: translate(0, -50%);');
+define('AI_ALIGNMENT_CSS_CENTER_VERTICAL_H',          ' top: 50%;');
+define('AI_ALIGNMENT_CSS_SCROLL_WITH_THE_CONTENT',    ' position: relative; margin-bottom: auto; width: fit-content; top: 100px; display: none;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_BOTTOM',        ' bottom: 0px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_BOTTOM_OFFSET', ' bottom: 100px;');
+
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_LEFT',          ' left: 0px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_LEFT',  ' left: auto; margin-right: 10px; width: fit-content; display: none;');
+define('AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL',    ' text-align: center; left: 50%; transform: translate(-50%);');
+define('AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL_V',  ' text-align: center; left: 50%; transform: translate(-50%, -50%);');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_RIGHT', ' right: auto; margin-left: 10px; width: fit-content; display: none;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_RIGHT',         ' right: 0px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_RIGHT_SCROLL',  ' margin-left: auto;');
 
 define('AI_ALIGNMENT_CSS_AMP_LEFT',       'display: flex; justify-content: flex-start;');
 define('AI_ALIGNMENT_CSS_AMP_RIGHT',      'display: flex; justify-content: flex-end;');
@@ -517,6 +561,7 @@ define ('DEFAULT_PLUGIN_PRIORITY',              99999);
 define ('DEFAULT_DYNAMIC_BLOCKS',               AI_DYNAMIC_BLOCKS_SERVER_SIDE);
 define ('DEFAULT_PARAGRAPH_COUNTING_FUNCTIONS', AI_STANDARD_PARAGRAPH_COUNTING_FUNCTIONS);
 define ('DEFAULT_NO_PARAGRAPH_COUNTING_INSIDE', 'blockquote, figure, li');
+define ('DEFAULT_AD_TITLE',                     'Advertisements');
 define ('DEFAULT_PARAGRAPH_TAGS',               'p');
 define ('DEFAULT_ADMIN_TOOLBAR_DEBUGGING',      AI_ENABLED);
 define ('DEFAULT_REMOTE_DEBUGGING',             AI_DISABLED);
@@ -543,6 +588,8 @@ define ('DEFAULT_CLOSE_BUTTON',                 AI_CLOSE_NONE);
 define ('DEFAULT_SERVER_SIDE_INSERTION',        AI_AUTOMATIC_INSERTION_FOOTER);
 define ('DEFAULT_HTML_ELEMENT_INSERTION',       AI_HTML_INSERTION_CLIENT_SIDE_DOM_READY);
 define ('DEFAULT_CLIENT_SIDE_ACTION',           AI_CLIENT_SIDE_ACTION_SHOW);
+define ('DEFAULT_HORIZONTAL_POSITION',          AI_STICK_TO_THE_LEFT);
+define ('DEFAULT_VERTICAL_POSITION',            AI_STICK_TO_THE_TOP);
 
 define ('AI_ADBLOCKING_DETECTION',              true);
 define ('AI_NORMAL_HEADER_STYLES',              true);
@@ -550,6 +597,8 @@ define ('AI_AMP_HEADER_STYLES',                 true);
 define ('AI_CODE_GENERATOR',                    true);
 define ('AI_BUFFERING',                         true);
 define ('AI_ADSENSE_API',                       true);
+define ('AI_ADSENSE_OVERLAY',                   true);
+//define ('AI_STICKY_SETTINGS',                   true);
 define ('AI_ADB_1_NAME',                        'dqwpediwqswqma');
 define ('AI_ADB_2_DEFAULT_NAME',                'lfoswyekaaslsd');
 define ('AI_ADB_CONTENT_CSS_BEGIN',             'ai-adb-content-begin');
@@ -705,6 +754,8 @@ define ('AI_DISABLE_CACHING',            27);
 define ('AI_COUNT',                      28);
 define ('AI_CLIENT_SIDE_INSERTION',      29);
 define ('AI_USER_AGENT',                 30);
+define ('AI_STICK_TO_THE_CONTENT',       31);
+define ('AI_DEBUG_MENU_ITEMS',           32);
 
 define ('AI_CONTEXT_NONE',                0);
 define ('AI_CONTEXT_CONTENT',             1);

@@ -1,12 +1,12 @@
-=== Ad Inserter - WordPress Ads Management ===
+=== Ad Inserter - WordPress Ads Management with AdSense Header Integration ===
 
 Contributors: spacetime
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4
-Tags: ads, adsense, ad management, advertising manager, advanced contextual ads, ad rotation, ad injection, adverts, sticky widgets, sticky sidebar, hook, amazon, banners, automatic insertion, amp, geo targeting, multisite, shortcodes, PHP, Javascript, HTML, header, footer, tracking, ad blocking, custom fields, custom posts
+Tags: ads, adsense, header footer code, ad management, sticky fixed widgets, advanced geo targeting ads, amp adverts ad rotation, advertising manager, amazon banners ad injection, ad blocking detection, PHP Javascript HTML insertion, custom fields posts
 Requires at least: 4.0
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 2.3.2
+Stable tag: 2.3.6
 License: GPLv3
 
 Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
@@ -28,9 +28,13 @@ Average Rating: 5 out of 5 stars
 
 Check Ad Inserter <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">reviews</a>
 
-**AdSense integration**
+**Endorsed by Google**
 
-Get <a href="https://adinserter.pro/adsense-ads#integration">AdSense ad codes</a> from the plugin settings page - no need to copy ad codes from the AdSense admin pages and paste them to code blocks. List ad units, preview AdSense ads and get ad codes where you need them.
+Google lists Ad Inserter plugin as possible solution to place AdSense ad code into your WordPress site.
+
+> If you're new to AdSense, one of your first tasks is to connect your site to AdSense. This requires you to copy the code on your AdSense homepage and paste it into the HTML of your page, between the `<head>` and `</head>` tags.
+
+Check [How to insert ad code in your WordPress site](https://support.google.com/adsense/answer/7527509). Advanced users can enable [AdSense integration](https://adinserter.pro/adsense-ads#integration): get AdSense ad codes from the plugin settings page - no need to copy ad codes from the AdSense admin pages and paste them to code blocks. List ad units, preview AdSense ads and get ad codes where you need them.
 
 **Endorsed by Amazon**
 
@@ -44,8 +48,8 @@ Check <a href="https://affiliate-program.amazon.com/help/topic/t405" target="_bl
 **Features**
 
 *   16 code (ad) blocks
-*   AdSense integration
-*   Syntax highlighting editor
+*   [AdSense](https://adinserter.pro/adsense-ads) integration
+*   Syntax highlighting [editor](https://adinserter.pro/code-editing)
 *   Code preview with visual CSS editor
 *   Automatically inserts ads on posts and pages
 *   Insert before or after post
@@ -83,7 +87,7 @@ Check <a href="https://affiliate-program.amazon.com/help/topic/t405" target="_bl
 *   Ad rotation (server-side and client-side - works with caching)
 *   Ad blocking detection - popup message, page redirection
 *   Desktop/mobile device detection (server-side and client-side - works with caching)
-*   Black/White-list categories, tags, taxonomies, post IDs, urls, url query parameters, cookies, referers
+*   [Black/White-list](https://adinserter.pro/lists) categories, tags, taxonomies, post IDs, urls, url query parameters, cookies, referers
 *   Easy copying and pasting code blocks or settings using internal clipboard
 *   Simple troubleshooting with many debugging functions
 *   Function to visualize inserted code blocks
@@ -151,8 +155,9 @@ Maintaining several plugins (often from different vendors) is not easy. And each
 
 Few very important things you need to know in order to <a href="http://adinserter.pro/documentation#quick-start">insert code and display some ad</a>:
 
-*   Code block is any code (for example Google AdSense ad) that has to be inserted (and displayed) at some position. Each code block can be configured to insert code at almost any position supported by Wordpress
+*   [Code block](https://adinserter.pro/code-editing) is any code (for example Google AdSense ad) that has to be inserted (and displayed) at some position. Each code block can be configured to insert code at almost any position supported by Wordpress
 *   To rename block click on the name
+*   If you are using AdSense check available tools and code generator for [AdSense code](https://adinserter.pro/adsense-ads)
 *   Paste ad code into the code window or use <a href="https://adinserter.pro/code-editing" target="_blank">code generator</a> to generate code for banners, AdSense or any other HTML advert
 *   **Enable and use at least one insertion option** (<a href="https://adinserter.pro/documentation#automatic-insertion" target="_blank">Automatic insertion</a>, Widget, <a href="https://adinserter.pro/documentation#manual" target="_blank">Shortcode</a>, PHP function call)
 *   **Enable insertion on at least one <a href="https://adinserter.pro/page-types">Wordpress page type</a>** (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages)
@@ -218,212 +223,44 @@ If you are using free Ad Inserter then first uninstall it. The Pro version will 
 After you receive the email with download link for the Ad Inserter Pro plugin, download it, go to Wordpress Plugins, Add New, Upload Plugin, Choose file, click on Install Now,
 activate it and then click "Enter License Key" and enter license key you got in the email.
 
-= Uploading plugin file =
-
-1. Go to Wordpress Plugins menu, click Add New button
-2. Click Upload Plugin
-3. Select `ad-inserter-pro.zip` from your computer
-4. Click 'Install Now'
-5. Activate Ad Inserter Pro in the Plugin dashboard
-5. Click "Enter License Key" or go to plugin Settings / tab * and enter license key you got in the email
-
-= Using FTP =
-
-1. Download `ad-inserter-pro.zip`
-2. Extract `ad-inserter-pro` directory to your computer
-3. Upload `ad-inserter-pro` directory to the `/wp-content/plugins/` directory
-4. Activate Ad Inserter Pro in the Plugin dashboard
-
-
 **Uninstall**
 
 If you deactivate and delete Ad Inserter, the settings will stay in the database. To completely remove the plugin and settings do the following:
 
 1. Go to Ad Inserter general settings (tab *) and click on Reset All Settings
-1. Go to Ad Inserter general settings (tab *) and click on Clear All Statistics Data
+1. Go to Ad Inserter general settings (tab *) and click on Clear All Statistics Data (Pro only)
 2. Deactivate Ad Inserter
 3. Delete Ad Inserter plugin
 
+*Please Note*
 
-**Quick Start**
+Ad Inserter inserts only the code you configure (blocks 1 - 16, Header, Footer). The code you see is the code that will be inserted (+ some internal scripts for plugin features).
+When you deactivate Ad Inserter it can't insert anything as WordPress doesn't call it. Please check page source code before you make any conclusion.
+Of course, if you configure code block with some javacript ad code, then this code may generate ads. But please, don't blame the plugin for this.
+You can also use Ad Inserter to insert code for AdSense Auto ads on each page (usually in the header). However, **the exact placement of ads will be done by the ad code, not Ad Inserter!**
+[https://adinserter.pro/adsense-ads#auto-ads](https://adinserter.pro/adsense-ads#auto-ads)
 
-Few very important things you need to know in order to <a href="http://adinserter.pro/documentation#quick-start">insert code and display some ad</a>:
+The easiest way to check Ad Inserter code blocks is to use **Label blocks** debugging function:
+[https://adinserter.pro/documentation#debugging](https://adinserter.pro/documentation#debugging)
 
-*   Code block is any code (for example AdSense ad) that has to be inserted (and displayed) at some position. Each code block can be configured to insert code at almost any position supported by Wordpress
-*   **Enable and use at least one insertion option** (Automatic insertion, Widget, Shortcode, PHP function call)
-*   **Enable insertion on at least one Wordpress page type** (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages)
-*   For Posts and static pages **select default value On all Posts / On all Static pages** unless you really know what are you doing
-*   If you don't see inserted code block turn on **debugging functions**: Label inserted blocks, Show available positions for automatic insertion (Ad Inserter menu item in the Wordpress toolbar on the top of every post/page)
+When you deactivate Ad Inserter it can't insert anything - WordPress doesn't call it. If you still see some ads that were inserted by Ad Inserter, make sure you have cleared all the caches.
+If you still see those ads after you have disabled Ad Inserter and cleared all the caches, then the ads were not inserted by Ad Inserter.
 
-Few examples for automatic insertion are described on the <a href="http://adinserter.pro/settings">Common settings</a> page. Please make sure you have also read **WARNINGS** on the bottom of this page and instructions for **Debugging**.
 
-**Settings**
+**Online Documentation**
 
-Each code block has a name and settings which are divided into sections. Some settings depend also on automatic insertion used. To rename code block click on the block name.
-Check **Simple editor** to switch to simple editor for mobile devices. If you have PHP code (surrounded with PHP tags `<?php … ?>`) in code block, you need to check **Process PHP** to enable PHP processing.
-When you are finished with settings you need to save them by clicking on the button **Save Settings**.
+*   [Code Editing](https://adinserter.pro/code-editing)
+*   [Common Settings](https://adinserter.pro/settings)
+*   [Ad Inserter Documentation](https://adinserter.pro/documentation)
+*   [Automatic Insertion](https://adinserter.pro/documentation#automatic-insertion)
+*   [Block Alignment and Style](https://adinserter.pro/alignments-and-styles)
+*   [AdSense Ads](https://adinserter.pro/adsense-ads)
+*   [WordPress Page Types](https://adinserter.pro/page-types)
+*   [Black and White Lists](https://adinserter.pro/lists)
+*   [Post and Page Exceptions](https://adinserter.pro/exceptions)
+*   [Debugging](https://adinserter.pro/documentation#debugging)
+*   [Ads not displayed](https://adinserter.pro/documentation#ads-not-displayed)
 
-Each code block has 4 insertion options:
-
-*   Automatic Insertion
-*   Widget
-*   Shortcode
-*   PHP function call
-
-Normally for each code block you use only one insertion option.
-Of course, you can use all 4 options simultaneously taking into account that all insertion options use the same block settings (with some exceptions mentioned below).
-
-To insert code block and display ad at some position **you need to enable and use at least one insertion option**.
-
-Automatic Insertion Options:
-
-*   Insert Before Post (before post or posts on blog pages, previously named Before Title)
-*   Insert Before Content (before post or static page text)
-*   Insert Before Paragraph (on posts, static pages and blog pages)
-*   Insert After Paragraph (on posts, static pages and blog pages)
-*   Insert After Content (after post or static page text)
-*   Insert After Post (after post or posts on blog pages)
-*   Insert Before Excerpt (on blog pages)
-*   Insert After Excerpt (on blog pages)
-*   Insert Between Posts (on blog pages)
-*   Insert Before Comments (on posts)
-*   Insert Between Comments (on posts)
-*   Insert After Comments (on posts)
-*   Insert into HTML Footer (before `</body>` tag)
-*   Insert at custom hook positions (define them on the tab * / tab Hooks)
-
-For single posts or static pages insertion position Before Post usually means position above the post/page title, for blog pages Before Post position means position above all the posts on the blog page.
-
-For single posts or static pages insertion position After Post means position below the post/page after all the content, for blog pages After Post position means position below all the posts on the blog page.
-
-Please use **Show positions** function to see available positions for automatic insertion (Ad Inserter menu item in the Wordpress toolbar on the top of every post/page).
-
-Block Alignment and Style:
-
-*   No Wrapping (leaves ad code as it is, otherwise it is wrapped by a div)
-*   Custom CSS (You can enter custom CSS code for wrapping div)
-*   Default (simple div with thin margin)
-*   Align Left
-*   Align Right
-*   Center
-*   Float Left (ad on left with wrapped text on right)
-*   Float Right (ad on right with wrapped text on left)
-
-**[ Preview ]**
-
-Ad Inserter has a very useful function that can help you to check if the ad code is working and to see how it will look like when it will be inserted. Click on the **Preview** button to open Preview window.
-WARNING: Some adblockers may block code on the Ad Inserter preview window. If you see warning PAGE BLOCKED or you don't see your code and the widow elements are distorted, make sure you have disabled ad blockers.
-On the top of the window there is visual CSS editor and four buttons and below there is CSS code of the wrapping div (which can be edited manually) and 'Alignment and Style' selection.
-
-Below the settings there is a preview of the code between two dummy paragraphs. Here you can test various block alignments, visually edit margin and padding values of the wrapping div or write CSS code directly
-and watch live preview. Highlight button highlights background, wrapping div margin and code area, while Reset button restores all the values to those of the current block.
-You can resize the window (and refresh the page to reload ads) to check display with different screen widths. Once you are satisfied with alignment click on the Use button and the settings will be copied to the active block.
-No Wrapping style inserts the code as it is so margin and padding can't be set. However, you can use own HTML code for the block.
-
-**Please note** that Preview window uses also Header and Footer code.
-
-Check <a href="https://adinserter.pro/alignments-and-styles">Ad Inserter Alignments and Styles</a> for explanation on available alignments and styles of code blocks.
-
-**CACHING**
-
-Keep in mind that just installing a caching plugin does not necessarily make your site faster. Doing a bit of optimization will get you a lot of speed increase without caching plugins.
-To further combat slowness you may want to re-evaluate the performance of your hosting package. Maybe you've outgrown it. In that case, upgrade to a better hosting solution.
-
-Caching on the frontend side (what visitors see) in some cases does speed up page loading but may also cause some unwanted behavior.
-When you are using caching and visitor visits some page, Wordpress creates that page, Ad Inseter is called to do the job, the created page is sent to the visitor and it is also saved for quicker serving later.
-The next time the page is visited **the visitor gets cached (saved) page**. Because of this some Ad Inserter functions can not work because Ad Inserter is not called when the page is cached:
-
-*   Server-side block rotation with [ADINSERTER ROTATE] (or old separator |rotate|)
-*   User check
-*   Server-side device detection
-*   Referer check
-*   Server-side GEO targeting (country detection, Pro only)
-*   Server-side IP address detection (Pro only)
-*   Debugging functions
-
-When you need the functions listed above you have to switch off caching (if possible only on selected pages where needed).
-
-However, Ad Inserter also supports some of the functions above even when caching is enabled:
-
-*   Client-side ad rotation with [ADINSERTER ROTATE] (or old separator |rotate|)
-*   Client-side device detection
-*   Client-side GEO targeting (country detection, Pro only)
-*   Client-side IP address detection (Pro only)
-
-All you have to do is to set enable and use client-side functions (executed in the visitor's browser). But you have to be careful as some adverts might not work properly or can't be used this way and you might violate their Terms of Service.
-
-PLEASE NOTE: If you are using W3 Total Cache for caching then you can still use server-side ad rotation, IP address and country detection even when the pages are cached as Ad Inserter supports special features of this caching plugin.
-
-**W3 Total Cache**
-
-If you are using W3 Total Cache for caching then you can still use server-side ad rotation, IP address and country detection even when the pages are cached as Ad Inserter supports special features of this caching plugin.
-To enable this mode go to Ad Inserter plugin settings tab * / tab General and set Dynamic blocks to Server-side with W3 Total Cache and configure  W3 Total Cache for dynamic content.
-
-When Dynamic blocks is set to Server-side with W3 Total Cache and you are using ad rotation, IP address or country detection, Ad Inserter inserts short PHP code with special tags in place of code block. When W3 Total Cache plugin loads cached page it executes this code before it serves the pages. So the page is stills served from the cache but the Ad Inserter blocks are dynamically created just before the page is served. Therefore, pages are served from the cache and the Ad Inserter code is still generated on the server-side.
-
-Configure W3 Total Cache
-
-How to fully set up W3 Total Cache is beyond the scope of this page. Check the W3 Total Cache manuals or contact its developer for help with that if you need it.
-
-*   In General Settings set the Page Caching to Disk: Basic.
-*   In Page Cache under Advanced enable Late Initialization.
-*   If you use the Minify option add mfunc to the ignored comment stem field.
-
-You need to flush the cache after making these changes.
-
-Please note also the following:
-
-*   Mixing static cached and dynamic content is a tricky thing to do and often causes all kinds of issues. Ad Inserter follows the guidelines from W3 Total Cache on this. If it doesn't work it's very likely you didn't configure W3 Total Cache correctly. Alternatively, you can decide to use client-side option for dynamic blocks - your adverts will show up just fine and rotation and GEO targeting will still work.
-*   In order to use dynamic content with W3 Total Cache, W3TC_DYNAMIC_SECURITY PHP constant needs to be defined. Usually it is located in the wp-confing.php file. This is a security string used when generating PHP code for dynamic content. If this constant is not defined, Ad Inserter will define and use it.
-*   Do not use debugging functions when caching is activated.
-*   When you make changes in settings of the W3 Total Cache purge all caches before you check page.
-*   After you activate W3 Total Cache plugin go to General Settings and Save all settings.
-
-**Ad rotation**
-
-To use client-side rotation you have to enable it first. Go to Ad Inserter plugin settings tab * / tab General and set Dynamic blocks to Client-side.
-
-Configure blocks normally and separate different versions with [ADINSERTER ROTATE] shortcode. When the page will be created and Ad Inserter called, it will generate hidden code for all block versions. When the page will be loaded in the browser, one randomly chosen version of the code will be displayed. For example, to rotate 3 images:
-
-`<img style='height: 400px;' src="http://malsup.github.io/images/p1.jpg">
-[ADINSERTER ROTATE]
-<img style='height: 400px;' src="http://malsup.github.io/images/p2.jpg">
-[ADINSERTER ROTATE]
-<img style='height: 400px;' src="http://malsup.github.io/images/p3.jpg">`
-
-Please note the following:
-
-*   Client-side rotation works fine with banners, text ads and many ad networks including Amazon Associates. However, it should not be used with some ad networks including AdSense (hiding ad units is not allowed) because of the method used for client-side rotation: all options are present on the page but are hidden until the page is loaded and one option is made visible. Please check Terms of Service for your ad network.
-*   Ad Inserter reserves space for code block based on the height of the first block version. If all the versions have the same height then you won't notice anything. However, if block versions have different heights then it makes sense to define fixed block height with Custom CSS to avoid content jumping when block option with different or initially unknown height is displayed. If the first option is some Javascript based ad (e.g. Amazon widget) you should wrap it with a div and define height, for example `<div style="height: 300px;"> ... </div>`
-*   Since the code (block option) is displayed only when the page is loaded, you may notice a very short delay (few 100 ms) before the code (or ad) is displayed.
-*   Client-side rotation uses div elements to wrap the code(s). This is not important unless you use No wrapping style.
-
-WARNING: If you are using caching, the inserted code may not appear immediately on the page. Make sure you disable caching when you are testing or debugging.
-Some caching plugins like WP Super Cache and W3 Total Cache have an option to disable caching for known (logged in) users.
-
-**DEBUGGING**
-
-Ad Inserter has many debugging functions that can help you to diagnose the problem when you don't see your ads at expected positions.
-
-*   Code preview: click on the Preview button for each code block to see how the ad or code will look like. On the Preview window click on the Highlight button to highlight code. If you don't see the ad displayed here it is very likely that the code is not working properly.
-*   Debugger Widget: Place Debugger widget in some widget area to see basic Wordpress page and Ad Inserter data (User status, Page Type, Post ID, Url, Referer, etc). With this widget you can also check saved block settings and client-side viewport name.
-*   Debugger Shortcode: Place shortcode [adinserter block="0"] or [adinserter name="Debugger"] into post or static page to see basic Wordpress page and Ad Inserter data
-
-Each post/page has a Wordpress toolbar on the top. Ad Inserter menu (visible only to administrators and can be hidden) item has the following debugging functions:
-
-*   Label Blocks: Each inserted block is labeled with a thin red border and red bar with block number, name and counters. Blocks that use client-side detection and are hidden are shown with blue bar and viewport name - resize the browser to check display for other devices (or screen widths). If you see only red bar then this means that the block with your **code is inserted** but the code doesn't display anything.
-*   Show Positions: Enable this function to show available positions for automatic insertion. Displayed positions are based on the theme layout and configured paragraph counting. You can choose between all paragraph tag lists (or counting parameters) used for blocks configured for Before or After paragraph. If you click on the Show Positions menu item you'll see default paragraph positions for p tags.
-*   Show HTML tags: Enable this function to see HTML tags used in the post. Use this function to determine post structure in order to configure paragraph counting.
-*   Disable insertion: Use this function to temporarily disable insertion of code blocks - everything else on the page will look like the code blocks were processed and inserted.
-*   Log Processing: Use this function to log insertion process in order to determine why some code block was not inserted. The log is added as HTML comment at the end of the page - check page source
-
-**WARNING:** Make sure **caching is disabled while debugging**! All debugging functions you enable will be visible only to you!
-
-When browsing other pages on the website debugging settings are temporarily saved (in a cookie). To disable all debugging functions click on the 'Ad Inserter' top menu item in the toolbar (or use `ai-debug=0`)
-
-If you enable **Remote debugging** you can also allow other people using url parameters to see post/page with debugging data. Remote debugging option is located on the Ad Inserter Settings tab - Debugging tab below.
-**Remote debugging** enables other, non-logged in users by using url parameters to see Debugger widget and code insertion debugging (blocks, positions, tags, processing).
-Enable this option (and disable caching) to allow other people to see Debugger widget, labeled blocks and positions in order to help you to diagnose problems. For logged in administrators debugging via url is always enabled.
 
 **Please support plugin development**
 
@@ -433,7 +270,7 @@ Positive reviews are a great way to show your appreciation for my work. Besides 
 
 Support the advancement of this plugin:
 
-*   Write a nice <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">review</a>
+*   Write a short <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">review</a>
 *   <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4">Donate</a>
 *   Buy license for <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro</a>
 
@@ -443,7 +280,7 @@ Support the advancement of this plugin:
 = I have activated Ad Inserter. How can I use it? =
 
 1. After activation, click "Settings / Ad Inserter" to access the settings page
-2. Put ad (or any other HTML/Javascript/PHP) code into the ad box
+2. Put ad (or any other HTML/Javascript/PHP) code into the code window
 3. Set automatic insertion option (for example: Before Post)
 4. Enable at least one page type (for example: Posts, some insertion options don't work on all page types)
 5. Save settings
@@ -452,10 +289,41 @@ Support the advancement of this plugin:
 8. Ads are not showing? Check <a href="https://adinserter.pro/documentation#ads-not-displayed" target="_blank">troubleshooting guide</a> to find out what to check to fix the problem.
 
 
+= Does Ad Inserter insert any internal ads?  =
+
+No revenue sharing and no such thing as "internal ads" or "our ads" on your website. Period. What you configure is what will be inserted (+ some internal scripts for plugin features).
+Ad Inserter is free, open source plugin and inserts only the code you configure (blocks 1 - 16, Header, Footer). The code you see is the code that will be inserted. Please check page source code before you make any conclusion.
+Of course, if you configure code block with some javacript ad code, then this code may generate ads. But please, don't blame the plugin for this.
+You can also use Ad Inserter to insert code for AdSense Auto ads on each page (usually in the header). However, **the exact placement of ads will be done by the ad code, not Ad Inserter!**
+[https://adinserter.pro/adsense-ads#auto-ads](https://adinserter.pro/adsense-ads#auto-ads)
+
+The easiest way to check Ad Inserter code blocks is to use **Label blocks** debugging function:
+[https://adinserter.pro/documentation#debugging](https://adinserter.pro/documentation#debugging)
+
+
+= I have installed code for AdSense ads and I see ads placed at random positions. =
+
+You are probably using code for [AdSense Auto ads](https://adinserter.pro/adsense-ads#auto-ads).
+
+AdSense Auto ads (known also as Page Level Ads) is a code that you insert on every page once and it will automatically display AdSense ads on positions chosen by the code.
+Auto ads use Google's machine learning to pick the best placements on your pages to show ads. You only need to add one piece of code to all your pages, and let Google take care of the rest.
+
+Auto ads may not be suitable for some WordPress themes or layouts. In such cases it is easier to place ads at wanted locations by using [normal AdSense code](https://adinserter.pro/adsense-ads#ad-unit) and specifying exact locations where the code should be inserted.
+
 = I have installed code for AdSense ads but the ad blocks are blank. =
 
-If you get blank ads then this might be because there is some error in the code (wrong IDs), your AdSense account is not fully approved yet, your website was not accepted or your AdSense account is banned.
-In such case you can try other ad networks for contextual ads. Check <a href="https://adinserter.pro/documentation#ads-not-displayed">Ads Not Displayed</a> for more information.
+Blank AdSense ad block means that the code is inserted properly only the ad code doesn't display anything. Typical reasons for this are the following:
+
+*   After the ad code is inserted Google needs some time (hours) to check the pages before it starts to serve ads.
+*   AdSense account is not fully approved yet - if your account is new you need to wait until Google checks ad codes on your website and and confirms your account. Usually this takes few days.
+*   Your website or page is not approved yet - you need to wait until Google web crawlers check your pages.
+*   Your website or page was not approved for AdSense ads
+*   Your AdSense account is banned
+*   No ads available for your website
+*   Errors in ad code - check or regenerate ad code
+*   You are using ad blocker
+
+See [AdSense ads not displayed](https://adinserter.pro/adsense-ads#ads-not-displayed) for details. In such case you can try other ad networks for contextual ads. Check <a href="https://adinserter.pro/documentation#ads-not-displayed">Ads Not Displayed</a> for more information.
 
 = Settings for widget =
 
@@ -532,25 +400,26 @@ This happens because Ad Inserter processes posts last and therefore "sees" also 
 Try to set Ad Inserter plugin priority to 10 (early processing, Ad Inserter settings - tab * / tab General).
 
 
-= How can I replace deprecated tags {adinserter n} for manual insertion with new ones [adinserter block="n"] in all posts? =
+= How can I add some title or label (e.g. Advertisements) above the ad? =
 
-Use <a href="https://wordpress.org/plugins/search-regex/" target="_blank">Search Regex</a> plugin to replace tags in all posts with few clicks. If you are not familiar with regular expressions simply use search and replace text for each code block. Use **Replace** to test replacements and when it works as expected use **Replace & Save**.
+If this is a sidebar widget then you can simply name the widget.
 
+For each code block you can also show a label above each ad. Default text (or HTML code) for ad labels can be set on the general plugin settings tab (tab * / tab General / **Ad label**.
+To enable ad label above the ad go to code block for this ad, click on the Misc button and then on the Display tab check **Ad label**.
 
-= How can I add some text or title (e.g. Advertisement) above the ad? =
+If you configured only text for ad label then the following code will be added above ad code: `<div class="code-block-label">AD_LABEL_TEXT</div>` (`code-block` is the block class name used, AD_LABEL_TEXT is the text for Ad Label).
+You can then style the label using CSS for class `.code-block-label` (the best place for this code is Header section). If HTML code is configured for ad label then this code will be used (instead of the div code above).
 
-If this is a sidebar widget then you can simply name the widget. In other cases you can add title HTML code above ad code. For example:
+In case you need a different label for some ad you can simply add label HTML code above the ad code. For example:
 
-`<h3>Advertisement</h3>
+`<h3>Advertisements</h3>
 
 AD_CODE`
-
-Change the title tag according to the theme style.
 
 
 = I like the plugin. How can I support it? =
 
-*   Write a nice <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">review</a>
+*   Write a short <a href="https://wordpress.org/support/plugin/ad-inserter/reviews/">review</a>
 *   <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LHGZEMRTR7WB4">Donate</a>
 *   Buy the license for <a href="http://adinserter.pro/" target="_blank">Ad Inserter Pro</a>
 
@@ -589,34 +458,6 @@ Select device types (desktop, tablet or phone) for which you need to show ads an
 = Which device type detection should I use? =
 
 In most cases you should use ONLY client-side detection. All code blocks are generated, however, they are displayed according to settings and browser's screen width using CSS Media Queries. This works perfectly in responsive designs.
-
-
-= How can I disable ads for direct visitors? =
-
-Blacklist `#` as referer for visitors that enter web address directly into browser (no referer).
-Blacklist `yourdomain.com` as referer for visitors that browse your website yourdomain.com.
-To blacklist both enter `yourdomain.com, #`
-
-
-= How can I disable ads on error 404 page? =
-
-This is disabled by default. Uncheck Error 404 Page checkbox (button Misc).
-
-
-= Is there a way to display country flag of the visitor? =
-
-Possible if you are using Ad Inserter Pro. In the header put the following code:
-
-`<link rel='stylesheet' href='/wp-content/plugins/ad-inserter/css/flags.css' type='text/css' media='all' />`
-
-In the code block use the following code for flag
-
-`<span class="flag-icon flag-icon-[adinserter data='country-iso2']" style="width: 400px; height: 300px;"></span>`
-
-Adjust width and height according to your needs. Please not that `[adinserter data='country_iso2']` tag works only server-side - it won't work on cached pages.
-Of course, you can also use static code for flags. For example, for United States:
-
-`<span class="flag-icon flag-icon-us" style="width: 400px; height: 300px;"></span>`
 
 
 = How can I enable or disable ads on group of similar pages? =
@@ -785,6 +626,29 @@ AD CODE RIGHT
 
 == Changelog ==
 
+= 2.3.7 =
+- Added support for ad labels
+- Blocked search indexing while debugging
+- Close button setting moved to tab Display (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.6 =
+- Added widget for debugging tools
+- Fix for AdSense ad overlays not displayed with some themes
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.5 =
+- Added display of header and footer code in Label blocks debugging function
+- Added AdSense ad overlays in Label blocks debugging function (experimental)
+- Fixed bug for removed square brackets in HTML element selectors
+- Fixed preview of AdSense ad units
+- Few minor bug fixes
+
+= 2.3.4 =
+- Added support for author:author-username items in taxonomy list
+- Fixed errors when downgrading from Pro
+- Few minor bug fixes
+
 = 2.3.3 =
 - Added list editors
 - Added Label blocks debugging function for AdSense Auto ads
@@ -844,153 +708,34 @@ AD CODE RIGHT
 - Fix for errors when using old |rotate| separator
 - Few minor bug fixes, cosmetic changes and code improvements
 
-= 2.2.9 =
-- Output buffering is now disabled by default (for position Above header you need to enable it)
-- Fix for min. paragraph number not processed
+= Earlier versions =
 
-= 2.2.8 =
-- Added position for automatic insertion Above header (after `<body>` tag)
-- Added rotation code editor
-- Added support to name rotation options
-- Added code generator for banners
-- Added code generator for AdSense
-- Added support to rearrange code blocks
-- Added support to copy any block settings
-- Added support for clipboard to copy/paste block settings
-- Added option to select ad blocking detection mode (Pro only)
-- Delayed insertion on posts now available for all insertion positions
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.2.7 =
-- Fix for duplicate amp-custom tag on AMP pages
-
-= 2.2.6 =
-- Fix for posts filter counter not counting
-- Added list with short overview of all code blocks
-- Added support for word count on blog pages
-- Added support for client code preview (no need to save it for preview)
-- Improved compatibility on AMP pages
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.2.5 =
-- Fix for issue with Ajax requests
-
-= 2.2.4 =
-- Added support to insert raw HTTP response header lines
-- Added support to check for individual exceptions for shortcodes
-- Added support to trigger ad blocking detection action only on individual pages
-- Added support for automatic insertion position Footer
-- Added support for custom hooks
-- Url parameter list now checks url parameters ($_GET) and cookies ($_COOKIE)
-- Fix for |count| separator not processed
-
-= 2.2.3 =
-- Added support to insert custom fields via shortcode [adinserter custom-field='CUSTOM_FIELD_NAME']
-- Added support for user:USERNAME and user-role:USER_ROLE taxonomy list items
-- Added support for post-type:POST_TYPE taxonomy list items
-- Added support for JavaScript based sticky widgets
-- Added support for ad blocking statistics (Pro only)
-- Added support for WP AMP and WP AMP Ninja plugins
-- Post/Page Word Count moved to Misc section (now works also on widgets)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.2.2 =
-- Fix for mobile admin layout
-- Few other minor bug fixes
-
-= 2.2.1 =
-- Fix for header/footer scripts on AMP pages
-
-= 2.2.0 =
-- Added support for ad blocking detection (experimental)
-- Added support for [ADINSERTER AMP] shortcode to separate code for AMP pages
-- Added support for [ADINSERTER ROTATE] and [ADINSERTER COUNT] shortcodes
-- Added syntax highlighting for shortcodes and separators
-- Added option to define minimum number of words in paragraphs above
-- Added support for %N filter item to filter every N-th insertion
-- Added filter support when inserting for all paragraphs
-- Added style `clear: both;` to Default, Left, Right and Center alignments
-- Bug fix for errors when loading tracking charts (Pro only)
-- Many minor bug fixes, cosmetic changes and code improvements
-
-= 2.1.14 =
-- Fix for error when using older PHP versions (prior to 5.5)
-
-= 2.1.13 =
-- Fix for Fatal error: Can't use method return value in write context
-
-= 2.1.12 =
-- Added option to define tags inside which paragraphs are not counted
-- Added max insertions check when inserting for all paragraphs
-- Added support for inverted filter
-- Increased nonce lifespan to 48 hours when using tracking (Pro only)
-- Fixed wrong urls in debug menu when behind proxy
-- Few other bug fixes, cosmetic changes and code improvements
-
-= 2.1.11 =
-- Improved support for sticky widgets (works with most themes)
-- Added support for ad counting (|count| separator)
-- Added support to black/white-list arbitrary taxonomies (taxonomy, term or taxonomy:term)
-- Added support for automatic insertion before, between and after comments
-- Added processing of shortcodes in the header and footer code
-- Debugging function Show positions shows also page type
-- Fixed page type detection when Post page was set to static page and it was not homepage
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.1.10 =
-- Fix for shifted sidebars in some themes
-
-= 2.1.9 =
-- Added support for sticky widgets
-- Added support to insert code after images (Automatic Insertion: After Paragraph, Paragraphs with tags: img)
-- Impression and click tracking (beta, Pro only)
-- Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.1.8 =
-- Fixed error when using server-side device detection
-
-= 2.1.7 =
-- Fixed error when using PHP 5.4 or earlier
-
-= 2.1.6 =
-- Added support for insertion before/after multiple paragraphs
-- Added initial support for impression and click tracking (Pro only)
-- Few bug fixes and cosmetic changes
-
-= 2.1.5 =
-- Added support to avoid insertion inside `<figure>` and `<li>` elements (image captions, lists)
-- Added support for exceptions for custom post types
-- Few minor bug fixes and code improvements
-
-= 2.1.4 =
-- Paragraph counting restored to standard functions
-- Added option to select paragraph counting functions with multibyte support (unicode characters)
-- Fixed bug for wrong paragraph counting in posts with blockquote sections in some cases
-- Fixed bug for wrong measuring of plugin processing time in some cases
-- Fixed bug for "Empty delimiter" warning
-
-= 2.1.3 =
-- Added support for counting paragraphs with multibyte (unicode) characters
-- Fixed bug for class name not saved
-- Few minor bug fixes and cosmetic changes
-
-= 2.1.2 =
-- Fixed bug for disabled settings page on multisite blogs
-
-= 2.1.1 =
-- Changes for compatibility with PHP 7.1
-- Automatic rename of old pro plugin slug (Pro only)
-- Added support for additional Pro features (Pro only)
-- Few bug fixes and cosmetic changes
-
-= 2.1.0 =
-- Added support to insert ads in Ajax requests (e.g. in infinite scroll)
-- Added support to not include block classes when class name is empty
-- Added sticky positions (Pro only)
-- Bug fix for minimum user role not taken into account for exceptions list
-- Bug fix for IP database update cron event (Pro only)
+For the changelog of earlier versions, please refer to the separate changelog.txt file.
 
 == Upgrade Notice ==
+
+= 2.3.7 =
+Added support for ad labels;
+Blocked search indexing while debugging;
+Close button setting moved to tab Display (Pro only);
+Few minor bug fixes, cosmetic changes and code improvements;
+
+= 2.3.6 =
+Added widget for debugging tools;
+Fix for AdSense ad overlays not displayed with some themes;
+Few minor bug fixes, cosmetic changes and code improvements;
+
+= 2.3.5 =
+Added display of header and footer code in Label blocks debugging function;
+Added AdSense ad overlays in Label blocks debugging function (experimental);
+Fixed bug for removed square brackets in HTML element selectors;
+Fixed preview of AdSense ad units;
+Few minor bug fixes
+
+= 2.3.4 =
+Added support for author:author-username items in taxonomy list;
+Fixed errors when downgrading from Pro;
+Few minor bug fixes
 
 = 2.3.3 =
 Added list editors;
@@ -1049,128 +794,3 @@ Fix for ad blocking detection when using https (Pro only)
 Fix for rotation editor code import/export;
 Fix for errors when using old |rotate| separator
 
-= 2.2.9 =
-Output buffering is now disabled by default (for position Above header you need to enable it);
-Fix for min. paragraph number not processed
-
-= 2.2.8 =
-Added position for automatic insertion Above header (after `<body>` tag);
-Added rotation code editor;
-Added support to name rotation options;
-Added code generator for banners and AdSense;
-Added support to rearrange code blocks;
-Added support for clipboard to copy/paste block settings;
-Added option to select ad blocking detection mode (Pro only);
-
-= 2.2.7 =
-Fix for duplicate amp-custom tag on AMP pages
-
-= 2.2.6 =
-Fix for posts filter counter not counting;
-Added list with short overview of all code blocks;
-Added support for word count on blog pages;
-Added support for client code preview (no need to save it for preview);
-Improved compatibility on AMP pages;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.2.5 =
-Fix for issue with Ajax requests
-
-= 2.2.4 =
-Added support to insert raw HTTP response header lines;
-Added support to check for individual exceptions for shortcodes;
-Added support to trigger ad blocking detection action only on individual pages;
-Added support for automatic insertion position Footer;
-Added support for custom hooks;
-Url parameter list now checks url parameters ($_GET) and cookies ($_COOKIE);
-Fix for |count| separator not processed;
-
-= 2.2.3 =
-Added support to insert custom fields via shortcode;
-Added support for user:USERNAME, user-role:USER_ROLE and post-type:POST_TYPE taxonomy list items;
-Added support for JavaScript based sticky widgets;
-Added support for ad blocking statistics (Pro only);
-Added support for WP AMP and WP AMP Ninja plugins;
-Post/Page Word Count moved to Misc section (now works also on widgets)
-
-= 2.2.2 =
-Fix for mobile admin layout;
-Few other minor bug fixes
-
-= 2.2.1 =
-Fix for header/footer scripts on AMP pages
-
-= 2.2.0 =
-Added support for ad blocking detection (experimental);
-Added support for [ADINSERTER AMP] shortcode to separate code for AMP pages;
-Added syntax highlighting for shortcodes and separators
-Added option to define minimum number of words in paragraphs above;
-Added support for %N filter item to filter every N-th insertion;
-Added style `clear: both;` to Default, Left, Right and Center alignments;
-Added filter support when inserting for all paragraphs;
-Bug fix for errors when loading tracking charts (Pro only);
-
-= 2.1.14 =
-Fix for error when using older PHP versions (prior to 5.5)
-
-= 2.1.13 =
-Fix for Fatal error: Can't use method return value in write context
-
-= 2.1.12 =
-Added option to define tags inside which paragraphs are not counted;
-Added max insertions check when inserting for all paragraphs;
-Added support for inverted filter;
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.1.11 =
-Improved support for sticky widgets (works with most themes);
-Added support for ad counting (|count| separator);
-Added support to black/white-list arbitrary taxonomies;
-Added support for automatic insertion before, between and after comments;
-Added processing of shortcodes in the header and footer code;
-Fixed page type detection on blog pages in some cases;
-
-= 2.1.10 =
-Fix for shifted sidebars in some themes
-
-= 2.1.9 =
-Added support for sticky widgets;
-Added support to insert code after images (Automatic Insertion: After Paragraph, Paragraphs with tags: img);
-Impression and click tracking (beta, Pro only);
-Few minor bug fixes, cosmetic changes and code improvements
-
-= 2.1.8 =
-Fixed error when using server-side device detection
-
-= 2.1.7 =
-Fixed error when using PHP 5.4 or earlier
-
-= 2.1.6 =
-Added support for insertion before/after multiple paragraphs;
-Few bug fixes and cosmetic changes
-
-= 2.1.5 =
-Added support to avoid insertion inside `<figure>` and `<li>` elements;
-Added support for exceptions for custom post types;
-Few minor bug fixes and code improvements
-
-= 2.1.4 =
-Paragraph counting restored to standard functions;
-Added option to select paragraph counting functions with multibyte support (unicode characters);
-Few bugs fixed including for "Empty delimiter" warning
-
-= 2.1.3 =
-Added support for counting paragraphs with multibyte (unicode) characters;
-Fixed bug for class name not saved;
-Few minor bug fixes and cosmetic changes
-
-= 2.1.2 =
-Fixed bug for disabled settings page on multisite blogs
-
-= 2.1.1 =
-Changes for compatibility with PHP 7.1;
-Few bug fixes and cosmetic changes
-
-= 2.1.0 =
-Support for ads in Ajax requests (e.g. in infinite scroll); Added sticky positions (Pro only);
-Bug fix for minimum user role for exceptions list; Bug fix for IP database update cron event (Pro only)

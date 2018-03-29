@@ -1,5 +1,5 @@
 #ai-data {
-  font-family: "2.3.3"; /* Used for version number of the file */
+  font-family: "2.3.7"; /* Used for version number of the file */
 }
 
 #blocked-warning {
@@ -341,7 +341,7 @@ textarea.simple-editor.small {
   margin-bottom: 4px;
 }
 
-.feature-list li {
+.feature-list li, .ai-help li {
   margin-bottom: 2px;
 }
 
@@ -530,194 +530,271 @@ div.automatic-insertion img {
   background-image: url(images/ui-icons_888888_256x240.png)
 }
 
-img.automatic-insertion.disabled {
+img.automatic-insertion.im-disabled {
   background: url('images/insertions-alignmets.png') 0 0;
 }
 
-img.automatic-insertion.before-post {
+img.automatic-insertion.im-before-post {
   background: url('images/insertions-alignmets.png') -56px 0;
 }
 
-img.automatic-insertion.after-post {
+img.automatic-insertion.im-after-post {
   background: url('images/insertions-alignmets.png') -112px 0;
 }
 
-img.automatic-insertion.before-content {
+img.automatic-insertion.im-before-content {
   background: url('images/insertions-alignmets.png') -168px 0;
 }
 
-img.automatic-insertion.after-content {
+img.automatic-insertion.im-after-content {
   background: url('images/insertions-alignmets.png') -224px 0;
 }
 
-img.automatic-insertion.before-paragraph {
+img.automatic-insertion.im-before-paragraph {
   background: url('images/insertions-alignmets.png') -280px 0;
 }
 
-img.automatic-insertion.after-paragraph {
+img.automatic-insertion.im-after-paragraph {
   background: url('images/insertions-alignmets.png') -336px 0;
 }
 
-img.automatic-insertion.before-excerpts {
+img.automatic-insertion.im-before-excerpts {
   background: url('images/insertions-alignmets.png') -392px 0;
 }
 
-img.automatic-insertion.after-excerpts {
+img.automatic-insertion.im-after-excerpts {
   background: url('images/insertions-alignmets.png') 0 -56px;
 }
 
-img.automatic-insertion.between-posts {
+img.automatic-insertion.im-between-posts {
   background: url('images/insertions-alignmets.png') -56px -56px;
 }
 
-img.automatic-insertion.before-comments {
+img.automatic-insertion.im-before-comments {
   background: url('images/insertions-alignmets.png') -112px -56px;
 }
 
-img.automatic-insertion.between-comments {
+img.automatic-insertion.im-between-comments {
   background: url('images/insertions-alignmets.png') -168px -56px;
 }
 
-img.automatic-insertion.after-comments {
+img.automatic-insertion.im-after-comments {
   background: url('images/insertions-alignmets.png') -224px -56px;
 }
 
-img.automatic-insertion.footer {
+img.automatic-insertion.im-footer {
   background: url('images/insertions-alignmets.png') -280px -56px;
 }
 
-img.automatic-insertion.custom-hook {
+img.automatic-insertion.im-custom-hook {
   background: url('images/insertions-alignmets.png') -336px -56px;
 }
 
-img.automatic-insertion.no-wrapping {
+img.automatic-insertion.im-no-wrapping {
   background: url('images/insertions-alignmets.png') -392px -56px;
 }
 
-img.automatic-insertion.custom-css {
+img.automatic-insertion.im-custom-css {
   background: url('images/insertions-alignmets.png') 0 -112px;
 }
 
-img.automatic-insertion.default {
+img.automatic-insertion.im-default {
   background: url('images/insertions-alignmets.png') -56px -112px;
 }
 
-img.automatic-insertion.align-left {
+img.automatic-insertion.im-align-left {
   background: url('images/insertions-alignmets.png') -112px -112px;
 }
 
-img.automatic-insertion.center {
+img.automatic-insertion.im-center {
   background: url('images/insertions-alignmets.png') -168px -112px;
 }
 
-img.automatic-insertion.align-right {
+img.automatic-insertion.im-align-right {
   background: url('images/insertions-alignmets.png') -224px -112px;
 }
 
-img.automatic-insertion.float-left {
+img.automatic-insertion.im-float-left {
   background: url('images/insertions-alignmets.png') -280px -112px;
 }
 
-img.automatic-insertion.float-right {
+img.automatic-insertion.im-float-right {
   background: url('images/insertions-alignmets.png') -336px -112px;
 }
 
-img.automatic-insertion.sticky-left {
+img.automatic-insertion.im-sticky-left {
   background: url('images/insertions-alignmets.png') -392px -112px;
 }
 
-img.automatic-insertion.sticky-right {
+img.automatic-insertion.im-sticky-right {
   background: url('images/insertions-alignmets.png') 0 -168px;
 }
 
-img.automatic-insertion.sticky-top {
+img.automatic-insertion.im-sticky-top {
   background: url('images/insertions-alignmets.png') -56px -168px;
 }
 
-img.automatic-insertion.sticky-bottom {
+img.automatic-insertion.im-sticky-bottom {
   background: url('images/insertions-alignmets.png') -112px -168px;
 }
 
-img.automatic-insertion.above-header {
+img.automatic-insertion.im-above-header {
   background: url('images/insertions-alignmets.png') -168px -168px;
 }
 
-img.automatic-insertion.before-html {
+img.automatic-insertion.im-before-html {
   background: url('images/insertions-alignmets.png') -224px -168px;
 }
 
-img.automatic-insertion.after-html {
+img.automatic-insertion.im-after-html {
   background: url('images/insertions-alignmets.png') -280px -168px;
 }
 
-/*img.automatic-insertion.float-right {*/
-/*  background: url('images/insertions-alignmets.png') -336px -168px;*/
-/*}*/
+img.automatic-insertion.im-sticky-content-left {
+  background: url('images/insertions-alignmets.png') -336px -168px;
+}
 
-/*img.automatic-insertion.sticky-left {*/
-/*  background: url('images/insertions-alignmets.png') -392px -168px;*/
-/*}*/
+img.automatic-insertion.im-sticky-content-right {
+  background: url('images/insertions-alignmets.png') -392px -168px;
+}
+
+img.automatic-insertion.im-sticky-center-horizontal {
+  background: url('images/insertions-alignmets.png') 0 -224px;
+}
+
+img.automatic-insertion.im-sticky-center-vertical {
+  background: url('images/insertions-alignmets.png') -56px -224px;
+}
+
+img.automatic-insertion.im-sticky-scroll {
+  background: url('images/insertions-alignmets.png') -112px -224px;
+}
+
+img.automatic-insertion.im-sticky {
+  background: url('images/insertions-alignmets.png') -168px -224px;
+}
+
+img.automatic-insertion.im-close-top-left {
+  background: url('images/insertions-alignmets.png') -224px -224px;
+}
+
+img.automatic-insertion.im-close-top-right {
+  background: url('images/insertions-alignmets.png') -280px -224px;
+}
+
+img.automatic-insertion.im-close-bottom-right {
+  background: url('images/insertions-alignmets.png') -336px -224px;
+}
+
+img.automatic-insertion.im-close-bottom-left {
+  background: url('images/insertions-alignmets.png') -392px -224px;
+}
+
+img.automatic-insertion.im-close-none {
+  background: url('images/insertions-alignmets.png') -0px   -280px;
+}
+
 
 img.automatic-insertion {
   background-size: 448px!important;
 }
 
 
-img.automatic-insertion.preview.no-wrapping {
+img.automatic-insertion.preview.im-no-wrapping {
   background: url('images/insertions-alignmets.png') -350px -50px;
 }
 
-img.automatic-insertion.preview.custom-css {
+img.automatic-insertion.preview.im-custom-css {
   background: url('images/insertions-alignmets.png') 0 -100px;
 }
 
-img.automatic-insertion.preview.default {
+img.automatic-insertion.preview.im-default {
   background: url('images/insertions-alignmets.png') -50px -100px;
 }
 
-img.automatic-insertion.preview.align-left {
+img.automatic-insertion.preview.im-align-left {
   background: url('images/insertions-alignmets.png') -100px -100px;
 }
 
-img.automatic-insertion.preview.center {
+img.automatic-insertion.preview.im-center {
   background: url('images/insertions-alignmets.png') -150px -100px;
 }
 
-img.automatic-insertion.preview.align-right {
+img.automatic-insertion.preview.im-align-right {
   background: url('images/insertions-alignmets.png') -200px -100px;
 }
 
-img.automatic-insertion.preview.float-left {
+img.automatic-insertion.preview.im-float-left {
   background: url('images/insertions-alignmets.png') -250px -100px;
 }
 
-img.automatic-insertion.preview.float-right {
+img.automatic-insertion.preview.im-float-right {
   background: url('images/insertions-alignmets.png') -300px -100px;
 }
 
-img.automatic-insertion.preview.sticky-left {
+img.automatic-insertion.preview.im-sticky-left {
   background: url('images/insertions-alignmets.png') -350px -100px;
 }
 
-img.automatic-insertion.preview.sticky-right {
+img.automatic-insertion.preview.im-sticky-right {
   background: url('images/insertions-alignmets.png') 0 -150px;
 }
 
-img.automatic-insertion.preview.sticky-top {
+img.automatic-insertion.preview.im-sticky-top {
   background: url('images/insertions-alignmets.png') -50px -150px;
 }
 
-img.automatic-insertion.preview.sticky-bottom {
+img.automatic-insertion.preview.im-sticky-bottom {
   background: url('images/insertions-alignmets.png') -100px -150px;
 }
 
-/*img.automatic-insertion.preview.before-html {*/
-/*  background: url('images/insertions-alignmets.png') -150px -150px;*/
-/*}*/
+img.automatic-insertion.preview.im-sticky-content-left {
+  background: url('images/insertions-alignmets.png') -300px -150px;
+}
 
-/*img.automatic-insertion.preview.after-html {*/
-/*  background: url('images/insertions-alignmets.png') -200px -150px;*/
-/*}*/
+img.automatic-insertion.preview.im-sticky-content-right {
+  background: url('images/insertions-alignmets.png') -350px -150px;
+}
+
+img.automatic-insertion.preview.im-sticky-content-right {
+  background: url('images/insertions-alignmets.png') -350px -150px;
+}
+
+img.automatic-insertion.preview.im-sticky-center-horizontal {
+  background: url('images/insertions-alignmets.png') 0 -200px;
+}
+
+img.automatic-insertion.preview.im-sticky-center-vertical {
+  background: url('images/insertions-alignmets.png') -50px -200px;
+}
+
+img.automatic-insertion.preview.im-sticky-scroll {
+  background: url('images/insertions-alignmets.png') -100px -200px;
+}
+
+img.automatic-insertion.preview.im-sticky {
+  background: url('images/insertions-alignmets.png') -150px -200px;
+}
+
+img.automatic-insertion.preview.im-close-top-left {
+  background: url('images/insertions-alignmets.png') -200px -200px;
+}
+
+img.automatic-insertion.preview.im-close-top-right {
+  background: url('images/insertions-alignmets.png') -250px -200px;
+}
+
+img.automatic-insertion.preview.im-close-bottom-right {
+  background: url('images/insertions-alignmets.png') -300px -200px;
+}
+
+img.automatic-insertion.preview.im-close-bottom-left {
+  background: url('images/insertions-alignmets.png') -350px -200px;
+}
+
+img.automatic-insertion.preview.im-close-none {
+  background: url('images/insertions-alignmets.png') -0px   -250px;
+}
 
 
 img.automatic-insertion.preview {
@@ -909,6 +986,15 @@ img.automatic-insertion.preview {
 .checkbox-icon.icon-auto-refresh.on {
   background: url('images/icons.png') -180px 0;
 }
+
+/*.checkbox-icon.icon-ad-label {*/
+/*  background: url('images/icons.png') -180px -80px;*/
+/*}*/
+
+/*.checkbox-icon.icon-ad-label.on {*/
+/*  background: url('images/icons.png') -180px -60px;*/
+/*}*/
+
 
 .checkbox-icon.size-8.icon-stop {
   background: #ddd;
