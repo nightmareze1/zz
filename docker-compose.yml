@@ -1,10 +1,10 @@
 version: '2'
 
 services:
-  mysql-test11:
+  mariadb01-it:
      image: mysql:5.6
-     container_name: mysql-itshellws1
-     hostname: mysql-itshellws1
+     container_name: mariadb01-it
+     hostname: mariadb01-it
      volumes:
        - ./mysql:/var/lib/mysql/
      ports:
@@ -23,7 +23,7 @@ services:
        - ./apache2/apache2.conf:/etc/apache2/apache2.conf
        - ./apache2/mods-available/status.conf:/etc/apache2/mods-available/status.conf
      links:
-       - mysql-test11:itshelldb
+       - mariadb01-it:itshelldb
      ports:
        - "8088:80"
 #     logging:
