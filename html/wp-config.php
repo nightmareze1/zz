@@ -92,6 +92,9 @@ $table_prefix  = 'wp_8663apy1wg_';
  */
 define('WP_DEBUG', false);
 //define( 'WP_CACHE', true );
+
+define( 'WP_CACHE', true );
+
 require_once( dirname( __FILE__ ) . '/gd-config.php' );
 define( 'FS_METHOD', 'direct');
 define('FS_CHMOD_DIR', (0705 & ~ umask()));
