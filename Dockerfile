@@ -16,6 +16,4 @@ RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-m
 
 COPY apache2/sites-enabled/ /etc/apache2/sites-enabled/
 
-RUN source /etc/apache2/envvars
-
 EXPOSE 80 443
