@@ -14,4 +14,8 @@ RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-m
     && docker-php-ext-install memcached \
     && rm /tmp/memcached.tar.gz
 
+COPY apache2/sites-enabled/ /etc/apache2/sites-enabled/
+
+RUN source /etc/apache2/envvars
+
 EXPOSE 80 443
