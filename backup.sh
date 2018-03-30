@@ -3,14 +3,14 @@
 DATE=$(date +%F)
 
 #login path
-cd /home/ec2-user/github/
+cd /home/ec2-user/zz/
 rm -rf mysql-backup.tar
 tar -cvf "mysql-backup-$DATE.tar" mysql/
 mv "mysql-backup-$DATE.tar" ../
 cd /home/ec2-user
 aws s3 cp "mysql-backup-$DATE.tar" s3://itshellws/
 rm -rf mysql-backup-*
-cd /home/ec2-user/github/
+cd /home/ec2-user/zz/
 
 git add .
 # Git: add and commit changes
@@ -20,4 +20,3 @@ git commit -a -m "daily crontab backup `date`"
 git push origin master
 
 echo "backup completado el dia `date`" > backup.txt
-
