@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Themes - Customizr package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-03-23 08:50:15+0000\n"
+"PO-Revision-Date: 2018-03-29 18:44:28+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -18,6 +18,50 @@ msgstr "Customizr es un sencillo y rápido tema WordPress diseñado para ayudart
 #. Theme Name of the plugin/theme
 msgid "Customizr"
 msgstr "Customizr"
+
+#: core/class-fire-placeholders.php:92
+msgid "The left sidebar has no widgets"
+msgstr "La barra lateral izquierda no tiene widgets"
+
+#: functions.php:47
+msgid "The <strong>%1$s</strong> theme requires at least %2$s version %3$s"
+msgstr "El tema <strong>%1$s</strong> requiere al menos %2$s versión %3$s"
+
+#: functions.php:40
+msgid "WordPress"
+msgstr "WordPress"
+
+#: functions.php:36
+msgid "PHP"
+msgstr "PHP"
+
+#: core/czr-base-fmk/czr-base-fmk.php:379
+msgid "ac_set_ajax_czr_tmpl => Security check failed."
+msgstr "ac_set_ajax_czr_tmpl => Comprobación de seguridad fallida."
+
+#: core/core-settings-map.php:2126
+msgid "Display boxed"
+msgstr "Mostrar en caja"
+
+#: core/core-settings-map.php:2125
+msgid "Display full-width"
+msgstr "Mostrar ancho completo"
+
+#: core/class-fire-placeholders.php:331
+msgid "Add widgets to the zone :"
+msgstr "Agrega widgets a la zona :"
+
+#: core/class-fire-init.php:133
+msgid "Appears before the site footer"
+msgstr "Aparece antes del pie de página del sitio"
+
+#: core/class-fire-init.php:132
+msgid "Footer Horizontal Widget Area"
+msgstr "Área de widget horizontal en el pie de página"
+
+#: core/core-settings-map.php:2122
+msgid "Horizontal widget area in your footer"
+msgstr "Área de widget horizontal en el pie de página"
 
 #: core/init-base.php:402
 msgid "Horizontal Top Bar Menu. (make sure that the topbar is displayed in the header settings )."
@@ -755,15 +799,16 @@ msgstr "No sabes cómo definir la imagen principal para una página? Aprende có
 msgid "You can display your page's featured image here if you have set one."
 msgstr "Puedes mostrar la imagen principal de tu página aquí, si has definido una."
 
-#: core/czr-modules/social-links/index.php:107
+#: core/czr-modules/social-links/index.php:126
+#: core/czr-modules/social-links/social_links_module.php:128
 msgid "default:"
 msgstr "por defecto:"
 
-#: core/czr-base-fmk/czr-base-fmk.php:207 core/czr-customize-ccat.php:880
+#: core/czr-base-fmk/czr-base-fmk.php:232 core/czr-customize-ccat.php:880
 msgid "Options for"
 msgstr "Opciones para"
 
-#: core/czr-base-fmk/czr-base-fmk.php:206 core/czr-customize-ccat.php:879
+#: core/czr-base-fmk/czr-base-fmk.php:231 core/czr-customize-ccat.php:879
 msgid "Settings"
 msgstr "Ajustes"
 
@@ -799,7 +844,7 @@ msgstr "Usar migas de pan de Yoast SEO"
 msgid "Display the tagline in the header"
 msgstr "Mostrar eslogan en la cabecera"
 
-#: core/core-settings-map.php:337 core/init-base.php:996
+#: core/core-settings-map.php:337 core/init-base.php:995
 msgid "Create and organize your social links"
 msgstr "Crea y organiza tus enlaces sociales"
 
@@ -807,95 +852,109 @@ msgstr "Crea y organiza tus enlaces sociales"
 msgid "Discover the Customizr WordPress theme &raquo;"
 msgstr "Descubre el tema Customizr WordPress &raquo;"
 
-#: core/czr-base-fmk/czr-base-fmk.php:216
+#: core/czr-base-fmk/czr-base-fmk.php:241
 msgid "Choose Image"
 msgstr "Elige una imagen"
 
-#: core/czr-base-fmk/czr-base-fmk.php:214
+#: core/czr-base-fmk/czr-base-fmk.php:239
 msgid "No image selected"
 msgstr "No se ha seleccionado ninguna imagen"
 
-#: core/czr-base-fmk/czr-base-fmk.php:213
+#: core/czr-base-fmk/czr-base-fmk.php:238
 msgid "Default"
 msgstr "Predeterminado"
 
-#: core/czr-base-fmk/czr-base-fmk.php:211
+#: core/czr-base-fmk/czr-base-fmk.php:236
 msgid "Change Image"
 msgstr "Cambiar Imagen"
 
-#: core/czr-base-fmk/czr-base-fmk.php:210
-#: core/czr-base-fmk/czr-base-fmk.php:215
+#: core/czr-base-fmk/czr-base-fmk.php:235
+#: core/czr-base-fmk/czr-base-fmk.php:240
 msgid "Select Image"
 msgstr "Secciona Imagen"
 
-#: core/czr-modules/social-links/index.php:114
+#: core/czr-modules/social-links/index.php:133
+#: core/czr-modules/social-links/social_links_module.php:135
 msgid "Check this option to open the link in a another tab of the browser."
 msgstr "Selecciona esta opción para abrir el enlace en una nueva pestaña del navegador"
 
-#: core/czr-modules/social-links/index.php:113
+#: core/czr-modules/social-links/index.php:132
+#: core/czr-modules/social-links/social_links_module.php:134
 msgid "Link target"
 msgstr "Destino del link"
 
-#: core/czr-modules/social-links/index.php:108
+#: core/czr-modules/social-links/index.php:127
+#: core/czr-modules/social-links/social_links_module.php:129
 msgid "Set a unique color for your icon."
 msgstr "Selecciona un único color para tu icono"
 
-#: core/czr-modules/social-links/index.php:107
+#: core/czr-modules/social-links/index.php:126
+#: core/czr-modules/social-links/social_links_module.php:128
 msgid "Icon color"
 msgstr "Color del icono"
 
-#: core/czr-modules/social-links/index.php:103
+#: core/czr-modules/social-links/index.php:122
+#: core/czr-modules/social-links/social_links_module.php:124
 msgid "This is the text displayed on mouse over."
 msgstr "Es es el texto mostrado al pasar el ratón"
 
-#: core/czr-modules/social-links/index.php:96
+#: core/czr-modules/social-links/index.php:115
+#: core/czr-modules/social-links/social_links_module.php:117
 msgid "Social link"
 msgstr "Enlace social"
 
-#: core/czr-modules/social-links/index.php:92
+#: core/czr-modules/social-links/index.php:111
+#: core/czr-modules/social-links/social_links_module.php:113
 msgid "Social icon"
 msgstr "Icono social"
 
-#: core/czr-modules/social-links/index.php:83
+#: core/czr-modules/social-links/index.php:102
+#: core/czr-modules/social-links/social_links_module.php:104
 msgid "Size in px"
 msgstr "Tamaño en px"
 
-#: core/czr-modules/social-links/index.php:76
-#: core/czr-modules/social-links/index.php:97
+#: core/czr-modules/social-links/index.php:95
+#: core/czr-modules/social-links/index.php:116
+#: core/czr-modules/social-links/social_links_module.php:97
+#: core/czr-modules/social-links/social_links_module.php:118
 msgid "Enter the full url of your social profile (must be valid url)."
 msgstr "Introduzce la url completa de tu perfil social (debe ser una url válida)"
 
-#: core/czr-modules/social-links/index.php:77
-#: core/czr-modules/social-links/index.php:98
+#: core/czr-modules/social-links/index.php:96
+#: core/czr-modules/social-links/index.php:117
+#: core/czr-modules/social-links/social_links_module.php:98
+#: core/czr-modules/social-links/social_links_module.php:119
 msgid "http://...,mailto:...,..."
 msgstr "http://...,mailto:...,..."
 
-#: core/czr-modules/social-links/index.php:75
+#: core/czr-modules/social-links/index.php:94
+#: core/czr-modules/social-links/social_links_module.php:96
 msgid "Social link url"
 msgstr "Dirección del link social"
 
-#: core/czr-modules/social-links/index.php:71
+#: core/czr-modules/social-links/index.php:90
+#: core/czr-modules/social-links/social_links_module.php:92
 msgid "Select an icon"
 msgstr "Elige un icono"
 
 #: core/core-settings-map.php:1207 core/core-settings-map.php:1219
-#: core/czr-base-fmk/czr-base-fmk.php:430
+#: core/czr-base-fmk/czr-base-fmk.php:455
 msgid "Yes"
 msgstr "Sí"
 
-#: core/czr-base-fmk/czr-base-fmk.php:429
+#: core/czr-base-fmk/czr-base-fmk.php:454
 msgid "Are you sure you want to remove : <strong>{{ data.title }} ?</strong>"
 msgstr "¿Seguro que quieres borrar?: <strong>{{ data.title }} ?</strong>"
 
-#: core/czr-base-fmk/czr-base-fmk.php:400
+#: core/czr-base-fmk/czr-base-fmk.php:425
 msgid "Add it"
 msgstr "Añadir"
 
-#: core/czr-base-fmk/czr-base-fmk.php:400
+#: core/czr-base-fmk/czr-base-fmk.php:425
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: core/czr-base-fmk/czr-base-fmk.php:395
+#: core/czr-base-fmk/czr-base-fmk.php:420
 msgid "Add New"
 msgstr "Nuevo"
 
@@ -903,11 +962,13 @@ msgstr "Nuevo"
 msgid "Press return or enter to open this panel"
 msgstr "Pulsa Intro para abrir este panel"
 
-#: core/czr-modules/social-links/index.php:196
+#: core/czr-modules/social-links/index.php:215
+#: core/czr-modules/social-links/social_links_module.php:217
 msgid "Please fill the social link inputs with a valid URLs"
 msgstr "Por favor, rellena los enlaces sociales con URLs válidas"
 
-#: core/czr-modules/social-links/index.php:152
+#: core/czr-modules/social-links/index.php:171
+#: core/czr-modules/social-links/social_links_module.php:173
 msgid "An error occurred: malformed social links"
 msgstr "Ha ocurrido un error: Enlaces sociales erróneos"
 
@@ -927,32 +988,38 @@ msgstr "¡Nueva diapositiva creada! Desplázate hacia abajo para editarla."
 msgid "Close Editor"
 msgstr "Cerrar Editor"
 
-#: core/czr-base-fmk/czr-base-fmk.php:205 core/czr-customize-ccat.php:858
+#: core/czr-base-fmk/czr-base-fmk.php:230 core/czr-customize-ccat.php:858
 #: core/czr-customize-ccat.php:878
 msgid "Learn more about this in the documentation"
 msgstr "Más información sobre esto en la documentación"
 
-#: core/czr-customize-ccat.php:857
+#: core/czr-customize-ccat.php:857 core/czr-modules/social-links/index.php:79
+#: core/czr-modules/social-links/social_links_module.php:81
 msgid "New Social Link created ! Scroll down to edit it."
 msgstr "Se ha creado un nuevo enlace social! Desplaza hacia abajo para editarlo"
 
-#: core/czr-base-fmk/czr-base-fmk.php:203 core/czr-customize-ccat.php:856
+#: core/czr-base-fmk/czr-base-fmk.php:228 core/czr-customize-ccat.php:856
+#: core/czr-modules/social-links/index.php:78
+#: core/czr-modules/social-links/social_links_module.php:80
 msgid "Done !"
 msgstr "¡Hecho!"
 
-#: core/czr-customize-ccat.php:855
+#: core/czr-customize-ccat.php:855 core/czr-modules/social-links/index.php:77
+#: core/czr-modules/social-links/social_links_module.php:79
 msgid "Follow us on"
 msgstr "Síguenos"
 
-#: core/czr-customize-ccat.php:854
+#: core/czr-customize-ccat.php:854 core/czr-modules/social-links/index.php:76
+#: core/czr-modules/social-links/social_links_module.php:78
 msgid "Select a social icon"
 msgstr "Selecciona un icono social"
 
-#: core/czr-customize-ccat.php:853
+#: core/czr-customize-ccat.php:853 core/czr-modules/social-links/index.php:75
+#: core/czr-modules/social-links/social_links_module.php:77
 msgid "Rss"
 msgstr "Rss"
 
-#: core/czr-base-fmk/czr-base-fmk.php:202 core/czr-customize-ccat.php:852
+#: core/czr-base-fmk/czr-base-fmk.php:227 core/czr-customize-ccat.php:852
 msgid "Not set"
 msgstr "No definido"
 
@@ -1192,11 +1259,11 @@ msgstr "Puedes elegir mostrar sólo las entradas destacadas. Si no estás seguro
 msgid "Include only sticky posts"
 msgstr "Incluir solo entradas fijas"
 
-#: core/class-fire-plugins_compat.php:379 inc/czr-init-ccat.php:836
+#: core/class-fire-plugins_compat.php:385 inc/czr-init-ccat.php:836
 msgid "Posts slider button text"
 msgstr "Texto del botón del carrusel de entradas"
 
-#: core/class-fire-plugins_compat.php:377 inc/czr-init-ccat.php:834
+#: core/class-fire-plugins_compat.php:383 inc/czr-init-ccat.php:834
 msgid "Front page slider name"
 msgstr "Nombre del carrusel de la página principal"
 
@@ -1367,7 +1434,7 @@ msgstr "Páginas"
 msgid "Menu"
 msgstr "Menu"
 
-#: core/czr-base-fmk/czr-base-fmk.php:201 core/czr-customize-ccat.php:851
+#: core/czr-base-fmk/czr-base-fmk.php:226 core/czr-customize-ccat.php:851
 #: inc/czr-front-ccat.php:824 inc/czr-front-ccat.php:831
 msgid "Close"
 msgstr "Cerrar"
@@ -1748,11 +1815,11 @@ msgid "Open"
 msgstr "Abierto"
 
 #: core/front/models/content/post-metas/class-model-post_metas.php:193
-#: inc/czr-front-ccat.php:6990
+#: inc/czr-front-ccat.php:6991
 msgid "View all posts by %s"
 msgstr "Ver todas las entradas de %s"
 
-#: core/front/models/content/post-metas/class-model-post_metas.php:244
+#: core/front/models/content/post-metas/class-model-post_metas.php:245
 #: inc/czr-front-ccat.php:6833
 msgid "View all posts in %s"
 msgstr "Ver todas las entradas en %s"
@@ -1884,7 +1951,7 @@ msgid "About %s"
 msgstr "Acerca de %s"
 
 #: core/core-settings-map.php:1208 core/core-settings-map.php:1220
-#: core/czr-base-fmk/czr-base-fmk.php:430 inc/czr-front-ccat.php:4196
+#: core/czr-base-fmk/czr-base-fmk.php:455 inc/czr-front-ccat.php:4196
 msgid "No"
 msgstr "No"
 
@@ -3231,7 +3298,7 @@ msgstr "Ajustes de adaptabilidad"
 msgid "Custom CSS"
 msgstr "CSS Personallizado"
 
-#: core/init-base.php:989 inc/czr-init-ccat.php:3162
+#: core/init-base.php:988 inc/czr-init-ccat.php:3162
 msgid "Social links"
 msgstr "Enlaces Sociales"
 
@@ -3515,8 +3582,8 @@ msgstr "Barra lateral izquierda"
 msgid "Right sidebar"
 msgstr "Barra lateral derecha"
 
-#: core/czr-base-fmk/czr-base-fmk.php:212
-#: core/czr-base-fmk/czr-base-fmk.php:409 core/czr-customize-ccat.php:1476
+#: core/czr-base-fmk/czr-base-fmk.php:237
+#: core/czr-base-fmk/czr-base-fmk.php:434 core/czr-customize-ccat.php:1476
 msgid "Remove"
 msgstr "Eliminar"
 
@@ -3596,9 +3663,9 @@ msgstr "Editar esta diapositiva"
 msgid "No Image Selected"
 msgstr "No se ha seleccionado ninguna imagen"
 
-#: core/czr-admin-ccat.php:2441 core/czr-base-fmk/czr-base-fmk.php:200
-#: core/czr-base-fmk/czr-base-fmk.php:409
-#: core/czr-base-fmk/czr-base-fmk.php:421 core/czr-customize-ccat.php:850
+#: core/czr-admin-ccat.php:2441 core/czr-base-fmk/czr-base-fmk.php:225
+#: core/czr-base-fmk/czr-base-fmk.php:434
+#: core/czr-base-fmk/czr-base-fmk.php:446 core/czr-customize-ccat.php:850
 #: core/czr-customize-ccat.php:860
 #: core/front/models/modules/common/class-model-breadcrumb.php:625
 #: core/front/models/modules/common/class-model-breadcrumb.php:658
@@ -3621,7 +3688,8 @@ msgstr "Texto del Botón"
 msgid "Slide Text"
 msgstr "Texto de la diapositiva"
 
-#: core/czr-admin-ccat.php:2437 core/czr-modules/social-links/index.php:102
+#: core/czr-admin-ccat.php:2437 core/czr-modules/social-links/index.php:121
+#: core/czr-modules/social-links/social_links_module.php:123
 msgid "Title"
 msgstr "Título"
 

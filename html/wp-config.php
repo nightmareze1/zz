@@ -36,7 +36,7 @@ define('DB_USER', 'root');
 define('DB_PASSWORD', '1');
 
 /** MySQL hostname */
-define('DB_HOST', 'mariadb01-it');
+define('DB_HOST', 'mysql-itshellws1');
 
 #define('FORCE_SSL_LOGIN', true);
 #define('FORCE_SSL_ADMIN', true);

@@ -1,32 +1,38 @@
 <?php
 function czr_fn_register_social_links_module( $args ) {
     $defaults = array(
-        'id' => '',
-        'section' => array(), //array( 'id' => '', 'label' => '' ),
-        'sanitize_callback' => '',
-        'validate_callback' => '',
+        'setting_id' => '',
+
         'base_url_path' => '',//PC_AC_BASE_URL/inc/czr-modules/social-links/
         'version' => '',
-        'option_value' => array() //<= will be used for the dynamic registration
+
+        'option_value' => array(), //<= will be used for the dynamic registration
+
+        'setting' => array(),
+        'control' => array(),
+        'section' => array(), //array( 'id' => '', 'label' => '' ),
+
+        'sanitize_callback' => '',
+        'validate_callback' => ''
     );
     $args = wp_parse_args( $args, $defaults );
 
-    if ( ! isset( $GLOBALS['czr_base_fmk'] ) ) {
+    if ( ! isset( $GLOBALS['czr_base_fmk_namespace'] ) ) {
         error_log( __FUNCTION__ . ' => global czr_base_fmk not set' );
         return;
     }
 
-    $czrnamespace = str_replace( 'CZR_Fmk_Base', '', $GLOBALS['czr_base_fmk']);
-    //pc\czr_base_fmk\czr_register_module
-    $function_name = $czrnamespace . 'czr_register_module';
-    if ( ! function_exists( $function_name ) ) {
-        error_log( __FUNCTION__ . ' => Namespace problem' );
+    $czrnamespace = $GLOBALS['czr_base_fmk_namespace'];
+    //czr_fn\czr_register_dynamic_module
+    $CZR_Fmk_Base_fn = $czrnamespace . 'CZR_Fmk_Base';
+    if ( ! function_exists( $CZR_Fmk_Base_fn) ) {
+        error_log( __FUNCTION__ . ' => Namespace problem => ' . $CZR_Fmk_Base_fn );
         return;
     }
 
-    $function_name( array(
-        'id' => $args['id'],
-        'dynamic_registration' => true,
+
+    $CZR_Fmk_Base_fn() -> czr_pre_register_dynamic_setting( array(
+        'setting_id' => $args['setting_id'],
         'module_type' => 'czr_social_module',
         'option_value' => ! is_array( $args['option_value'] ) ? array() : $args['option_value'],
 
@@ -34,8 +40,14 @@ function czr_fn_register_social_links_module( $args ) {
 
         'section' => $args['section'],
 
-        'control' => $args['control'],
+        'control' => $args['control']
+    ));
 
+    // czr_fn\czr_register_dynamic_module()
+    $CZR_Fmk_Base_fn() -> czr_pre_register_dynamic_module( array(
+
+        'dynamic_registration' => true,
+        'module_type' => 'czr_social_module',
 
         'customizer_assets' => array(
             'control_js' => array(
@@ -54,11 +66,18 @@ function czr_fn_register_social_links_module( $args ) {
             ),
             'localized_control_js' => array(
                 'deps' => 'czr-customizer-fmk',
-                'global_var_name' => 'socialLocalized',
+                'global_var_name' => 'socialModuleLocalized',
                 'params' => array(
                     //Social Module
                     'defaultSocialColor' => 'rgb(90,90,90)',
                     'defaultSocialSize'  => 14,
+                    'i18n' => array(
+                        'Rss' => __('Rss', 'customizr'),
+                        'Select a social icon' => __('Select a social icon', 'customizr'),
+                        'Follow us on' => __('Follow us on', 'customizr'),
+                        'Done !' => __('Done !', 'customizr'),
+                        'New Social Link created ! Scroll down to edit it.' => __('New Social Link created ! Scroll down to edit it.', 'customizr'),
+                    )
                     //option value for dynamic registration
                 )
             )
