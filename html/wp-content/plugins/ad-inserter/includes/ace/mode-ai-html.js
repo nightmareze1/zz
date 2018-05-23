@@ -35,7 +35,7 @@ function add_ai_highlighting_rules (highlighter, highlight_rules) {
   highlighter.$ai_shortcodes  = highlighter.$lang.arrayToMap ("adinserter".split ("|"));
   highlighter.$ai_separators1 = highlighter.$lang.arrayToMap ("http|rotate|count".split ("|"));
   highlighter.$ai_separators2  = highlighter.$lang.arrayToMap ("amp".split ("|"));
-  highlighter.$ai_attributes  = highlighter.$lang.arrayToMap ("block|name|ignore|check|debugger|adb|css|text|selectors|custom-field|data".split ("|"));
+  highlighter.$ai_attributes  = highlighter.$lang.arrayToMap ("block|code|name|ignore|check|debugger|adb|css|text|selectors|custom-field|data|share|time".split ("|"));
 
   //WP shortcodes
   highlighter.$rules ['start'].unshift (

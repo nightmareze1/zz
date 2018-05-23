@@ -27,8 +27,13 @@ function generate_code_editor ($block, $client_code, $process_php) {
 
   $ai_wp_data [AI_WP_DEBUGGING] = 0;
 
-  $obj  = $block_object [$block];
-  $code = $obj->ai_getCode ($client_code, $process_php);
+  $obj = new ai_Block ($block);
+  $obj->wp_options = $block_object [$block]->wp_options;
+
+  $obj->wp_options [AI_OPTION_CODE]         = $client_code;
+  $obj->wp_options [AI_OPTION_PROCESS_PHP]  = $process_php;
+
+  $code = $obj->ai_getCode ();
 
   wp_enqueue_script ('ai-adb-js',   plugins_url ('includes/js/ad-inserter-check.js', AD_INSERTER_FILE), array (
     'jquery',

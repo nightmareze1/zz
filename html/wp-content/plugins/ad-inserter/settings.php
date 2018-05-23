@@ -205,7 +205,11 @@ function generate_settings_form (){
           <td style="width: 100%;">
             <input class="option-name" style="width: 100%;" type="text" size="50" maxlength="200" />
           </td>
-          <td style="width: 130px;">
+          <td style="padding-left: 7px;">
+            Share
+          </td>
+          <td>
+            <input class="option-share" style="width: 42px;" type="text" maxlength="2" title="Option share in percents - 0 means option disabled, if share for one option is not defined it will be calculated automatically. Leave all share fields empty for equal option shares." /> %
           </td>
         </tr>
       </table>
@@ -442,6 +446,7 @@ function generate_settings_form (){
     if ($filter_active)           $filter_style     = "font-weight: bold; color: #66f;"; else $filter_style = "";
     if ($adb_block_action_active) $adb_style        = "font-weight: bold; color: #66f;"; else $adb_style = "";
     if ($display_options)         $display_style    = "font-weight: bold; color: #66f;"; else $display_style = "";
+    $general_style = '';
 
     $automatic_insertion = $obj->get_automatic_insertion();
 
@@ -613,7 +618,6 @@ function generate_settings_form (){
 
     <div id="tab-banner-<?php echo $block; ?>" class="ai-banner ai-banner-top responsive-table rounded">
       <div class="banner-preview">
-<!--        <a id="banner-link-<?php echo $block; ?>" class="clear-link" target="_blank"><img id="banner-image-<?php echo $block; ?>" src="//:0" style="display: none;" /></a>-->
         <a id="banner-link-<?php echo $block; ?>" class="clear-link" target="_blank"><img id="banner-image-<?php echo $block; ?>" src="" style="display: none;" /></a>
       </div>
       <table class="ai-settings-table">
@@ -794,26 +798,25 @@ function generate_settings_form (){
             <?php echo $viewport_name; ?>
           </td>
           <td style="padding-left: 7px;">
-              <select class="adsense-ad-size">
-                 <option value="&nbsp;" selected></option>
-                 <option value="300x250">300x250</option>
-                 <option value="336x280">336x280</option>
-                 <option value="728x90" >728x90</option>
-                 <option value="300x600">300x600</option>
-                 <option value="320x100">320x100</option>
-                 <option value="468x60" >468x60</option>
-                 <option value="234x60" >234x60</option>
-                 <option value="125x125">125x125</option>
-                 <option value="250x250">250x250</option>
-                 <option value="200x200">200x200</option>
-                 <option value="120x600">120x600</option>
-                 <option value="160x600">160x600</option>
-                 <option value="300x1050">300x1050</option>
-                 <option value="320x50">320x50</option>
-                 <option value="970x90">970x90</option>
-                 <option value="970x250">970x250</option>
-              </select>
-            </span>
+            <select class="adsense-ad-size">
+               <option value="&nbsp;" selected></option>
+               <option value="300x250">300x250</option>
+               <option value="336x280">336x280</option>
+               <option value="728x90" >728x90</option>
+               <option value="300x600">300x600</option>
+               <option value="320x100">320x100</option>
+               <option value="468x60" >468x60</option>
+               <option value="234x60" >234x60</option>
+               <option value="125x125">125x125</option>
+               <option value="250x250">250x250</option>
+               <option value="200x200">200x200</option>
+               <option value="120x600">120x600</option>
+               <option value="160x600">160x600</option>
+               <option value="300x1050">300x1050</option>
+               <option value="320x50">320x50</option>
+               <option value="970x90">970x90</option>
+               <option value="970x250">970x250</option>
+            </select>
           </td>
         </tr>
 <?php   }
@@ -848,7 +851,7 @@ function generate_settings_form (){
       <button id="manual-button-<?php echo $block; ?>" type="button" class='ai-button2' style="display: none; margin-right: 4px;" title="Widget, Shortcode and PHP function call"><span style="<?php echo $manual_style; ?>">Manual</span></button>
       <button id="device-detection-button-<?php echo $block; ?>" class='ai-button2' type="button" style="display: none; margin-right: 4px;" title="Client/Server-side Device Detection (Desktop, Tablet, Phone,...)"><span style="<?php echo $devices_style; ?>">Devices</span></button>
       <button id="misc-button-<?php echo $block; ?>" type="button" class='ai-button2' style="display: none; margin-right: 4px;" title="Check for user status, Limit insertions, [error 404 page, Ajax requests, RSS feeds], Filter, Scheduling, General tag"><span style="<?php echo $misc_style; ?>">Misc</span></button>
-      <button id="preview-button-<?php echo $block; ?>" type="button" class='ai-button2' style="display: none; margin-right: 4px;" title="Preview saved code above" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">Preview</button>
+      <button id="preview-button-<?php echo $block; ?>" type="button" class='ai-button2' style="display: none; margin-right: 4px;" title="Preview code and alignment" site-url="<?php echo wp_make_link_relative (get_site_url()); ?>">Preview</button>
     </div>
     <div style="float: right;">
 <?php if (function_exists ('ai_settings_bottom_buttons')) ai_settings_bottom_buttons ($start, $end); else { ?>
@@ -905,17 +908,17 @@ function generate_settings_form (){
     </div>
     <div style="clear: both;"></div>
 
-    <div id="icons-css-code-<?php echo $block; ?>" style="margin: 4px 0 2px; display: none;">
+    <div id="icons-css-code-<?php echo $block; ?>" style="margin: 4px 0 0; display: none;">
       <div id="automatic-insertion-<?php echo $block; ?>"></div>
       <div id="alignment-style-<?php echo $block; ?>" style="margin-bottom: 4px;"></div>
 
-<?php if (function_exists ('ai_sticky_options')) ai_sticky_options ($block, $obj, $default); ?>
+<?php if (function_exists ('ai_sticky_position')) ai_sticky_position ($block, $obj, $default); ?>
 
       <div class="max-input">
         <span id="css-label-<?php echo $block; ?>" style="display: table-cell; width: 36px; padding: 0; height: 26px; vertical-align: middle; margin: 4px 0 0 0; font-size: 14px; font-weight: bold;">CSS</span>
         <input id="custom-css-<?php echo $block; ?>" style="width: 100%; display: none; font-family: Courier, 'Courier New', monospace; font-weight: bold;" type="text" name="<?php echo AI_OPTION_CUSTOM_CSS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_custom_css(); ?>" value="<?php echo $obj->get_custom_css(); ?>" maxlength="500" title="Custom CSS code for wrapping div" />
         <span style="display: table-cell; vertical-align: middle; font-family: Courier, 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer;">
-          <span id="css-no-wrapping-<?php echo $block; ?>" class='css-code' style="height: 18px; padding-left: 7px; display: none;"></span>
+          <span id="css-no-wrapping-<?php echo $block; ?>" class='css-code' style="height: 26px; padding-left: 7px; display: none;"></span>
           <span id="css-none-<?php echo $block; ?>" class='css-code-<?php echo $block; ?>' style="height: 18px; padding-left: 7px; display: none;" title="CSS code for wrapping div, click to edit"><?php echo $obj->alignment_style (AI_ALIGNMENT_DEFAULT); ?></span>
           <span id="css-left-<?php echo $block; ?>" class='css-code-<?php echo $block; ?>' style="height: 18px; padding-left: 7px; display: none;" title="CSS code for wrapping div, click to edit"><?php echo $obj->alignment_style (AI_ALIGNMENT_LEFT); ?></span>
           <span id="css-right-<?php echo $block; ?>" class='css-code-<?php echo $block; ?>' style="height: 18px; padding-left: 7px; display: none;" title="CSS code for wrapping div, click to edit"><?php echo $obj->alignment_style (AI_ALIGNMENT_RIGHT); ?></span>
@@ -929,9 +932,7 @@ function generate_settings_form (){
     </div>
   </div>
 
-  <div id="sticky-scroll-warning-<?php echo $block; ?>" class="rounded" style="display: none;">
-     <span style="margin-top: 5px;"><strong><span style="color: red;">WARNING:</span></strong> vertical position <strong><?php echo AI_TEXT_SCROLL_WITH_THE_CONTENT; ?></strong> needs <strong>Output buffering</strong> enabled and automatic insertion <strong><?php echo AI_TEXT_ABOVE_HEADER; ?></strong>!</span>
-  </div>
+<?php if (function_exists ('ai_sticky_animation')) ai_sticky_animation ($block, $obj, $default); ?>
 
   <div class="responsive-table small-button rounded">
     <table>
@@ -1608,15 +1609,15 @@ function generate_settings_form (){
     <div id="ai-misc-container-<?php echo $block; ?>" style="padding: 0; margin 8px 0 0 0; border: 0;">
       <ul id="ai-misc-tabs-<?php echo $block; ?>" style="display: none;">
         <li id="ai-misc-insertion-<?php echo $block; ?>"><a href="#tab-insertion-<?php echo $block; ?>"><span style="<?php echo $insertion_style; ?>">Insertion</span></a></li>
-        <li id="ai-misc-scheduling-<?php echo $block; ?>"><a href="#tab-scheduling-<?php echo $block; ?>"><span style="<?php echo $scheduling_style; ?>">Scheduling</span></a></li>
-        <li id="ai-misc-displey-<?php echo $block; ?>"><a href="#tab-display-<?php echo $block; ?>"><span style="<?php echo $display_style; ?>">Display</span></a></li>
-        <li id="ai-misc-word-count-<?php echo $block; ?>"><a href="#tab-word-count-<?php echo $block; ?>"><span style="<?php echo $word_count_style; ?>">Word Count</span></a></li>
         <li id="ai-misc-filter-<?php echo $block; ?>"><a href="#tab-filter-<?php echo $block; ?>"><span style="<?php echo $filter_style; ?>">Filter</span></a></li>
+        <li id="ai-misc-word-count-<?php echo $block; ?>"><a href="#tab-word-count-<?php echo $block; ?>"><span style="<?php echo $word_count_style; ?>">Word Count</span></a></li>
+        <li id="ai-misc-scheduling-<?php echo $block; ?>"><a href="#tab-scheduling-<?php echo $block; ?>"><span style="<?php echo $scheduling_style; ?>">Scheduling</span></a></li>
+        <li id="ai-misc-display-<?php echo $block; ?>"><a href="#tab-display-<?php echo $block; ?>"><span style="<?php echo $display_style; ?>">Display</span></a></li>
         <?php if (function_exists ('ai_adb_action_0')) ai_adb_action_0 ($block, $adb_style); ?>
         <li id="ai-misc-general-<?php echo $block; ?>"><a href="#tab-general-<?php echo $block; ?>"><span style="<?php echo $general_style; ?>">General</span></a></li>
       </ul>
 
-      <div id="tab-insertion-<?php echo $block; ?>" class="max-input" style="padding: 0";>
+      <div id="tab-insertion-<?php echo $block; ?>" class="max-input" style="padding: 0;">
         <div class="rounded">
           <table class="responsive-table" style="width: 70%">
             <tbody>
@@ -1677,41 +1678,6 @@ function generate_settings_form (){
         </div>
       </div>
 
-      <div id="tab-scheduling-<?php echo $block; ?>" class="rounded" style="min-height: 24px;">
-        <select id="scheduling-<?php echo $block; ?>" style="margin: 0 1px;" name="<?php echo AI_OPTION_SCHEDULING, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_scheduling(); ?>">
-          <option value="<?php echo AI_SCHEDULING_OFF; ?>" <?php echo ($obj->get_scheduling() == AI_SCHEDULING_OFF) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_OFF; ?></option>
-          <option value="<?php echo AI_SCHEDULING_DELAY; ?>" <?php echo ($obj->get_scheduling() == AI_SCHEDULING_DELAY) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DELAY_INSERTION; ?></option>
-<?php if (function_exists ('ai_scheduling_options')) ai_scheduling_options ($obj); ?>
-        </select>
-
-        <span id="scheduling-delay-<?php echo $block; ?>">
-          for <input type="text" name="<?php echo AI_OPTION_AFTER_DAYS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_after_day(); ?>" value="<?php echo $obj->get_ad_after_day(); ?>" size="2" maxlength="3" /> days after publishing
-        </span>
-        <span id="scheduling-delay-warning-<?php echo $block; ?>" style="color: #d00; display: none;">&nbsp;&nbsp; Not available</span>
-
-<?php if (function_exists ('ai_scheduling_data')) ai_scheduling_data ($block, $obj, $default); ?>
-      </div>
-
-      <div id="tab-display-<?php echo $block; ?>" class="rounded">
-        <div class="max-input">
-          <span style="display: table-cell; width: 1px; white-space: nowrap;">
-            <input type="hidden" name="<?php echo AI_OPTION_SHOW_LABEL, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
-            <input style="" id="show-label-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_SHOW_LABEL, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_show_label (); ?>" <?php if ($obj->get_show_label () == AI_ENABLED) echo 'checked '; ?> />
-            <label for="show-label-<?php echo $block; ?>" style="vertical-align: top;">Ad label</label>
-          </span>
-
-          <?php if (function_exists ('ai_tab_general')) ai_tab_general ($block, $obj, $default); ?>
-        </div>
-      </div>
-
-      <div id="tab-word-count-<?php echo $block; ?>" class="rounded">
-        Post/Static page must have between
-        <input type="text" name="<?php echo AI_OPTION_MIN_WORDS, WP_FORM_FIELD_POSTFIX, $block; ?>" style="margin: 0 1px;" default="<?php echo $default->get_minimum_words(); ?>" value="<?php echo $obj->get_minimum_words() ?>" title="Minimum number of post/static page words, leave empty for no limit" size="4" maxlength="6" />
-        and
-        <input type="text" name="<?php echo AI_OPTION_MAX_WORDS, WP_FORM_FIELD_POSTFIX, $block; ?>" style="margin: 0 1px;" default="<?php echo $default->get_maximum_words(); ?>" value="<?php echo $obj->get_maximum_words() ?>" title="Maximum number of post/static page words, leave empty for no limit" size="4" maxlength="6" />
-        words
-      </div>
-
       <div id="tab-filter-<?php echo $block; ?>" class="rounded">
         <div class="max-input">
           <span style="display: table-cell;">
@@ -1722,7 +1688,7 @@ function generate_settings_form (){
           </span>
           <span style="display: table-cell;">
             &nbsp;&nbsp;&nbsp;using
-            <select id="filter-type-<?php echo $block; ?>" style="margin: 0 1px;" name="<?php echo AI_OPTION_FILTER_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_filter_type(); ?>" style="width:160px">
+            <select id="filter-type-<?php echo $block; ?>" style="width:160px; margin: 0 1px;" name="<?php echo AI_OPTION_FILTER_TYPE, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_filter_type(); ?>">
                <option value="<?php echo AI_FILTER_AUTO; ?>" <?php echo ($filter_type == AI_FILTER_AUTO) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_AUTO; ?></option>
                <option value="<?php echo AI_FILTER_PHP_FUNCTION_CALLS; ?>" <?php echo ($filter_type == AI_FILTER_PHP_FUNCTION_CALLS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_PHP_FUNCTION_CALLS; ?></option>
                <option value="<?php echo AI_FILTER_CONTENT_PROCESSING; ?>" <?php echo ($filter_type == AI_FILTER_CONTENT_PROCESSING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CONTENT_PROCESSING; ?></option>
@@ -1745,6 +1711,47 @@ function generate_settings_form (){
         </div>
       </div>
 
+      <div id="tab-word-count-<?php echo $block; ?>" class="rounded">
+        Post/Static page must have between
+        <input type="text" name="<?php echo AI_OPTION_MIN_WORDS, WP_FORM_FIELD_POSTFIX, $block; ?>" style="margin: 0 1px;" default="<?php echo $default->get_minimum_words(); ?>" value="<?php echo $obj->get_minimum_words() ?>" title="Minimum number of post/static page words, leave empty for no limit" size="4" maxlength="6" />
+        and
+        <input type="text" name="<?php echo AI_OPTION_MAX_WORDS, WP_FORM_FIELD_POSTFIX, $block; ?>" style="margin: 0 1px;" default="<?php echo $default->get_maximum_words(); ?>" value="<?php echo $obj->get_maximum_words() ?>" title="Maximum number of post/static page words, leave empty for no limit" size="4" maxlength="6" />
+        words
+      </div>
+
+      <div id="tab-scheduling-<?php echo $block; ?>" class="rounded" style="min-height: 24px;">
+        <select id="scheduling-<?php echo $block; ?>" style="margin: 0 1px;" name="<?php echo AI_OPTION_SCHEDULING, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_scheduling(); ?>">
+          <option value="<?php echo AI_SCHEDULING_OFF; ?>" <?php echo ($obj->get_scheduling() == AI_SCHEDULING_OFF) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_OFF; ?></option>
+          <option value="<?php echo AI_SCHEDULING_DELAY; ?>" <?php echo ($obj->get_scheduling() == AI_SCHEDULING_DELAY) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DELAY_INSERTION; ?></option>
+<?php if (function_exists ('ai_scheduling_options')) ai_scheduling_options ($obj); ?>
+        </select>
+
+        <span id="scheduling-delay-<?php echo $block; ?>">
+          for <input type="text" name="<?php echo AI_OPTION_AFTER_DAYS, WP_FORM_FIELD_POSTFIX, $block; ?>" default="<?php echo $default->get_ad_after_day(); ?>" value="<?php echo $obj->get_ad_after_day(); ?>" size="2" maxlength="3" /> days after publishing
+        </span>
+        <span id="scheduling-delay-warning-<?php echo $block; ?>" style="color: #d00; display: none;">&nbsp;&nbsp; Not available</span>
+
+<?php if (function_exists ('ai_scheduling_data')) ai_scheduling_data ($block, $obj, $default); ?>
+      </div>
+
+      <div id="tab-display-<?php echo $block; ?>" class="rounded">
+
+        <table class="responsive-table" style="width: 100%;" cellspacing=0 cellpadding=0 >
+          <tbody>
+            <tr>
+              <td style="width: 10%;">
+                <input type="hidden" name="<?php echo AI_OPTION_SHOW_LABEL, WP_FORM_FIELD_POSTFIX, $block; ?>" value="0" />
+                <input style="" id="show-label-<?php echo $block; ?>" type="checkbox" name="<?php echo AI_OPTION_SHOW_LABEL, WP_FORM_FIELD_POSTFIX, $block; ?>" value="1" default="<?php echo $default->get_show_label (); ?>" <?php if ($obj->get_show_label () == AI_ENABLED) echo 'checked '; ?> />
+                <label for="show-label-<?php echo $block; ?>">Ad label</label>
+              </td>
+              <td>
+<?php if (function_exists ('ai_display_close')) ai_display_close ($block, $obj, $default, 'close-button-'.$block, AI_OPTION_CLOSE_BUTTON . WP_FORM_FIELD_POSTFIX . $block); ?>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
 <?php if (function_exists ('ai_adb_action')) ai_adb_action ($block, $obj, $default); ?>
 
       <div id="tab-general-<?php echo $block; ?>" class="rounded">
@@ -1763,8 +1770,10 @@ function generate_settings_form (){
   </div>
 
   <div id="no-wrapping-warning-<?php echo $block; ?>" class="rounded" style="display: none;">
-     <span style="margin-top: 5px;"><strong><span style="color: red;">WARNING:</span> No Wrapping</strong> style has no HTML code for client-side device detection!</span>
+     <span style="margin-top: 5px;"><strong><span style="color: red;">WARNING:</span> No Wrapping</strong> style has no wrapping code needed for client-side device detection!</span>
   </div>
+
+<?php if (function_exists ('ai_warnings')) ai_warnings ($block); ?>
 
   </div>
 </div>
@@ -1964,6 +1973,9 @@ function generate_settings_form (){
             <input type="text" name="ad-label" style="width: 100%;" value="<?php echo get_ad_label (); ?>"  default="<?php echo DEFAULT_AD_TITLE; ?>" size="60" maxlength="500" />
           </td>
         </tr>
+
+<?php if (function_exists ('ai_general_settings_2')) ai_general_settings_2 (); ?>
+
       </table>
     </div>
 
@@ -1977,17 +1989,17 @@ function generate_settings_form (){
           <td>
             <span title="Include general plugin block class">Block class</span>
             <input type="hidden" name="block-class" value="0" />
-            <input id="block-class" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="block-class"value="1" default="<?php echo DEFAULT_BLOCK_CLASS; ?>" <?php if ($block_class == AI_ENABLED) echo 'checked '; ?> />
+            <input id="block-class" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="block-class" value="1" default="<?php echo DEFAULT_BLOCK_CLASS; ?>" <?php if ($block_class == AI_ENABLED) echo 'checked '; ?> />
           </td>
           <td>
             <span title="Include block number class">Block number class</span>
             <input type="hidden" name="block-number-class" value="0" />
-            <input id="block-number-class" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="block-number-class"value="1" default="<?php echo DEFAULT_BLOCK_NUMBER_CLASS; ?>" <?php if ($block_number_class == AI_ENABLED) echo 'checked '; ?> />
+            <input id="block-number-class" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="block-number-class" value="1" default="<?php echo DEFAULT_BLOCK_NUMBER_CLASS; ?>" <?php if ($block_number_class == AI_ENABLED) echo 'checked '; ?> />
           </td>
           <td>
             <span title="Instead of alignment classes generate inline alignment styles for code blocks">Inline styles</span>
             <input type="hidden" name="inline-styles" value="0" />
-            <input id="inline-styles" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="inline-styles"value="1" default="<?php echo DEFAULT_INLINE_STYLES; ?>" <?php if ($inline_styles == AI_ENABLED) echo 'checked '; ?> />
+            <input id="inline-styles" class="ai-block-code-demo" style="margin-left: 5px;" type="checkbox" name="inline-styles" value="1" default="<?php echo DEFAULT_INLINE_STYLES; ?>" <?php if ($inline_styles == AI_ENABLED) echo 'checked '; ?> />
           </td>
         </tr>
       </table>
@@ -2562,6 +2574,10 @@ function generate_settings_form (){
 
   endif; // end of code only for normal settings
 
+  if (isset ($_POST [AI_FORM_SAVE])) {
+    if (function_exists ('ai_save_settings')) ai_save_settings ();
+  }
+
 } // generate_settings_form ()
 
 function get_sidebar_widgets () {
@@ -2667,7 +2683,7 @@ function adsense_list_container () {
 
 
 function code_block_list () {
-  global $block_object, $wpdb;
+  global $block_object, $wpdb, $ai_db_options_extract;
 
   if (isset ($_GET ["blocks-org"]) && isset ($_GET ["blocks-new"])) {
     $blocks_org = json_decode ($_GET ["blocks-org"]);
@@ -2712,6 +2728,18 @@ function code_block_list () {
 
         update_option (AI_OPTION_NAME, $new_options);
         ai_load_settings ();
+
+        $new_options [AI_OPTION_EXTRACT] = ai_generate_extract ($new_options);
+        $ai_db_options_extract = $new_options [AI_OPTION_EXTRACT];
+
+        $new_options [AI_OPTION_GLOBAL]['VIEWPORT_CSS']  = generate_viewport_css ();
+        $new_options [AI_OPTION_GLOBAL]['ALIGNMENT_CSS'] = generate_alignment_css ();
+
+        $new_options [AI_OPTION_GLOBAL]['TIMESTAMP'] = time ();
+
+        update_option (AI_OPTION_NAME, $new_options);
+        ai_load_settings ();
+
 
         $ai_widgets = get_option ('widget_ai_widget');
         if (is_array ($ai_widgets))

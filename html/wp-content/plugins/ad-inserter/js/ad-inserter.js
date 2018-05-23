@@ -1,4 +1,4 @@
-var javascript_version = "2.3.7";
+var javascript_version = "2.3.8";
 var ignore_key = true;
 var start = 1;
 var end = 16;
@@ -261,6 +261,9 @@ function SyntaxHighlight (id, block, settings) {
   this.editor = editor = ace.edit(editDiv[0]);
   this.form = form = textarea.closest('form');
   this.session = session = editor.getSession();
+
+  editor.$blockScrolling = Infinity;
+
   session.setValue(textarea.val());
 
   // copy back to textarea on form submit...
@@ -317,27 +320,12 @@ SyntaxHighlight.prototype.applySettings = function () {
   session.setUseSoftTabs(settings['use_soft_tabs'] == 1);
 };
 
-function get_sticky_classes (custom_css) {
+function is_sticky (custom_css) {
   custom_css = custom_css.replace (/\s+/g, '');
-  var sticky_classes = [];
-  if (custom_css.indexOf ("position:fixed") != - 1 &&
-      custom_css.indexOf ("z-index:9995") != - 1 &&
-      custom_css.indexOf ("display:none") != - 1) {
-    if (custom_css.indexOf (";left:auto") != - 1) {
-      sticky_classes.push ('ai-sticky-content');
-      sticky_classes.push ('ai-sticky-left');
-    } else
-    if (custom_css.indexOf ("right:auto") != - 1) {
-      sticky_classes.push ('ai-sticky-content');
-      sticky_classes.push ('ai-sticky-right');
-    };
 
-    if (custom_css.indexOf ("margin-bottom:auto") != - 1) {
-      sticky_classes.push ('ai-sticky-content');
-      sticky_classes.push ('ai-sticky-scroll');
-    };
-  }
-  return sticky_classes;
+  if (custom_css.indexOf ("position:fixed") != - 1 && custom_css.indexOf ("z-index:") != - 1) return true;
+
+  return false;
 }
 
 function change_block_alignment (block) {
@@ -350,6 +338,73 @@ function change_banner_image (block) {
   jQuery ("input#banner-image-url-" + block).trigger ("input");
 }
 
+function ai_css_value_px (css, property) {
+  var found = false;
+
+  styles = css.split (';');
+  styles.forEach (function (style, index) {
+    style = style.trim ();
+    if (style.indexOf (property) == 0) {
+      style_parts = style.split (':');
+      if (style_parts.length == 2) {
+        style_property = style_parts [0].trim ();
+        style_value = style_parts [1].trim ();
+        if (style_property == property && style_value.endsWith ('px')) found = true;
+      }
+    }
+  });
+
+  return found;
+}
+
+function ai_change_css (css, property, value) {
+  var replaced = false;
+
+  styles = css.split (';');
+  styles.forEach (function (style, index) {
+    org_style = style;
+    style = style.trim ();
+    if (style.indexOf (property) == 0) {
+      style_parts = style.split (':');
+      if (style_parts.length == 2) {
+        style_property = style_parts [0].trim ();
+        style_value = style_parts [1].trim ();
+        if (style_property == property && style_value.endsWith ('px')) {
+          var org_style_parts = org_style.split (':');
+          styles [index] = org_style_parts [0] + ': ' + value + 'px';
+          replaced = true;
+        }
+      }
+    }
+  });
+
+  var new_style = styles.join (';');
+
+  if (!replaced) {
+    new_style = new_style.trim ();
+    if (new_style.length != 0 && new_style.slice (-1) == ';') new_style = new_style.substring (0, new_style.length - 1);
+    return new_style + '; ' + property + ': ' + value + ';';
+  }
+
+  return new_style;
+}
+
+function update_sticky_margins (style, horizontal_margin, vertical_margin) {
+
+  if (vertical_margin !== '') {
+    if (ai_css_value_px (style, 'top')) style = ai_change_css (style, 'top', vertical_margin);
+    if (ai_css_value_px (style, 'bottom')) style = ai_change_css (style, 'bottom', vertical_margin);
+  }
+
+  if (horizontal_margin !== '') {
+    if (ai_css_value_px (style, 'left')) style = ai_change_css (style, 'left', horizontal_margin); else
+    if (ai_css_value_px (style, 'right')) style = ai_change_css (style, 'right', horizontal_margin); else
+    if (ai_css_value_px (style, 'margin-left')) style = ai_change_css (style, 'margin-left', horizontal_margin); else
+    if (ai_css_value_px (style, 'margin-right')) style = ai_change_css (style, 'margin-right', horizontal_margin);
+  }
+
+  return style;
+}
 
 (function ($) {
   $.widget("toggle.checkboxButton", {
@@ -997,7 +1052,10 @@ jQuery(document).ready(function($) {
 
     $("#no-wrapping-warning-"+block).hide();
 
-    $("#sticky-settings-"+block).hide();
+    $("#sticky-position-"+block).hide();
+    $("#sticky-animation-"+block).hide();
+
+    $('#tracking-wrapping-warning-' + block).hide ();
 
     var alignment = $("select#block-alignment-"+block+" option:selected").attr('value');
 
@@ -1008,6 +1066,10 @@ jQuery(document).ready(function($) {
       if ($("#client-side-detection-"+block).is(":checked")) {
         $("#no-wrapping-warning-"+block).show();
       }
+
+      if ($('#tracking-' + block).next ().find ('.checkbox-icon').hasClass ('on')) {
+        $('#tracking-wrapping-warning-' + block).show ();
+      }
     } else
     if (alignment == AI_ALIGNMENT_DEFAULT) {
       $("#css-none-"+block).css('display', 'table-cell');
@@ -1016,6 +1078,10 @@ jQuery(document).ready(function($) {
       $("#icons-css-code-" + block).show();
       $("#custom-css-"+block).show();
       configure_selection_icons (block);
+      if (is_sticky ($("#custom-css-"+block).val ())) {
+        $("#sticky-position-"+block).show();
+        $("#sticky-animation-"+block).show();
+      }
     } else
     if (alignment == AI_ALIGNMENT_LEFT) {
       $("#css-left-"+block).css('display', 'table-cell');
@@ -1046,7 +1112,8 @@ jQuery(document).ready(function($) {
     } else
     if (alignment == AI_ALIGNMENT_STICKY) {
       $("#icons-css-code-" + block).show();
-      $("#sticky-settings-"+block).show();
+      $("#sticky-position-"+block).show();
+      $("#sticky-animation-"+block).show();
       $("#css-sticky-"+block).css('display', 'table-cell');
       configure_selection_icons (block);
     }
@@ -1855,9 +1922,12 @@ jQuery(document).ready(function($) {
 
       var sticky = false;
 
-      var alignment  = $("select#block-alignment-"+block+" option:selected").attr('value');
-      var horizontal = $("select#horizontal-position-"+block+" option:selected").attr('value');
-      var vertical   = $("select#vertical-position-"+block+" option:selected").attr('value');
+      var alignment         = $("select#block-alignment-"+block+" option:selected").attr('value');
+      var horizontal        = $("select#horizontal-position-"+block+" option:selected").attr('value');
+      var vertical          = $("select#vertical-position-"+block+" option:selected").attr('value');
+      var horizontal_margin = $("#horizontal-margin-"+block).val ();
+      var vertical_margin   = $("#vertical-margin-"+block).val ();
+      var animation         = $("select#animation-"+block+" option:selected").attr('value');
 
       var custom_css = $("#custom-css-"+block).val ();
 
@@ -1866,8 +1936,8 @@ jQuery(document).ready(function($) {
         alignment_css = $("#css-none-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_CUSTOM_CSS) {
-        alignment_css = $("#custom-css-"+block).val();
-        sticky = get_sticky_classes (custom_css).length != 0;
+        alignment_css = custom_css;
+        sticky = is_sticky (custom_css);
       } else
       if (alignment == AI_ALIGNMENT_LEFT) {
         alignment_css = $("#css-left-"+block).text ();
@@ -1897,13 +1967,12 @@ jQuery(document).ready(function($) {
         alignment_css = $("#css-sticky-bottom-"+block).text ();
       } else
       if (alignment == AI_ALIGNMENT_STICKY) {
-        alignment_css = $("#css-sticky-"+block).text ();
+        alignment_css = update_sticky_margins ($("#css-sticky-"+block).text (), horizontal_margin, vertical_margin);
         sticky = true;
       }
 
       var name = $("#name-label-"+block).text ();
-
-      var code  = $.base64Encode (get_editor_text (block));
+      var code  = get_editor_text (block);
       var php   = $("input#process-php-"+block).is(":checked") ? 1 : 0;
       var label = $("input#show-label-"+block).is(":checked") ? 1 : 0;
 
@@ -1923,7 +1992,24 @@ jQuery(document).ready(function($) {
 
       var nonce = $("#ai-form").attr ('nonce');
 
-      var param = {'action': 'ai_ajax_backend', 'preview': block, 'ai_check': nonce, 'name': $.base64Encode (name), 'alignment': btoa (alignment), 'horizontal': btoa (horizontal), 'vertical': btoa (vertical), 'alignment_css': btoa (alignment_css), 'custom_css': btoa (custom_css), 'code': code, 'php': php, 'label': label, 'close': close_button};
+      var param = {
+        'action':             'ai_ajax_backend',
+        'preview':            block,
+        'ai_check':           nonce,
+        'name':               $.base64Encode (name),
+        'code':               $.base64Encode (code),
+        'alignment':          btoa (alignment),
+        'horizontal':         btoa (horizontal),
+        'vertical':           btoa (vertical),
+        'horizontal_margin':  btoa (horizontal_margin),
+        'vertical_margin':    btoa (vertical_margin),
+        'animation':          btoa (animation),
+        'alignment_css':      btoa (alignment_css),
+        'custom_css':         btoa (custom_css),
+        'php':                php,
+        'label':              label,
+        'close':              close_button
+      };
       window_open_post (ajaxurl, 'width='+window_width+',height='+window_height+',top='+window_top+',left='+window_left+',resizable=yes,scrollbars=yes,toolbar=no,location=no,directories=no,status=no,menubar=no', 'preview', param);
     });
 
@@ -1937,7 +2023,13 @@ jQuery(document).ready(function($) {
     create_list_editor   ('ip-address',   tab);
     create_list_selector ('country',      tab);
 
-    $('#tracking-' + tab).checkboxButton ();
+    $('#tracking-' + tab).checkboxButton ().click (function () {
+      var block = $(this).attr('id').replace ("tracking-", "");
+      var alignment = $("select#block-alignment-"+block+" option:selected").attr('value');
+      var tracking  = !$('#tracking-' + block).next ().find ('.checkbox-icon').hasClass ('on');
+      if (tracking && alignment == AI_ALIGNMENT_NO_WRAPPING) $('#tracking-wrapping-warning-' + block).show (); else $('#tracking-wrapping-warning-' + block).hide ();
+    });
+
     $('#simple-editor-' + tab).checkboxButton ().click (function () {
       var block = $(this).attr('id').replace ("simple-editor-", "");
       if (block == active_tab) {
@@ -2355,6 +2447,16 @@ jQuery(document).ready(function($) {
         duration: 50,
       }
     });
+
+    $("select#close-button-" + tab).change (function () {
+      var block = $(this).attr('id').replace ("close-button-", "");
+      $("select#close-button2-"+block+"").val ($("select#close-button-"+block+" option:selected").attr('value'));
+    });
+
+    $("select#close-button2-" + tab).change (function () {
+      var block = $(this).attr('id').replace ("close-button2-", "");
+      $("select#close-button-"+block+"").val ($("select#close-button2-"+block+" option:selected").attr('value'));
+    });
   }
 
   function configure_sticky_css (block) {
@@ -2425,6 +2527,14 @@ jQuery(document).ready(function($) {
         $(this).attr ('title', titles [index]);
       });
 
+//      var titles = new Array();
+//      $("select#close-button-"+block).imagepicker({hide_select: false}).find ('option').each (function (index) {
+//        titles.push ($(this).data ('title'));
+//      });
+//      $("select#close-button2-"+block+" + ul").appendTo("#close-buttons-"+block).css ('padding-top', '10px').find ('li').each (function (index) {
+//        $(this).attr ('title', titles [index]);
+//      });
+
       css_code_container.addClass ('configured');
     }
   }
@@ -2470,6 +2580,9 @@ jQuery(document).ready(function($) {
           rotation_container.find ('input.option-name').each (function (index) {
             if (index < options) $(this).val (code_data ['options'][index]['name']);
           });
+          rotation_container.find ('input.option-share').each (function (index) {
+            if (index < options) $(this).val (code_data ['options'][index]['share']);
+          });
         }
       }
     }).fail (function (xhr, status, error) {
@@ -2502,7 +2615,7 @@ jQuery(document).ready(function($) {
     rotation_container.find ("div.rounded").each (function (index) {
       var code_data = $('#option-' + block + '-' + (index + 1)).data ('code');
       var code = typeof code_data == 'undefined' ? '' : $.base64Decode (code_data);
-      var option_data = {'name': $(this).find ('input.option-name').val (), 'code': code};
+      var option_data = {'name': $(this).find ('input.option-name').val (), 'share': $(this).find ('input.option-share').val (), 'code': code};
 
       rotation_data.push (option_data);
     });

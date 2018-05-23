@@ -1,11 +1,21 @@
 jQuery (function ($) {
   $("div.ai-rotate").each (function () {
     var rotate_options = $(".ai-rotate-option", this);
-    var random_index = Math.floor (Math.random () * rotate_options.length);
 
-    var d = new Date();
-    var n = d.getMilliseconds();
-    if (n % 2) random_index = rotate_options.length - random_index - 1;
+    var thresholds_data = $(this).data ('shares');
+    if (typeof thresholds_data === 'string') {
+      var thresholds = JSON.parse (atob (thresholds_data));
+      var random_threshold = Math.round (Math.random () * 100);
+      for (var index = 0; index < thresholds.length; index ++) {
+        var random_index = index;
+        if (random_threshold <= thresholds [index]) break;
+      }
+    } else {
+        var random_index = Math.floor (Math.random () * rotate_options.length);
+        var d = new Date();
+        var n = d.getMilliseconds();
+        if (n % 2) random_index = rotate_options.length - random_index - 1;
+      }
 
     rotate_options.hide ();
     var option = $(rotate_options [random_index]);

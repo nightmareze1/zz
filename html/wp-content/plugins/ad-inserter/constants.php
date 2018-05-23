@@ -24,7 +24,7 @@ if (!defined( 'AD_INSERTER_NAME'))
   define ('AD_INSERTER_NAME', 'Ad Inserter');
 
 if (!defined( 'AD_INSERTER_VERSION'))
-  define ('AD_INSERTER_VERSION', '2.3.7');
+  define ('AD_INSERTER_VERSION', '2.3.8');
 
 if (!defined ('AD_INSERTER_PLUGIN_BASENAME'))
   define ('AD_INSERTER_PLUGIN_BASENAME', plugin_basename (__FILE__));
@@ -140,6 +140,14 @@ define ('AI_OPTION_DETECT_VIEWPORT',             'detect_viewport');
 define ('AI_OPTION_ADB_BLOCK_ACTION',            'adb-block-action');
 define ('AI_OPTION_ADB_BLOCK_REPLACEMENT',       'adb-block-replacement');
 define ('AI_OPTION_CLOSE_BUTTON',                'close-button');
+define ('AI_OPTION_HORIZONTAL_MARGIN',           'horizontal-margin');
+define ('AI_OPTION_VERTICAL_MARGIN',             'vertical-margin');
+define ('AI_OPTION_ANIMATION',                   'animation');
+define ('AI_OPTION_ANIMATION_TRIGGER',           'animation-trigger');
+define ('AI_OPTION_ANIMATION_TRIGGER_VALUE',     'animation-trigger-value');
+define ('AI_OPTION_ANIMATION_TRIGGER_OFFSET',    'animation-trigger-offset');
+define ('AI_OPTION_ANIMATION_TRIGGER_DELAY',     'animation-trigger-delay');
+define ('AI_OPTION_ANIMATION_TRIGGER_ONCE',      'animation-trigger-once');
 
 define ('AI_OPTION_DISABLED',                    'disabled');
 
@@ -163,7 +171,7 @@ define('AD_EMPTY_VALUE','');
 
 //define constant variable form
 define('AI_FORM_SAVE',              'ai_save');
-define('AI_FORM_CLEAR','ai_clear');
+define('AI_FORM_CLEAR',             'ai_clear');
 define('AI_FORM_CLEAR_EXCEPTIONS',  'ai-clear-exceptions');
 define('AI_FORM_CLEAR_STATISTICS',  'ai-clear-statistics');
 
@@ -321,6 +329,33 @@ define('AI_TEXT_STICK_TO_THE_TOP',        'Stick to the top');
 define('AI_TEXT_SCROLL_WITH_THE_CONTENT', 'Scroll with the content');
 define('AI_TEXT_STICK_TO_THE_BOTTOM',     'Stick to the bottom');
 
+define('AI_ANIMATION_NONE',           0);
+define('AI_ANIMATION_FADE',           1);
+define('AI_ANIMATION_SLIDE',          2);
+define('AI_ANIMATION_SLIDE_FADE',     3);
+define('AI_ANIMATION_FLIP',           4);
+define('AI_ANIMATION_ZOOM_IN',        5);
+define('AI_ANIMATION_ZOOM_OUT',       6);
+define('AI_ANIMATION_TURN',           7);
+
+define('AI_TEXT_FADE',                'Fade');
+define('AI_TEXT_SLIDE',               'Slide');
+define('AI_TEXT_SLIDE_FADE',          'Slide and Fade');
+define('AI_TEXT_FLIP',                'Flip');
+define('AI_TEXT_ZOOM_IN',             'Zoom In');
+define('AI_TEXT_ZOOM_OUT',            'Zoom Out');
+define('AI_TEXT_TURN',                'Turn');
+
+define('AI_TRIGGER_PAGE_LOADED',      0);
+define('AI_TRIGGER_PAGE_SCROLLED_PC', 1);
+define('AI_TRIGGER_PAGE_SCROLLED_PX', 2);
+define('AI_TRIGGER_ELEMENT_VISIBLE',  3);
+
+define('AI_TEXT_PAGE_LOADED',         'Page loaded');
+define('AI_TEXT_PAGE_SCROLLED_PC',    'Page scrolled (%)');
+define('AI_TEXT_PAGE_SCROLLED_PX',    'Page scrolled (px)');
+define('AI_TEXT_ELEMENT_VISIBLE',     'Element visible');
+
 define('AI_STICKY_Z_INDEX',               9995);   // update ad-inserter.js
 
 define('AI_ALIGNMENT_CSS_DEFAULT',        'margin: 8px 0; clear: both;');
@@ -335,21 +370,26 @@ define('AI_ALIGNMENT_CSS_STICKY_TOP',     'position: fixed; top: 0; text-align: 
 define('AI_ALIGNMENT_CSS_STICKY_BOTTOM',  'position: fixed; bottom: 0; text-align: center; left: 50%; transform: translate(-50%); width: 100%; z-index: 9999;||position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; z-index: 9999;||position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; display: flex; justify-content: center; z-index: 9999;');
 define('AI_ALIGNMENT_CSS_STICKY',         'position: fixed; z-index: '.AI_STICKY_Z_INDEX.';');
 
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_TOP',           ' top: 0px;');
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_TOP_OFFSET',    ' top: 100px;');
-define('AI_ALIGNMENT_CSS_CENTER_VERTICAL',            ' top: 50%; transform: translate(0, -50%);');
-define('AI_ALIGNMENT_CSS_CENTER_VERTICAL_H',          ' top: 50%;');
-define('AI_ALIGNMENT_CSS_SCROLL_WITH_THE_CONTENT',    ' position: relative; margin-bottom: auto; width: fit-content; top: 100px; display: none;');
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_BOTTOM',        ' bottom: 0px;');
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_BOTTOM_OFFSET', ' bottom: 100px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_TOP',             ' top: 0px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_TOP_OFFSET',      ' top: 100px;');
+define('AI_ALIGNMENT_CSS_CENTER_VERTICAL',              ' top: 50%; transform: translate(0, -50%);');
+define('AI_ALIGNMENT_CSS_CENTER_VERTICAL_H_ANIM',       ' top: 50%;');
+//define('AI_ALIGNMENT_CSS_SCROLL_WITH_THE_CONTENT',      ' position: relative; margin-bottom: auto; width: fit-content; top: 100px; display: none;');
+define('AI_ALIGNMENT_CSS_SCROLL_WITH_THE_CONTENT',      ' position: absolute; margin-bottom: auto; width: fit-content; top: 100px; display: none;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_BOTTOM',          ' bottom: 0px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_BOTTOM_OFFSET',   ' bottom: 100px;');
 
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_LEFT',          ' left: 0px;');
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_LEFT',  ' left: auto; margin-right: 10px; width: fit-content; display: none;');
-define('AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL',    ' text-align: center; left: 50%; transform: translate(-50%);');
-define('AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL_V',  ' text-align: center; left: 50%; transform: translate(-50%, -50%);');
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_RIGHT', ' right: auto; margin-left: 10px; width: fit-content; display: none;');
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_RIGHT',         ' right: 0px;');
-define('AI_ALIGNMENT_CSS_STICK_TO_THE_RIGHT_SCROLL',  ' margin-left: auto;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_LEFT',            ' left: 0px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_LEFT',    ' left: auto; margin-right: 10px; width: fit-content; display: none;');
+define('AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL',      ' text-align: center; left: 50%; transform: translate(-50%);');
+define('AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL_V',    ' text-align: center; left: 50%; transform: translate(-50%, -50%);');
+define('AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL_ANIM', ' text-align: center; left: 50%;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_RIGHT',   ' right: auto; margin-left: 10px; width: fit-content; display: none;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_RIGHT',           ' right: 0px;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_RIGHT_SCROLL',    ' right: 0px; margin-left: auto;');
+
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_LEFT_W',  ' right: calc(50%); display: block;');
+define('AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_RIGHT_W', ' left: calc(50%); display: block;');
 
 define('AI_ALIGNMENT_CSS_AMP_LEFT',       'display: flex; justify-content: flex-start;');
 define('AI_ALIGNMENT_CSS_AMP_RIGHT',      'display: flex; justify-content: flex-end;');
@@ -590,6 +630,16 @@ define ('DEFAULT_HTML_ELEMENT_INSERTION',       AI_HTML_INSERTION_CLIENT_SIDE_DO
 define ('DEFAULT_CLIENT_SIDE_ACTION',           AI_CLIENT_SIDE_ACTION_SHOW);
 define ('DEFAULT_HORIZONTAL_POSITION',          AI_STICK_TO_THE_LEFT);
 define ('DEFAULT_VERTICAL_POSITION',            AI_STICK_TO_THE_TOP);
+define ('DEFAULT_HORIZONTAL_MARGIN',            '');
+define ('DEFAULT_VERTICAL_MARGIN',              '');
+define ('DEFAULT_MAIN_CONTENT_ELEMENT',         '');
+define ('DEFAULT_ANIMATION',                    AI_ANIMATION_NONE);
+define ('DEFAULT_ANIMATION_TRIGGER',            AI_TRIGGER_PAGE_LOADED);
+define ('DEFAULT_ANIMATION_TRIGGER_VALUE',      '');
+define ('DEFAULT_ANIMATION_TRIGGER_OFFSET',     '');
+define ('DEFAULT_ANIMATION_TRIGGER_DELAY',      '');
+define ('DEFAULT_ANIMATION_TRIGGER_ONCE',       AI_DISABLED);
+
 
 define ('AI_ADBLOCKING_DETECTION',              true);
 define ('AI_NORMAL_HEADER_STYLES',              true);
@@ -598,7 +648,7 @@ define ('AI_CODE_GENERATOR',                    true);
 define ('AI_BUFFERING',                         true);
 define ('AI_ADSENSE_API',                       true);
 define ('AI_ADSENSE_OVERLAY',                   true);
-//define ('AI_STICKY_SETTINGS',                   true);
+define ('AI_STICKY_SETTINGS',                   true);
 define ('AI_ADB_1_NAME',                        'dqwpediwqswqma');
 define ('AI_ADB_2_DEFAULT_NAME',                'lfoswyekaaslsd');
 define ('AI_ADB_CONTENT_CSS_BEGIN',             'ai-adb-content-begin');
@@ -756,6 +806,8 @@ define ('AI_CLIENT_SIDE_INSERTION',      29);
 define ('AI_USER_AGENT',                 30);
 define ('AI_STICK_TO_THE_CONTENT',       31);
 define ('AI_DEBUG_MENU_ITEMS',           32);
+define ('AI_ANIMATION',                  33);
+define ('AI_TRIGGER_ELEMENTS',           34);
 
 define ('AI_CONTEXT_NONE',                0);
 define ('AI_CONTEXT_CONTENT',             1);

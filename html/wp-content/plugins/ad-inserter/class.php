@@ -352,16 +352,15 @@ abstract class ai_BaseCodeBlock {
     unset ($this->wp_options ['GENERATED_CODE']);
   }
 
-  public function ai_getCode ($client_code = null, $process_php = null){
+  public function ai_getCode (){
     global $block_object, $ai_total_php_time, $ai_wp_data;
 
     if ($this->fallback != 0) return $block_object [$this->fallback]->ai_getCode ();
 
     $obj = $this;
-    $code = $client_code === null ? $obj->get_ad_data()      : $client_code;
-    $php  = $process_php === null ? $obj->get_process_php () : $process_php;
+    $code = $obj->get_ad_data();
 
-    if ($php && (!is_multisite() || is_main_site () || multisite_php_processing ())) {
+    if ($obj->get_process_php () && (!is_multisite() || is_main_site () || multisite_php_processing ())) {
       $global_name = 'GENERATED_CODE';
       if (isset ($obj->wp_options [$global_name])) return $obj->wp_options [$global_name];
 
@@ -437,6 +436,14 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     if (defined ('AI_STICKY_SETTINGS') && AI_STICKY_SETTINGS) {
       $this->wp_options [AI_OPTION_HORIZONTAL_POSITION]        = DEFAULT_HORIZONTAL_POSITION;
       $this->wp_options [AI_OPTION_VERTICAL_POSITION]          = DEFAULT_VERTICAL_POSITION;
+      $this->wp_options [AI_OPTION_HORIZONTAL_MARGIN]          = DEFAULT_HORIZONTAL_MARGIN;
+      $this->wp_options [AI_OPTION_VERTICAL_MARGIN]            = DEFAULT_VERTICAL_MARGIN;
+      $this->wp_options [AI_OPTION_ANIMATION]                  = DEFAULT_ANIMATION;
+      $this->wp_options [AI_OPTION_ANIMATION_TRIGGER]          = DEFAULT_ANIMATION_TRIGGER;
+      $this->wp_options [AI_OPTION_ANIMATION_TRIGGER_VALUE]    = DEFAULT_ANIMATION_TRIGGER_VALUE;
+      $this->wp_options [AI_OPTION_ANIMATION_TRIGGER_OFFSET]   = DEFAULT_ANIMATION_TRIGGER_OFFSET;
+      $this->wp_options [AI_OPTION_ANIMATION_TRIGGER_DELAY]    = DEFAULT_ANIMATION_TRIGGER_DELAY;
+      $this->wp_options [AI_OPTION_ANIMATION_TRIGGER_ONCE]     = DEFAULT_ANIMATION_TRIGGER_ONCE;
     }
     $this->wp_options [AI_OPTION_GENERAL_TAG]                = AD_GENERAL_TAG;
     $this->wp_options [AI_OPTION_SCHEDULING]                 = AI_SCHEDULING_OFF;
@@ -661,8 +668,18 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     }
   }
 
-  public function sticky_style ($vertical_position, $horizontal_position) {
+  public function sticky_style ($horizontal_position, $vertical_position, $horizontal_margin = null, $vertical_margin = null) {
     $style = "";
+
+    if ($horizontal_margin === null)  $horizontal_margin = trim ($this->get_horizontal_margin ());
+    if ($vertical_margin === null)    $vertical_margin   = trim ($this->get_vertical_margin ());
+
+    $animation = $this->get_animation () != AI_ANIMATION_NONE;
+
+    $main_content_fixed_width = is_numeric (get_main_content_element ());
+    if ($main_content_fixed_width) {
+      $main_content_shift = (int) (get_main_content_element () / 2);
+    }
 
     switch ($vertical_position) {
       case AI_STICK_TO_THE_TOP:
@@ -674,19 +691,26 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
             $style = AI_ALIGNMENT_CSS_STICK_TO_THE_TOP_OFFSET;
             break;
         }
+        if ($vertical_margin != '') {
+          $style = ai_change_css ($style, 'top', $vertical_margin . 'px');
+        }
         break;
       case AI_STICK_VERTICAL_CENTER:
-        switch ($horizontal_position) {
-          case AI_STICK_HORIZONTAL_CENTER:
-            $style = AI_ALIGNMENT_CSS_CENTER_VERTICAL_H;
-            break;
-          default:
-            $style = AI_ALIGNMENT_CSS_CENTER_VERTICAL;
-            break;
-        }
+        if ($animation) $style .= AI_ALIGNMENT_CSS_CENTER_VERTICAL_H_ANIM; else
+          switch ($horizontal_position) {
+            case AI_STICK_HORIZONTAL_CENTER:
+              $style = AI_ALIGNMENT_CSS_CENTER_VERTICAL_H_ANIM;
+              break;
+            default:
+              $style = AI_ALIGNMENT_CSS_CENTER_VERTICAL;
+              break;
+          }
         break;
       case AI_SCROLL_WITH_THE_CONTENT:
         $style = AI_ALIGNMENT_CSS_SCROLL_WITH_THE_CONTENT;
+        if ($vertical_margin != '') {
+          $style = ai_change_css ($style, 'top', $vertical_margin . 'px');
+        }
         break;
       case AI_STICK_TO_THE_BOTTOM:
         switch ($horizontal_position) {
@@ -697,36 +721,61 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
             $style = AI_ALIGNMENT_CSS_STICK_TO_THE_BOTTOM_OFFSET;
             break;
         }
+        if ($vertical_margin != '') {
+          $style = ai_change_css ($style, 'bottom', $vertical_margin . 'px');
+        }
         break;
     }
 
     switch ($horizontal_position) {
       case AI_STICK_TO_THE_LEFT:
         $style .= AI_ALIGNMENT_CSS_STICK_TO_THE_LEFT;
+        if ($horizontal_margin != '') {
+          $style = ai_change_css ($style, 'left', $horizontal_margin . 'px');
+        }
         break;
       case AI_STICK_TO_THE_CONTENT_LEFT:
         $style .= AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_LEFT;
+        if ($horizontal_margin != '') {
+          $style = ai_change_css ($style, 'margin-right', $horizontal_margin . 'px');
+        }
+        if ($main_content_fixed_width) {
+          $style = $style . ai_change_css (AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_LEFT_W, 'right', 'calc(50% + ' . $main_content_shift . 'px)');
+        }
         break;
       case AI_STICK_HORIZONTAL_CENTER:
-        switch ($vertical_position) {
-          case AI_STICK_VERTICAL_CENTER:
-            $style .= AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL_V;
-            break;
-          default:
-            $style .= AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL;
-            break;
-        }
+        if ($animation) $style .= AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL_ANIM; else
+          switch ($vertical_position) {
+            case AI_STICK_VERTICAL_CENTER:
+              $style .= AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL_V;
+              break;
+            default:
+              $style .= AI_ALIGNMENT_CSS_STICK_CENTER_HORIZONTAL;
+              break;
+          }
         break;
       case AI_STICK_TO_THE_CONTENT_RIGHT:
         $style .= AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_RIGHT;
+        if ($horizontal_margin != '') {
+          $style = ai_change_css ($style, 'margin-left', $horizontal_margin . 'px');
+        }
+        if ($main_content_fixed_width) {
+          $style = $style . ai_change_css (AI_ALIGNMENT_CSS_STICK_TO_THE_CONTENT_RIGHT_W, 'left', 'calc(50% + ' . $main_content_shift . 'px)');
+        }
         break;
       case AI_STICK_TO_THE_RIGHT:
         switch ($vertical_position) {
           case AI_SCROLL_WITH_THE_CONTENT:
             $style .= AI_ALIGNMENT_CSS_STICK_TO_THE_RIGHT_SCROLL;
+            if ($horizontal_margin != '') {
+              $style = ai_change_css ($style, 'margin-left', $horizontal_margin . 'px');
+            }
             break;
           default:
             $style .= AI_ALIGNMENT_CSS_STICK_TO_THE_RIGHT;
+            if ($horizontal_margin != '') {
+              $style = ai_change_css ($style, 'right', $horizontal_margin . 'px');
+            }
             break;
         }
         break;
@@ -738,36 +787,201 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
   public function stick_to_the_content_class () {
     $classes = array ();
 
-    switch ($this->get_alignment_type ()) {
+    $alignment_type = $this->get_alignment_type ();
+    $custom_css = $this->get_custom_css ();
+    $horizontal_position = $this->get_horizontal_position ();
+    $vertical_position = $this->get_vertical_position ();
+
+    $main_content_fixed_width = is_numeric (get_main_content_element ());
+
+    switch ($alignment_type) {
       case AI_ALIGNMENT_STICKY:
-        switch ($this->get_horizontal_position ()) {
-          case AI_STICK_TO_THE_CONTENT_LEFT:
-            $classes []= 'ai-sticky-left';
-            break;
-          case AI_STICK_TO_THE_CONTENT_RIGHT:
-            $classes []= 'ai-sticky-right';
-            break;
-        }
-        switch ($this->get_vertical_position ()) {
+        if (!$main_content_fixed_width)
+          switch ($horizontal_position) {
+            case AI_STICK_TO_THE_CONTENT_LEFT:
+              $classes []= 'ai-sticky-left';
+              break;
+            case AI_STICK_TO_THE_CONTENT_RIGHT:
+              $classes []= 'ai-sticky-right';
+              break;
+          }
+        switch ($vertical_position) {
           case AI_SCROLL_WITH_THE_CONTENT:
             $classes []= 'ai-sticky-scroll';
             break;
         }
         break;
       case AI_ALIGNMENT_CUSTOM_CSS:
-        $custom_css = str_replace (' ', '', $this->get_custom_css ());
-        if (strpos ($custom_css, 'position:fixed') !== false &&
-            strpos ($custom_css, 'z-index:' . AI_STICKY_Z_INDEX) !== false &&
-            strpos ($custom_css, 'display:none') !== false) {
-              if (strpos ($custom_css, ';left:auto') !== false) $classes []= 'ai-sticky-left'; // ; to avoid margin-left:auto
-          elseif (strpos ($custom_css, 'right:auto') !== false) $classes []= 'ai-sticky-right';
+        $clean_custom_css_code = str_replace (' ', '', $custom_css);
+        if (!$main_content_fixed_width &&
+            strpos ($clean_custom_css_code, 'position:fixed') !== false &&
+            strpos ($clean_custom_css_code, 'z-index:') !== false &&
+            strpos ($clean_custom_css_code, 'display:none') !== false) {
+              if (strpos ($clean_custom_css_code, ';left:auto') !== false) $classes []= 'ai-sticky-left'; // ; to avoid margin-left:auto
+          elseif (strpos ($clean_custom_css_code, 'right:auto') !== false) $classes []= 'ai-sticky-right';
 
-          if (strpos ($custom_css, 'margin-bottom:auto') !== false) $classes []= 'ai-sticky-scroll';
+          if (strpos ($clean_custom_css_code, 'margin-bottom:auto') !== false) $classes []= 'ai-sticky-scroll';
         }
         break;
     }
 
     return implode (' ', $classes);
+  }
+
+  public function sticky_parameters (&$classes, $preview = false) {
+    global $ai_wp_data;
+
+    $sticky_parameters = '';
+
+    $custom_sticky_css = false;
+    if ($this->get_alignment_type () == AI_ALIGNMENT_CUSTOM_CSS) {
+      $clean_custom_css_code = str_replace (' ', '', $this->get_custom_css ());
+      if (strpos ($clean_custom_css_code, 'position:fixed') !== false && strpos ($clean_custom_css_code, 'z-index:') !== false) $custom_sticky_css = true;
+    }
+
+    if ($this->get_alignment_type () == AI_ALIGNMENT_STICKY || $custom_sticky_css) {
+
+      $stick_to_the_content_class = $this->stick_to_the_content_class ();
+
+      if ($stick_to_the_content_class != '') {
+        $classes [] = 'ai-sticky-content';
+        $classes [] = $stick_to_the_content_class;
+      }
+
+      $horizontal_position = $this->get_horizontal_position ();
+      $vertical_position = $this->get_vertical_position ();
+      $animation = $this->get_animation ();
+
+      $direction = '';
+
+      switch ($horizontal_position) {
+        case AI_STICK_TO_THE_LEFT:
+        case AI_STICK_TO_THE_CONTENT_LEFT:
+          $direction = 'right';
+          break;
+        case AI_STICK_HORIZONTAL_CENTER:
+          $classes [] = 'ai-center-h';
+          switch ($vertical_position) {
+            case AI_STICK_TO_THE_TOP:
+            case AI_SCROLL_WITH_THE_CONTENT:
+              $direction = 'down';
+              break;
+            case AI_STICK_VERTICAL_CENTER:
+              $direction = 'left';
+              switch ($animation) {
+                case AI_ANIMATION_SLIDE:
+                case AI_ANIMATION_SLIDE_FADE:
+                  $animation = AI_ANIMATION_FADE;
+                  break;
+                case AI_ANIMATION_ZOOM_IN:
+                case AI_ANIMATION_ZOOM_OUT:
+                  $direction = 'up';
+                  break;
+              }
+              break;
+            case AI_STICK_TO_THE_BOTTOM:
+              $direction = 'up';
+              break;
+          }
+          break;
+        case AI_STICK_TO_THE_CONTENT_RIGHT:
+        case AI_STICK_TO_THE_RIGHT:
+          $direction = 'left';
+          break;
+      }
+
+      if ($vertical_position == AI_STICK_VERTICAL_CENTER) $classes [] = 'ai-center-v';
+
+      switch ($horizontal_position) {
+        case AI_STICK_TO_THE_LEFT:
+          if ($animation == AI_ANIMATION_TURN) $direction = 'left';
+          break;
+        case AI_STICK_TO_THE_RIGHT:
+          if ($animation == AI_ANIMATION_TURN) $direction = 'right';
+          break;
+        case AI_STICK_TO_THE_CONTENT_LEFT:
+        case AI_STICK_TO_THE_CONTENT_RIGHT:
+          if ($animation == AI_ANIMATION_SLIDE) $animation = AI_ANIMATION_SLIDE_FADE;
+          break;
+      }
+
+      switch ($animation) {
+        case AI_ANIMATION_FADE:
+          $sticky_parameters .= ' data-aos="fade"';
+          break;
+        case AI_ANIMATION_SLIDE:
+          $sticky_parameters .= ' data-aos="slide-'.$direction.'"';
+          break;
+        case AI_ANIMATION_SLIDE_FADE:
+          $sticky_parameters .= ' data-aos="fade-'.$direction.'"';
+          break;
+        case AI_ANIMATION_TURN:
+          $classes [] = 'ai-sticky-turn';
+          $sticky_parameters .= ' data-aos="flip-'.$direction.'"';
+          break;
+        case AI_ANIMATION_FLIP:
+          if ($direction == 'right') $direction = 'left';
+          elseif ($direction == 'left') $direction = 'right';
+          $sticky_parameters .= ' data-aos="flip-'.$direction.'"';
+          break;
+        case AI_ANIMATION_ZOOM_IN:
+          $sticky_parameters .= ' data-aos="zoom-in-'.$direction.'"';
+          break;
+        case AI_ANIMATION_ZOOM_OUT:
+          $sticky_parameters .= ' data-aos="zoom-out-'.$direction.'"';
+          break;
+      }
+
+      if (!$preview) {
+        switch ($this->get_animation_trigger ()) {
+          case AI_TRIGGER_PAGE_SCROLLED_PC:
+            $pc = $this->get_animation_trigger_value ();
+            if (!is_numeric ($pc)) $pc = 0;
+            $pc = intval ($pc);
+            if ($pc < 0) $pc = 0;
+            if ($pc > 100) $pc = 100;
+            $pc = number_format ($pc / 100, 2);
+            if (!isset ($ai_wp_data [AI_TRIGGER_ELEMENTS])) $ai_wp_data [AI_TRIGGER_ELEMENTS] = array ();
+            $ai_wp_data [AI_TRIGGER_ELEMENTS][$this->number] = $pc;
+            $sticky_parameters .= ' data-aos-anchor="#ai-position-'.$this->number.'" data-aos-anchor-placement="top-top"';
+            break;
+          case AI_TRIGGER_PAGE_SCROLLED_PX:
+            $px = $this->get_animation_trigger_value ();
+            if (!is_numeric ($px)) $px = 0;
+            $px = intval ($px);
+            if ($px < 0) $px = 0;
+            if (!isset ($ai_wp_data [AI_TRIGGER_ELEMENTS])) $ai_wp_data [AI_TRIGGER_ELEMENTS] = array ();
+            $ai_wp_data [AI_TRIGGER_ELEMENTS][$this->number] = $px;
+            $sticky_parameters .= ' data-aos-anchor="#ai-position-'.$this->number.'" data-aos-anchor-placement="top-top"';
+            break;
+          case AI_TRIGGER_ELEMENT_VISIBLE:
+            $sticky_parameters .= ' data-aos-anchor="'.$this->get_animation_trigger_value ().'"';
+            break;
+        }
+
+        $offset = $this->get_animation_trigger_offset ();
+        if (is_numeric ($offset)) {
+          $offset = intval ($offset);
+          if ($offset < -1000) $offset = - 1000;
+          elseif ($offset > 1000) $offset = 1000;
+
+          $sticky_parameters .= ' data-aos-offset="'.$offset.'"';
+        }
+
+        $delay = $this->get_animation_trigger_delay ();
+        if (is_numeric ($delay) && $delay > 0) {
+          $delay = intval ($delay);
+
+          $sticky_parameters .= ' data-aos-delay="'.$delay.'"';
+        }
+
+        if ($this->get_animation_trigger_once ()) {
+          $sticky_parameters .= ' data-aos-once="true"';
+        }
+      }
+    }
+
+    return $sticky_parameters;
   }
 
   public function alignment_style ($alignment_type, $all_styles = false, $full_sticky_style = true) {
@@ -807,7 +1021,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       case AI_ALIGNMENT_STICKY:
         $style = AI_ALIGNMENT_CSS_STICKY;
         if ($full_sticky_style) {
-          $style .= $this->sticky_style ($this->get_vertical_position (), $this->get_horizontal_position ());
+          $style .= $this->sticky_style ($this->get_horizontal_position (), $this->get_vertical_position ());
         }
         break;
       case AI_ALIGNMENT_CUSTOM_CSS:
@@ -1370,8 +1584,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     return $counters;
   }
 
-  public function ai_getAdLabel ($show_label = null) {
-    $label_enabled = $show_label === null ? $this->get_show_label () : $show_label;
+  public function ai_getAdLabel () {
+    $label_enabled = $this->get_show_label ();
 
     if (!$label_enabled) return '';
 
@@ -1382,10 +1596,10 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     return $ad_label .= "\n";
   }
 
-  public function ai_getProcessedCode ($hide_label = false, $force_server_side_code = false, $client_code = null, $process_php = null, $show_label = null) {
+  public function ai_getProcessedCode ($hide_debug_label = false, $force_server_side_code = false, $force_close_button = false) {
     global $ai_wp_data, $ad_inserter_globals, $block_object;
 
-    $code = $this->ai_getCode ($client_code, $process_php);
+    $code = $this->ai_getCode ();
 
     // Clear the codes for cases when the code block is called more than once
     $this->additional_code_before = '';
@@ -1394,10 +1608,10 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     // Code for ad label, close button
     $additional_code = '';
 
-    $additional_code .= $this->ai_getAdLabel ($show_label);
+    $additional_code .= $this->ai_getAdLabel ();
 
     $alignment_type = $this->get_alignment_type ();
-    if ($this->get_close_button () != AI_CLOSE_NONE && !$ai_wp_data [AI_WP_AMP_PAGE] && $alignment_type != AI_ALIGNMENT_NO_WRAPPING && $client_code === null) {
+    if ($force_close_button || ($this->get_close_button () != AI_CLOSE_NONE && !$ai_wp_data [AI_WP_AMP_PAGE] && $alignment_type != AI_ALIGNMENT_NO_WRAPPING)) {
       switch ($this->get_close_button ()) {
         case AI_CLOSE_TOP_RIGHT:
           $button_class = 'ai-close-button';
@@ -1466,9 +1680,42 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
         $ads = array_values ($ads);
       } else array_unshift ($ai_wp_data [AI_SHORTCODES]['rotate'],  array ('name' => ''));
 
+      $shares = false;
       $version_names = array ();
+      $version_shares = array ();
       foreach ($ai_wp_data [AI_SHORTCODES]['rotate'] as $index => $option) {
         $version_names []= isset ($option ['name']) && trim ($option ['name']) != '' ? $option ['name'] : chr (ord ('A') + $index);
+        if (isset ($option ['share'])) $shares = true;
+        $version_shares []= isset ($option ['share']) && is_numeric ($option ['share']) ? intval ($option ['share']) : - 1;
+      }
+
+      if ($shares) {
+        $total_share = 0;
+        $no_share = 0;
+
+        foreach ($version_shares as $index => $share) {
+          if ($share < 0) $no_share ++; else $total_share += $share;
+        }
+
+        if ($total_share > 100 || $no_share == 0) {
+          $scale = $total_share / 100;
+        } else $scale = 1;
+
+        foreach ($version_shares as $index => $share) {
+          // Disable options with share 0
+          if ($share == 0) $version_shares [$index] = - 1; else
+            if ($share < 0) $version_shares [$index] = (100 - $total_share / $scale) / $no_share; else
+              $version_shares [$index] = $share / $scale;
+        }
+
+        $thresholds = array ();
+        $total_share = 0;
+        foreach ($version_shares as $index => $share) {
+          if ($share >= 0) {
+            $total_share += $share;
+            $thresholds [] = round ($total_share);
+          } else $thresholds [] = - 1;
+        }
       }
 
       $amp_dynamic_blocks = $dynamic_blocks;
@@ -1476,17 +1723,29 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
       switch ($amp_dynamic_blocks) {
         case AI_DYNAMIC_BLOCKS_SERVER_SIDE:
-          $this->code_version = mt_rand (1, count ($ads));
+          if ($shares) {
+            $random_threshold = mt_rand (0, 100);
+            foreach ($thresholds as $index => $threshold) {
+              $this->code_version = $index + 1;
+              if ($random_threshold <= $threshold) break;
+            }
+          } else $this->code_version = mt_rand (1, count ($ads));
+
           $processed_code = $additional_code . trim ($ads [$this->code_version - 1]);
           $this->version_name = $version_names [$this->code_version - 1];
           break;
         case AI_DYNAMIC_BLOCKS_CLIENT_SIDE:
           $this->code_version = '""';
 
+          $version_share_data = '';
+          if ($shares) {
+            $version_share_data = " data-shares='".base64_encode (json_encode ($thresholds))."'";
+          }
+
           if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
-            $processed_code = "\n<div class='ai-rotate'>\n" . $additional_code;
+            $processed_code = "\n<div class='ai-rotate'".$version_share_data.">\n" . $additional_code;
           } else
-          $processed_code = "\n<div class='ai-rotate' style='position: relative;'>\n" . $additional_code;
+          $processed_code = "\n<div class='ai-rotate'".$version_share_data." style='position: relative;'>\n" . $additional_code;
 
           foreach ($ads as $index => $ad) {
 
@@ -1501,22 +1760,27 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
             switch ($index) {
               case 0:
                 if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
-                  $processed_code .= "<div class='ai-rotate-option'".$version_name_data.">\n".trim ($ad, "\n")."\n</div>\n";
+                  $processed_code .= "<div class='ai-rotate-option'".$version_name_data.">\n".trim ($ad, "\n\r")."</div>\n";
                 } else
-                $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden;'".$version_name_data.">\n".trim ($ad, "\n")."\n</div>\n";
+                $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden;'".$version_name_data.">\n".trim ($ad, "\n\r")."</div>\n";
                 break;
               default:
                 if (defined ('AI_NORMAL_HEADER_STYLES') && AI_NORMAL_HEADER_STYLES && !get_inline_styles ()) {
-                  $processed_code .= "<div class='ai-rotate-option ai-rotate-options'".$version_name_data.">".trim ($ad, "\n")."\n</div>\n";
+                  $processed_code .= "<div class='ai-rotate-option ai-rotate-options'".$version_name_data.">\n".trim ($ad, "\n\r")."</div>\n";
                 } else
-                $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%;'".$version_name_data.">".trim ($ad, "\n")."\n</div>\n";
+                $processed_code .= "<div class='ai-rotate-option' style='visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%;'".$version_name_data.">\n".trim ($ad, "\n\r")."</div>\n";
                 break;
             }
           }
           $processed_code .= "</div>\n";
           break;
         case AI_DYNAMIC_BLOCKS_SERVER_SIDE_W3TC:
-          $this->w3tc_code = '$ai_code = unserialize (base64_decode (\''.base64_encode (serialize ($ads)).'\')); $ai_index = mt_rand (1, count ($ai_code)); $ai_code = base64_decode (\''.base64_encode ($additional_code).'\') . $ai_code [$ai_index - 1]; $ai_enabled = true;';
+          if ($shares) {
+            $ad_index_code = ' $ai_random_threshold = mt_rand (0, 100); $ai_thresholds = unserialize (\''.
+                               serialize ($thresholds).'\'); foreach ($ai_thresholds as $ai_option_index => $ai_threshold) {$ai_index = $ai_option_index + 1; if ($ai_random_threshold <= $ai_threshold) break;}';
+          } else $ad_index_code = ' $ai_index = mt_rand (1, count ($ai_code));';
+
+          $this->w3tc_code = '$ai_code = unserialize (base64_decode (\''.base64_encode (serialize ($ads)).'\'));'.$ad_index_code.' $ai_code = base64_decode (\''.base64_encode ($additional_code).'\') . $ai_code [$ai_index - 1]; $ai_enabled = true;';
           $processed_code = '<!-- mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
           $processed_code .= $this->w3tc_code.' echo $ai_code;';
           $processed_code .= '<!-- /mfunc '.W3TC_DYNAMIC_SECURITY.' -->';
@@ -1606,13 +1870,13 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       }
     }
 
-    if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 /*&& !$hide_label*/) {
+    if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 /*&& !$hide_debug_label*/) {
       $processed_code =  "<div class='ai-code'>\n" . $processed_code ."</div>\n";
     }
 
-    if (function_exists ('ai_adb_block_actions')) ai_adb_block_actions ($this, $hide_label);
+    if (function_exists ('ai_adb_block_actions')) ai_adb_block_actions ($this, $hide_debug_label);
 
-    if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 && !$hide_label) {
+    if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_BLOCKS) != 0 && !$hide_debug_label) {
       $title = '';
       $fallback_block_name = '';
 
@@ -1742,15 +2006,7 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
       $sticky_parameters = '';
 
       if (!$ai_wp_data [AI_WP_AMP_PAGE]) {
-        $stick_to_the_content_class = $this->stick_to_the_content_class ();
-
-        if ($stick_to_the_content_class != '') {
-          $classes [] = 'ai-sticky-content';
-          $classes [] = $stick_to_the_content_class;
-
-//          $classes [] = 'ai-sticky-parameters';
-//          $sticky_parameters = ' data-ai-parameters="'.base64_encode ('[3500,0,1500]').'"';
-        }
+        $sticky_parameters = $this->sticky_parameters ($classes);
       }
 
       if ($this->get_close_button () && !$ai_wp_data [AI_WP_AMP_PAGE]) {
@@ -1957,16 +2213,56 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
     return $serverside_insertion_code;
   }
 
+  public function get_close_button (){
+     $option = isset ($this->wp_options [AI_OPTION_CLOSE_BUTTON]) ? $this->wp_options [AI_OPTION_CLOSE_BUTTON] : DEFAULT_CLOSE_BUTTON;
+     return $option;
+  }
+
+  public function get_horizontal_margin (){
+     $option = isset ($this->wp_options [AI_OPTION_HORIZONTAL_MARGIN]) ? $this->wp_options [AI_OPTION_HORIZONTAL_MARGIN] : DEFAULT_HORIZONTAL_MARGIN;
+     return $option;
+  }
+
+  public function get_vertical_margin () {
+    $option = isset ($this->wp_options [AI_OPTION_VERTICAL_MARGIN]) ? $this->wp_options [AI_OPTION_VERTICAL_MARGIN] : DEFAULT_VERTICAL_MARGIN;
+    return $option;
+  }
+
+  public function get_animation () {
+    $option = isset ($this->wp_options [AI_OPTION_ANIMATION]) ? $this->wp_options [AI_OPTION_ANIMATION] : DEFAULT_ANIMATION;
+    return $option;
+  }
+
+  public function get_animation_trigger () {
+    $option = isset ($this->wp_options [AI_OPTION_ANIMATION_TRIGGER]) ? $this->wp_options [AI_OPTION_ANIMATION_TRIGGER] : DEFAULT_ANIMATION_TRIGGER;
+    return $option;
+  }
+
+  public function get_animation_trigger_value () {
+    $option = isset ($this->wp_options [AI_OPTION_ANIMATION_TRIGGER_VALUE]) ? $this->wp_options [AI_OPTION_ANIMATION_TRIGGER_VALUE] : DEFAULT_ANIMATION_TRIGGER_VALUE;
+    return $option;
+  }
+
+  public function get_animation_trigger_offset () {
+    $option = isset ($this->wp_options [AI_OPTION_ANIMATION_TRIGGER_OFFSET]) ? $this->wp_options [AI_OPTION_ANIMATION_TRIGGER_OFFSET] : DEFAULT_ANIMATION_TRIGGER_OFFSET;
+    return $option;
+  }
+
+  public function get_animation_trigger_delay () {
+    $option = isset ($this->wp_options [AI_OPTION_ANIMATION_TRIGGER_DELAY]) ? $this->wp_options [AI_OPTION_ANIMATION_TRIGGER_DELAY] : DEFAULT_ANIMATION_TRIGGER_DELAY;
+    return $option;
+  }
+
+  public function get_animation_trigger_once () {
+    $option = isset ($this->wp_options [AI_OPTION_ANIMATION_TRIGGER_ONCE]) ? $this->wp_options [AI_OPTION_ANIMATION_TRIGGER_ONCE] : DEFAULT_ANIMATION_TRIGGER_ONCE;
+    return $option;
+  }
+
   public function get_ad_general_tag(){
     $option = isset ($this->wp_options [AI_OPTION_GENERAL_TAG]) ? $this->wp_options [AI_OPTION_GENERAL_TAG] : "";
     if ($option == '') $option = AD_GENERAL_TAG;
     return $option;
   }
-
-  public function get_close_button (){
-     $option = isset ($this->wp_options [AI_OPTION_CLOSE_BUTTON]) ? $this->wp_options [AI_OPTION_CLOSE_BUTTON] : DEFAULT_CLOSE_BUTTON;
-     return $option;
-   }
 
   public function get_adb_block_action (){
      $option = isset ($this->wp_options [AI_OPTION_ADB_BLOCK_ACTION]) ? $this->wp_options [AI_OPTION_ADB_BLOCK_ACTION] : DEFAULT_ADB_BLOCK_ACTION;
@@ -2784,8 +3080,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
             $ai_last_check = AI_CHECK_DEBUG_NO_INSERTION;
             if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_NO_INSERTION) == 0) {
-              $ai_last_check = AI_CHECK_INSERTED;
               $inserted_code = $this->get_code_for_serverside_insertion ();
+              $ai_last_check = AI_CHECK_INSERTED;
               $inserted = true;
             }
           }
@@ -3381,8 +3677,8 @@ abstract class ai_CodeBlock extends ai_BaseCodeBlock {
 
             $ai_last_check = AI_CHECK_DEBUG_NO_INSERTION;
             if (($ai_wp_data [AI_WP_DEBUGGING] & AI_DEBUG_NO_INSERTION) == 0) {
-              $ai_last_check = AI_CHECK_INSERTED;
               $inserted_code = $this->get_code_for_serverside_insertion ();
+              $ai_last_check = AI_CHECK_INSERTED;
               $inserted = true;
             }
           }
@@ -4907,6 +5203,7 @@ class ai_code_generator {
           array (
             'code' => $code,
             'name' => '',
+            'share' => '',
           ),
         ),
     );
@@ -4922,8 +5219,9 @@ class ai_code_generator {
       foreach ($options as $index => $option) {
         $option_code = trim ($option, "\n");
         $option_name = isset ($ai_wp_data [AI_SHORTCODES]['rotate'][$index - 1]['name']) ? $ai_wp_data [AI_SHORTCODES]['rotate'][$index - 1]['name'] : '';
+        $option_share = isset ($ai_wp_data [AI_SHORTCODES]['rotate'][$index - 1]['share']) && is_numeric ($ai_wp_data [AI_SHORTCODES]['rotate'][$index - 1]['share']) ? intval ($ai_wp_data [AI_SHORTCODES]['rotate'][$index - 1]['share']) : '';
         if ($index == 0 && $option_code == '') continue;
-        $data ['options'] []= array ('code' => $option_code, 'name' => $option_name);
+        $data ['options'] []= array ('code' => $option_code, 'name' => $option_name, 'share' => $option_share);
       }
     }
 
@@ -4939,9 +5237,10 @@ class ai_code_generator {
         foreach ($rotation_data as $index => $rotation_data_row) {
 
           $name = trim ($rotation_data_row ['name']);
+          $share = trim ($rotation_data_row ['share']);
           $code = trim ($rotation_data_row ['code'], "\n");
 
-          if ($index != 0 || $name != '') {
+          if ($index != 0 || $name != '' || $share != '') {
 
             $shortcode = "" ;
             if ($index != 0) $shortcode .= "\n\n";
@@ -4949,6 +5248,7 @@ class ai_code_generator {
             $shortcode .= '[ADINSERTER ROTATE';
 
             if ($name != '') $shortcode .= ' name="'.str_replace ('"', '\'', $name).'"';
+            if ($share != '') $shortcode .= ' share="'.str_replace ('"', '\'', $share).'"';
             $shortcode .= "]\n\n";
           } else $shortcode = '';
 

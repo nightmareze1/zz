@@ -6,10 +6,10 @@ Tags: ads, adsense, header footer code, ad management, sticky fixed widgets, adv
 Requires at least: 4.0
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 2.3.6
+Stable tag: 2.3.7
 License: GPLv3
 
-Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, header, footer code
+Insert and manage ads: AdSense, Amazon, banners, ad rotation, sticky ad widgets, shortcodes, AMP, PHP, HTML, CSS, form, tracking, footer, header code
 
 == Description ==
 
@@ -84,6 +84,7 @@ Check <a href="https://affiliate-program.amazon.com/help/topic/t405" target="_bl
 *   Use custom fields as defined in posts
 *   Use post title, tags or categories to create contextual ads
 *   PHP code processing
+*   Ad labels
 *   Ad rotation (server-side and client-side - works with caching)
 *   Ad blocking detection - popup message, page redirection
 *   Desktop/mobile device detection (server-side and client-side - works with caching)
@@ -93,6 +94,7 @@ Check <a href="https://affiliate-program.amazon.com/help/topic/t405" target="_bl
 *   Function to visualize inserted code blocks
 *   Function to visualize available insertion positions
 *   Function to visualize HTML tags
+*   You name it :)
 
 And Ad Inserter Pro - all-in-one <a href="http://adinserter.pro/" target="_blank">WordPress ad management plugin</a> has even more advanced features:
 
@@ -102,7 +104,10 @@ And Ad Inserter Pro - all-in-one <a href="http://adinserter.pro/" target="_blank
 *   Ad impression and click tracking (works also with `<iframe>` Javascript ads like Google AdSense)
 *   External tracking via Google Analytics or Piwik
 *   A/B testing
-*   Sticky ad positions with optional close button (left, top, right, bottom)
+*   Sticky ad positions with optional close button
+*   Sticky sidebar ads (stick to the screen or to the content)
+*   Sticky ad trigger (page scroll in % or px, HTML element visible)
+*   Sticky ad animations (fade, slide, turn, flip, zoom)
 *   Scheduling with fallback option
 *   Ad blocking detection - ad replacement, content protection
 *   Ad blocking statistics
@@ -471,8 +476,6 @@ Use `*` to define url pattern to whitelist (enable) or blacklist (disable).
 
 For example, to exclude ads on pages that have /shop/ in url (page address) blacklist the following url: `*/shop/*`
 
-**WARNING:** Separate urls with SPACES.
-
 
 = How can I put an ad in the middle of the post regardless of the number of paragraphs? =
 
@@ -486,7 +489,18 @@ Use Before paragraph automatic insertion and put `2, 0.5` as paragraph number. Y
 
 = I'd like to rotate my ad codes based on percentage, for example show one ad 75% of the time and another one 25% of the time. Is that possible? =
 
-Yes, simply create block with 4 ads separated with [ADINSERTER ROTATE]: 3 times ad1 and 1 time ad2.
+Yes. Either use rotation code generator and define shares in percents or create code using `ROTATE` separator with attribute *share* where you define percentage of the rotation share:
+
+`[ADINSERTER ROTATE share="75"]
+ad_code_1
+[ADINSERTER ROTATE share="25"]
+ad_code_2`
+
+If you omit one share value it will be automatically calculated:
+
+`ad_code_1
+[ADINSERTER ROTATE share="25"]
+ad_code_2`
 
 
 = How can I show different ads to different visitors according to a url query parameter? =
@@ -626,6 +640,11 @@ AD CODE RIGHT
 
 == Changelog ==
 
+= 2.3.8 =
+- Added support rotation option shares
+- Added support for sticky ad settings and animations (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
 = 2.3.7 =
 - Added support for ad labels
 - Blocked search indexing while debugging
@@ -713,6 +732,11 @@ AD CODE RIGHT
 For the changelog of earlier versions, please refer to the separate changelog.txt file.
 
 == Upgrade Notice ==
+
+= 2.3.8 =
+Added support rotation option shares;
+Added support for sticky ad settings and animations (Pro only);
+Few minor bug fixes, cosmetic changes and code improvements
 
 = 2.3.7 =
 Added support for ad labels;
