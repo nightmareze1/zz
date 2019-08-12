@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 /**
  * Class allowing to filter RecursiveDirectoryIterator, to return only files that Imagify can optimize.
@@ -17,7 +17,7 @@ class Imagify_Files_Recursive_Iterator extends RecursiveFilterIterator {
 	 * @since  1.7
 	 * @author Grégory Viguier
 	 */
-	const VERSION = '1.0.1';
+	const VERSION = '1.0.2';
 
 	/**
 	 * Filesystem object.
@@ -55,8 +55,18 @@ class Imagify_Files_Recursive_Iterator extends RecursiveFilterIterator {
 	public function accept() {
 		static $extensions, $has_extension_method;
 
-		// Forbidden file/folder paths and names.
 		$file_path = $this->current()->getPathname();
+
+		// Prevent triggering an open_basedir restriction error.
+		$file_name = $this->filesystem->file_name( $file_path );
+
+		if ( '.' === $file_name || '..' === $file_name ) {
+			return false;
+		}
+
+		if ( $this->current()->isDir() ) {
+			$file_path = trailingslashit( $file_path );
+		}
 
 		if ( Imagify_Files_Scan::is_path_forbidden( $file_path ) ) {
 			return false;

@@ -9,7 +9,7 @@
         <?php endif; ?>
     </a>
     <?php if(isset($redux_builder_amp['ampforwp-amp-menu']) && $redux_builder_amp['ampforwp-amp-menu']){ ?>
-    <div on='tap:sidebar.toggle' role="button" tabindex="0" class="nav_container">
+    <div on='tap:sidebar.toggle' role="button" aria-label="Navigation" tabindex="0" class="nav_container">
         <a href="#" class="toggle-text">
             <span></span>
             <span></span>
@@ -30,23 +30,19 @@
     layout="nodisplay"
     side="right">
   <div class="toggle-navigationv2">
-      <div role="button" tabindex="0" on='tap:sidebar.close' class="close-nav">X</div> <?php
-       // schema.org/SiteNavigationElement missing from menus #1229 ?>
-      <nav id ="primary-amp-menu" itemscope="" itemtype="https://schema.org/SiteNavigationElement">
-         <?php
-         $menu_html_content = wp_nav_menu( array(
-                                  'theme_location' => 'amp-menu' ,
-                                  'link_before'     => '<span itemprop="name">',
-                                  'link_after'     => '</span>',
-                                  'menu'=>'ul',
-                                  'echo' => false,
-                                  'menu_class' => 'menu amp-menu'
-                                ) );
-        $menu_html_content = apply_filters('ampforwp_menu_content', $menu_html_content);
-        $sanitizer_obj = new AMPFORWP_Content( $menu_html_content, array(), apply_filters( 'ampforwp_content_sanitizers', array( 'AMP_Img_Sanitizer' => array(), 'AMP_Style_Sanitizer' => array(), ) ) );
-        $sanitized_menu =  $sanitizer_obj->get_amp_content();
-        echo $sanitized_menu;
-        ?>
+      <div role="button" tabindex="0" on='tap:sidebar.close' class="close-nav">X</div>
+      <nav id ="primary-amp-menu">
+        <?php
+        $menu_args = array(
+                        'theme_location' => 'amp-menu' ,
+                        'link_before'     => '<span>',
+                        'link_after'     => '</span>',
+                        'menu'=>'ul',
+                        'echo' => false,
+                        'menu_class' => 'menu amp-menu',
+                        'walker' => new Ampforwp_Walker_Nav_Menu()
+                    );     
+        amp_menu( true, $menu_args, 'header' );?>
     </nav>
     <?php do_action('ampforwp_after_amp_menu'); ?>
   </div>

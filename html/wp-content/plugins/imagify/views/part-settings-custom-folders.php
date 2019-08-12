@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 if ( ! imagify_can_optimize_custom_folders() ) {
 	return;
@@ -12,6 +12,7 @@ $themes         = array();
 if ( $custom_folders ) {
 	$custom_folders = array_combine( $custom_folders, $custom_folders );
 	$custom_folders = array_map( array( 'Imagify_Files_Scan', 'remove_placeholder' ), $custom_folders );
+	$custom_folders = array_map( 'trailingslashit', $custom_folders );
 	$custom_folders = array_filter( $custom_folders, array( 'Imagify_Files_Scan', 'is_path_autorized' ) );
 }
 
@@ -21,8 +22,8 @@ if ( $custom_folders ) {
 	natcasesort( $custom_folders );
 	$custom_folders = array_map( 'trailingslashit', $custom_folders );
 
-	if ( isset( $custom_folders['{{ABSPATH}}/'] ) ) {
-		$custom_folders['{{ABSPATH}}/'] = __( 'Site\'s root', 'imagify' );
+	if ( isset( $custom_folders['{{ROOT}}/'] ) ) {
+		$custom_folders['{{ROOT}}/'] = __( 'Site\'s root', 'imagify' );
 	}
 }
 
@@ -121,7 +122,7 @@ if ( ! is_network_admin() ) {
 
 						<button id="imagify-add-themes-to-custom-folder" class="button imagify-button-clean imagify-add-themes" type="button" data-theme="<?php echo implode( '" data-theme-parent="', $themes ); ?>">
 							<span class="dashicons dashicons-plus"></span>
-							<span class="button-text"><?php echo _n( 'Add the theme to optimization', 'Add the themes to optimization', $themes_count , 'imagify' ); ?></span>
+							<span class="button-text"><?php echo _n( 'Add the theme to optimization', 'Add the themes to optimization', $themes_count, 'imagify' ); ?></span>
 						</button>
 						<?php
 					}
@@ -153,6 +154,19 @@ if ( ! is_network_admin() ) {
 			}
 			?>
 		</fieldset>
+
+		<p>
+			<?php
+			printf(
+				/* translators: 1 and 2 are <strong> opening and closing tags. */
+				__( '%1$sSelecting a folder will also optimize images in sub-folders.%2$s The only exception is "Site’s root": when selected, only images that are directly at the site’s root will be optimized (sub-folders can be selected separately).', 'imagify' ),
+				'<strong>',
+				'</strong>'
+			);
+			?>
+			<br/>
+			<?php _e( 'Folders that are hidden in the folder selector window are excluded and will not be optimized even if a parent folder is selected.', 'imagify' ); ?>
+		</p>
 
 		<p class="imagify-success hidden"><?php _e( 'You changed your custom folder settings, don\'t forget to save your changes!', 'imagify' ); ?></p>
 

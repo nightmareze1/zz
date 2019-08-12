@@ -1,6 +1,8 @@
 <?php 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
 $output = '
-<div class="ln-fx">{{repeater}}</div>';
+<div {{if_id}}id="{{id}}"{{ifend_id}} class="ln-fx {{user_class}}">{{repeater}}</div>';
 $css = '
 {{if_condition_pricing_layout_type==1}}
 .pricing-mod{margin:{{margin_css}};padding:{{padding_css}};}
@@ -23,15 +25,20 @@ $css = '
 {{ifend_condition_pricing_layout_type_1}}
 
 ';
+if( ampforwp_get_setting('amp-design-selector') != 4 ) {
+ $css .= '@media(max-width:768px){
+	.pri-mod{flex:100%;margin:0px 0px 20px 0px;}
+}';
+}
 return array(
 		'label' =>'Pricing',
 		'name' =>'pricing-mod',
 		'default_tab'=> 'customizer',
 		'tabs' => array(
               'customizer'=>'Content',
+              'layouts'=> 'Layouts',
               'design'=>'Design',
-              'advanced' => 'Advanced',
-              'layouts'=> 'Layouts'
+              'advanced' => 'Advanced'
             ),
 		'fields' => array(
 						array(    
@@ -65,6 +72,22 @@ return array(
 								'tab'		=>'design',
 								'default'	=>'#333',
 								'content_type'=>'css'
+							),
+	 					array(
+								'type'		=>'text',
+								'name'		=>"id",
+								'label'		=>'ID',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
+							),
+	 					array(
+								'type'		=>'text',
+								'name'		=>"user_class",
+								'label'		=>'Class',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
 							),
 						array(
 								'type'		=>'spacing',

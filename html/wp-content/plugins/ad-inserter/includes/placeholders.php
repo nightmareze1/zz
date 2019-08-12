@@ -4,11 +4,20 @@
 //error_reporting (E_ALL);
 
 function generate_placeholder_editor ($placeholder_url, $block) {
+  global $wp_version;
 
-  $base_placeholder_url = 'http://via.placeholder.com/';
+  $placeholder_protocol = 'http://';
+  $placeholder_domain   = 'via.placeholder.com';
+
+  $base_placeholder_url = $placeholder_protocol . $placeholder_domain . '/';
+
+  if (is_ssl()) {
+    $base_placeholder_url = str_replace ('http://', 'https://', $base_placeholder_url);
+  }
+
 
   $standard_placeholders = array (
-    'Custom',
+    __('Custom', 'ad-inserter'),
     '300x250',
     '336x280',
     '728x90',
@@ -32,9 +41,9 @@ function generate_placeholder_editor ($placeholder_url, $block) {
   $initial_placeholder_url              = $base_placeholder_url . $initial_placeholder_size;
 
   $parameters = array ();
-  if (strpos ($placeholder_url, $base_placeholder_url) === 0) {
+  if (strpos ($placeholder_url, $placeholder_domain) !== false) {
     $initial_placeholder_url = $placeholder_url;
-    $url = str_replace ($base_placeholder_url, '', $placeholder_url);
+    $url = str_replace (array ('http://', 'https://', $placeholder_domain . '/'), '', $placeholder_url);
 
     $query = '';
     if (strpos ($url, '?') !== false) {
@@ -91,12 +100,18 @@ function generate_placeholder_editor ($placeholder_url, $block) {
 
 ?><html>
 <head>
-<title><?php echo AD_INSERTER_NAME; ?> Placeholder Editor</title>
+<title><?php echo AD_INSERTER_NAME; ?> <?php _e ('Placeholder Editor', 'ad-inserter'); ?></title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
-<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js'></script>
+
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/jquery.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo admin_url ('load-scripts.php?c=0&amp;load%5B%5D=jquery-core,jquery-migrate,utils,jquery-ui-core&amp;ver='); ?><?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/ui/effect.min.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/ui/widget.min.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/ui/button.min.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/ui/spinner.min.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<link rel='stylesheet' href='<?php echo plugins_url ('css/jquery-ui-1.10.3.custom.min.css', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>' type='text/css' media='all' />
+
 <script src='<?php echo plugins_url ('includes/colorpicker/js/bootstrap-colorpicker.min.js', AD_INSERTER_FILE); ?>'></script>
-<link rel='stylesheet' href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css'>
 <link rel="stylesheet" href='<?php echo plugins_url ('includes/colorpicker/css/bootstrap-colorpicker.min.css', AD_INSERTER_FILE); ?>'>
 <script>
 
@@ -334,18 +349,18 @@ img#placeholder {
   <div id="ai-data" style="display: none;" version="<?php echo AD_INSERTER_VERSION; ?>"></div>
 
   <div style="float: right; width: 90px; margin-left: 20px;">
-    <button id="use-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Select placeholder" >Use</button>
-    <button id="edit-button"   type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Edit placeholder size, colors and text">Edit</button>
-    <button id="cancel-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Close placeholder editor" >Cancel</button>
+    <button id="use-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="<?php _e ('Select placeholder', 'ad-inserter'); ?>" ><?php _e ('Use', 'ad-inserter'); ?></button>
+    <button id="edit-button"   type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="<?php _e ('Edit placeholder size, colors and text', 'ad-inserter'); ?>"><?php _e ('Edit', 'ad-inserter'); ?></button>
+    <button id="cancel-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="<?php _e ('Close placeholder editor', 'ad-inserter'); ?>" ><?php _e ('Cancel', 'ad-inserter'); ?></button>
   </div>
 
   <div style="float: left; margin-right: 20px">
-    <h1 style="margin: 0;">Placeholder <span id="placeholder-name"><?php echo $initial_placeholder_size; ?></span></h1>
+    <h1 style="margin: 0;"><?php _e ('Placeholder', 'ad-inserter'); ?> <span id="placeholder-name"><?php echo $initial_placeholder_size; ?></span></h1>
 
   <div id="placeholder-parameters">
 
     <div style="float: left; display: inline-block; margin: 10px 0;">
-      Size
+      <?php _e ('Size', 'ad-inserter'); ?>
       <select id="placeholder-size" style="width: 80px; margin-right: 10px;" tabindex="1">
 
 <?php
@@ -361,17 +376,17 @@ img#placeholder {
 
     <div class="custom-placeholder-parameters custom-parameters-right" style="<?php echo $placeholder_selection == 0 ? '' : 'display: none;'; ?>">
       <div class="float-right">
-        Background color
+        <?php _e ('Background color', 'ad-inserter'); ?>
         <input id="background" type="text" value="<?php echo $initial_placeholder_background_color; ?>" size="7" maxlength="7" tabindex="4" />
       </div>
 
       <div class="float-right">
-        Height
+        <?php _e ('Height', 'ad-inserter'); ?>
         <input id="height" type="text" value="<?php echo $initial_placeholder_height; ?>" size="4" maxlength="4" tabindex="3" />
       </div>
 
       <div class="float-right">
-        Width
+        <?php _e ('Width', 'ad-inserter'); ?>
         <input id="width" type="text" value="<?php echo $initial_placeholder_width; ?>" size="4" maxlength="4" tabindex="2" />
       </div>
     </div>
@@ -380,40 +395,37 @@ img#placeholder {
 
     <div class="custom-placeholder-parameters" style="margin: 10px 0;<?php echo $placeholder_selection == 0 ? '' : ' display: none;'; ?>">
       <div  class="float-left">
-        Text
+        <?php _e ('Text', 'ad-inserter'); ?>
         <input id="text" style="width: 215px;" type="text" value="<?php echo $initial_placeholder_text; ?>" size="30" maxlength="40" tabindex="5" />
       </div>
 
       <div class="float-right">
-        Text color
+        <?php _e ('Text color', 'ad-inserter'); ?>
         <input id="text-color" type="text" value="<?php echo $initial_placeholder_text_color; ?>" size="7" maxlength="7" tabindex="6" />
       </div>
     </div>
   </div>
 
   </div>
-
   <div style="clear: both;"></div>
 
-  <p id="p1">Here you can create a universal placeholder image that can be used in place of ads when they are not available yet.
-Placeholder images created here will behave as any other image. You can also save them to local computer or server.</p>
+  <p id="p1"><?php _e ('Here you can create a universal placeholder image that can be used in place of ads when they are not available yet.
+Placeholder images created here will behave as any other image. You can also save them to local computer or server.', 'ad-inserter'); ?></p>
 
   <img id="placeholder" src="<?php echo $initial_placeholder_url; ?>" />
 
-  <p id="p2">Choose between common ad sizes 300x250, 336x280, 728x90, 468x60, 250x250, 300x600 or define custom size. Default placeholders
-are gray with size as placeholder text but you can use any color or text you want. Click on <strong>Edit</strong> button
-to edit placeholder size, color or text. You can also create blank solid color rectangles by clearing placeholder text.</p>
+  <p id="p2"><?php _e ('Choose between common ad sizes 300x250, 336x280, 728x90, 468x60, 250x250, 300x600 or define custom size.
+Default placeholders are gray with size as placeholder text but you can use any color or text you want. Click on <strong>Edit</strong> button to edit placeholder size, color or text.
+You can also create blank solid color rectangles by clearing placeholder text.', 'ad-inserter'); ?></p>
 
-  <p id="p3"><strong>Please note</strong>: if you have active rotation editor the code window shows only the code for the currently selected option.
-Therefore, code generator will in such case import or generate code for the currently selected option.</p>
+  <p id="p3"><?php _e ('<strong>Please note</strong>: if you have active rotation editor the code window shows only the code for the currently selected option.
+Therefore, code generator will in such case import or generate code for the currently selected option.', 'ad-inserter'); ?></p>
 
-  <p id="p4">Code generator for banners and AdSense generates the code only when you click on the button Generate code.
-It is a tool that can help you to create code for AdSense or banners with links. So if you are using rotation editor and switch between options,
-you need to (optionally) import and generate code for each rotation option.</p>
+  <p id="p4"><?php _e ('Code generator for banners and AdSense generates the code only when you click on the button Generate code.
+It is a tool that can help you to create code for AdSense or banners with links. So if you are using rotation editor and switch between options, you need to (optionally) import and generate code for each rotation option.', 'ad-inserter'); ?></p>
 
-  <p id="p5">Ad Inserter has a simple code generator for banners and placeholders. You can select banner image (or placeholder),
-optionally define link (web page address that will open when the banner will be clicked) and select whether to open link in a new tab.</p>
-
+  <p id="p5"><?php _e ('Ad Inserter has a simple code generator for banners and placeholders.
+You can select banner image (or placeholder), optionally define link (web page address that will open when the banner will be clicked) and select whether to open link in a new tab.', 'ad-inserter'); ?></p>
 </body>
 </html>
 <?php

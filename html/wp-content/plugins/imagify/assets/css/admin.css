@@ -621,8 +621,18 @@ button.imagify-link-like {
 .imagify-settings-main-content {
 	padding-bottom: 20px;
 }
-.imagify-settings-main-content p {
+.imagify-settings-main-content p,
+.imagify-settings-main-content .imagify-setting-line {
 	font-size: 14px;
+	line-height: 1.5;
+}
+
+.imagify-settings-main-content .code {
+	max-height: 10em;
+	padding: 3px 5px 2px 5px;
+	overflow: auto;
+	background: #EAEAEA;
+	background: rgba(0,0,0,.07);
 }
 
 .imagify-settings-main-content + .imagify-settings-main-content {
@@ -1028,12 +1038,12 @@ p.imagify-section-title.imagify-section-title {
 	vertical-align: middle;
 }
 .column-imagify_optimized_file > * {
-	max-width: 235px;
+	max-width: 21em;
 	margin: 0 auto;
 }
 @media (min-width: 1151px) and (max-width: 1800px) {
 	.column-imagify_optimized_file.column-imagify_optimized_file {
-		width: 235px;
+		width: 21em;
 	}
 }
 @media (min-width: 783px) and (max-width: 1150px) {
@@ -1081,7 +1091,6 @@ p.imagify-section-title.imagify-section-title {
 ul.imagify-datas-list.imagify-datas-list {
 	margin: 0 auto;
 	color: #555;
-	font-size: 10px;
 }
 ul.imagify-datas-list .big {
 	font-size: 12px;
@@ -1097,14 +1106,15 @@ li.imagify-data-item {
 ul.imagify-datas-list .imagify-data-item span.data,
 ul.imagify-datas-list .imagify-data-item strong {
 	float: left;
-	width: 50%;
+	width: 38%;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
 ul.imagify-datas-list .imagify-data-item span.data {
-	text-align: left;
+	width: 62%;
 	padding-right: 5px;
+	text-align: left;
 }
 .compat-field-imagify .imagify-datas-list .imagify-data-item .data {
 	width: 130px;
@@ -1178,7 +1188,7 @@ ul.imagify-datas-details.imagify-datas-details {
 	overflow: hidden;
 	border-top: 2px solid transparent;
 	padding-top: 5px;
-	font-size: 8px;
+	font-size: 11px;
 }
 .nggform .imagify-datas-actions-links {
 	position: relative;
@@ -1210,7 +1220,6 @@ ul.imagify-datas-details.imagify-datas-details {
 /* Media edition */
 .compat-field-imagify .imagify-datas-actions-links a,
 .misc-pub-imagify .imagify-datas-actions-links a {
-	font-size: 10px;
 	float: left;
 	width: 50%;
 }
@@ -1219,6 +1228,10 @@ ul.imagify-datas-details.imagify-datas-details {
 	display: block;
 	width: auto;
 	float: none;
+}
+.media-sidebar .compat-field-imagify .imagify-datas-actions-links br,
+.submitbox .misc-pub-imagify .imagify-datas-actions-links br {
+	display: none;
 }
 .imagify-datas-actions-links a:only-child {
 	float: none;

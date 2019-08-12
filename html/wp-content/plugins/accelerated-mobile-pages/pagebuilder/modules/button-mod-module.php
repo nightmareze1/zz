@@ -1,9 +1,11 @@
 <?php 
-$output = '
-	<div class="btn"><a href="{{btn_link}}" {{if_condition_page_link_open==new_page}}target="_blank"{{ifend_condition_page_link_open_new_page}} class="btn-txt">{{content_title}}{{if_condition_check_for_icon==1}}<i class="ico-pic icon-{{icon-picker}}"></i>{{ifend_condition_check_for_icon_1}}</a>
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
+$output = '<div {{if_id}}id="{{id}}"{{ifend_id}} class="{{user_class}}">
+	<div class="btn"><a href="{{btn_link}}" {{if_condition_page_link_open==new_page}}target="_blank"{{ifend_condition_page_link_open_new_page}} {{if_condition_check_for_nofollow==1}}rel="nofollow"{{ifend_condition_check_for_nofollow_1}} class="btn-txt">{{content_title}}{{if_condition_check_for_icon==1}}<i class="ico-pic icon-{{icon-picker}}"></i>{{ifend_condition_check_for_icon_1}}</a>
 {{if_sub_heading}}<span>{{sub_heading}}</span> {{ifend_sub_heading}}</div>
 {{if_condition_button_repeat_check==1}}{{repeater}}{{ifend_condition_button_repeat_check_1}}
-';
+</div>';
 $css = '
 {{module-class}}.button-mod {width:100%;display:inline-block;text-align:{{align_type}};margin:{{margin_css}};padding:{{padding_css}};}
 {{module-class}} .btn-txt{
@@ -17,7 +19,10 @@ font-size:{{text-size}}; border-radius:{{border-rds}}; color:{{font_color_picker
 {{module-class}} .btn-txt .ico-pic{font-size: {{icon-size}};position: absolute; margin:{{margin_gap}};}
 {{ifend_condition_check_for_icon_1}}
 {{if_condition_display_type==inline}}
-.btn{display:inline-block;}
+	.btn{
+		display:inline-block;
+		margin:{{mrgn_css}};
+	}
 {{ifend_condition_display_type_inline}}
 {{if_condition_check_for_altrbtn==1}}
 {{module-class}} .alt-btn{
@@ -64,6 +69,7 @@ return array(
 		 						'name'		=>"btn_link",		
 		 						'label'		=>'URL',
 		           				'tab'     =>'customizer',
+		           				'helpmessage'	=> esc_html__('Enter URL with Valid Protocol(http, https, mailto, sms, tel, viber, whatsapp, ftp)', 'accelerated-mobile-pages'),
 		 						'default'	=>'#',	
 		           				'content_type'=>'html',
 	 						),
@@ -79,6 +85,21 @@ return array(
 	 											),
 	 							'content_type'=>'html',
 	 						),
+
+						array(
+                        'type'    =>'checkbox_bool',
+                        'name'    =>"check_for_nofollow",
+                        'label'   => 'Nofollow Link',
+                        'tab'   =>'customizer',
+                        'default' =>0,
+                        'options' =>array(
+                                array(
+                                  'label'=>'Yes',
+                                  'value'=>1,
+                                )
+                              ),
+                 'content_type'=>'html',
+               ),
 
 						array(		
 		 						'type'		=>'text',		
@@ -232,7 +253,7 @@ return array(
 	 					array(
 								'type'		=>'spacing',
 								'name'		=>"gapping_css",
-								'label'		=>'Button Gapping',
+								'label'		=>'Button Padding',
 								'tab'		=>'design',
 								'default'	=>array(
 													'left'=>'20px',
@@ -240,6 +261,19 @@ return array(
 													'top'=>'10px',
 													'bottom'=>'10px'
 												),
+								'content_type'=>'css',
+							),
+	 					array(
+								'type'		=>'spacing',
+								'name'		=>"mrgn_css",
+								'label'		=>'Button Margin',
+								'tab'		=>'design',
+								'default'	=> array(
+					                                'top'=>'0px',
+					                                'right'=>'0px',
+					                                'bottom'=>'0px',
+					                                'left'=>'0px',
+					                            ),
 								'content_type'=>'css',
 							),
 	 					 array(
@@ -305,6 +339,22 @@ return array(
 								'default'	=>'#333',
 								'content_type'=>'css',
 								'required'  => array('check_for_altrbtn'=>'1')
+							),
+						array(
+								'type'		=>'text',
+								'name'		=>"id",
+								'label'		=>'ID',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
+							),
+						array(
+								'type'		=>'text',
+								'name'		=>"user_class",
+								'label'		=>'Class',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
 							),
 						array(
 								'type'		=>'spacing',
@@ -406,7 +456,7 @@ return array(
 			'<div class="btn">
 				<a href="{{btn_link}}" {{if_condition_page_link_open==new_page}}target="_blank"{{ifend_condition_page_link_open_new_page}} 
 					class="btn-txt{{if_condition_button_repeat_check==1}}
-				alt-btn"{{ifend_condition_button_repeat_check_1}} </a>
+				alt-btn"{{ifend_condition_button_repeat_check_1}} {{if_condition_check_for_nofollow==1}}rel="nofollow"{{ifend_condition_check_for_nofollow_1}} </a>
 				{{if_condition_button_repeat_check==1}}
 					{{content_title}}{{if_condition_check_for_icon==1}}<i class="ico-pic icon-{{icon-picker}}"></i>{{ifend_condition_check_for_icon_1}}
 				</a>

@@ -1,6 +1,6 @@
 <?php 
 $output = '
-	<div class="ln-fx">{{repeater}}</div>
+	<div {{if_id}}id="{{id}}"{{ifend_id}} class="ln-fx {{user_class}}">{{repeater}}</div>
 ';
 $css = '
 {{if_condition_testimonial_layout_type==1}}
@@ -23,7 +23,7 @@ $css = '
 {{ifend_condition_testimonial_layout_type_1}}
 ';
 global $redux_builder_amp;
-if($redux_builder_amp['amp-rtl-select-option']){
+if(ampforwp_get_setting('amp-rtl-select-option')){
 $css .= '/** RTL CSS **/
 .testi-mod{margin: 0 0 2% 3%;}
 .testi-mod:nth-child(3),.testi-mod:nth-child(6),.testi-mod:nth-child(9){margin-left:0;}
@@ -40,9 +40,9 @@ return array(
 		'default_tab'=> 'customizer',
 		'tabs' => array(
               'customizer'=>'Content',
+              'layout' => 'Layout',
               'design'=>'Design',
-              'advanced' => 'Advanced',
-              'layout' => 'Layout'
+              'advanced' => 'Advanced'
             ),
 		'fields' => array(
 						array(    
@@ -115,6 +115,22 @@ return array(
 			                    'content_type'=>'css',
 			                    
 			                ),
+			            array(
+								'type'		=>'text',
+								'name'		=>"id",
+								'label'		=>'ID',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
+							),
+			            array(
+								'type'		=>'text',
+								'name'		=>"user_class",
+								'label'		=>'Class',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
+							),
 						array(
 								'type'		=>'spacing',
 								'name'		=>"margin_css",
@@ -183,6 +199,7 @@ return array(
 		 						'default'	=>'Designation',	
 		           				'content_type'=>'html',
 	 						),
+						
                 
               ),
           'front_template'=>

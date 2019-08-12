@@ -1,83 +1,98 @@
 <?php
 /* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */
 $generated_i18n_strings = array(
-	// Reference: yoast-components/composites/OnboardingWizard/OnboardingWizard.js:297
-	__( '%s installation wizard', 'wordpress-seo' ),
-
-	// Reference: yoast-components/composites/OnboardingWizard/OnboardingWizard.js:284
-	__( 'Next step', 'wordpress-seo' ),
-
-	// Reference: yoast-components/composites/OnboardingWizard/OnboardingWizard.js:283
-	__( 'Next', 'wordpress-seo' ),
-
-	// Reference: yoast-components/composites/OnboardingWizard/OnboardingWizard.js:275
-	__( 'Previous step', 'wordpress-seo' ),
-
-	// Reference: yoast-components/composites/OnboardingWizard/OnboardingWizard.js:274
-	__( 'Previous', 'wordpress-seo' ),
-
-	// Reference: yoast-components/composites/OnboardingWizard/OnboardingWizard.js:244
-	__( 'Close the Wizard', 'wordpress-seo' ),
-
-	// Reference: yoast-components/composites/OnboardingWizard/OnboardingWizard.js:243
-	__( 'Close', 'wordpress-seo' ),
-
-	// Reference: yoast-components/composites/OnboardingWizard/OnboardingWizard.js:167
-	__( 'A problem occurred when saving the current step, {{link}}please file a bug report{{/link}} describing what step you are on and which changes you want to make (if any).', 'wordpress-seo' ),
-
-	// Reference: yoast-components/composites/OnboardingWizard/StepIndicator.js:50
-	__( 'Step %1$d: %2$s', 'wordpress-seo' ),
-
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:360
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:367
 	__( 'Get Google Authorization Code', 'wordpress-seo' ),
 
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:353
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:360
 	__( 'To allow %s to fetch your Google Search Console information, please enter your Google Authorization Code. Clicking the button below will open a new window.', 'wordpress-seo' ),
 
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:342
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:348
 	__( 'Reauthenticate with Google', 'wordpress-seo' ),
 
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:317
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:323
 	__( 'Authenticate', 'wordpress-seo' ),
 
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:313
-	__( 'Enter authorization code here...', 'wordpress-seo' ),
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:314
+	__( 'Authorization code', 'wordpress-seo' ),
 
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:302
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:305
 	__( 'Enter your Google Authorization Code and press the Authenticate button.', 'wordpress-seo' ),
 
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:277
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:279
 	__( 'Choose a profile', 'wordpress-seo' ),
 
 	// Reference: js/src/components/ConnectGoogleSearchConsole.js:271
 	__( 'Select profile', 'wordpress-seo' ),
 
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:259
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:258
 	__( 'There were no profiles found', 'wordpress-seo' ),
 
-	// Reference: js/src/components/ConnectGoogleSearchConsole.js:112
+	// Reference: js/src/components/ConnectGoogleSearchConsole.js:111
 	__( 'There is an error with the request.', 'wordpress-seo' ),
 
-	// Reference: js/src/components/MailchimpSignup.js:239
+	// Reference: js/src/components/MailchimpSignup.js:225
 	__( 'Email', 'wordpress-seo' ),
 
-	// Reference: js/src/components/MailchimpSignup.js:221
+	// Reference: js/src/components/MailchimpSignup.js:206
 	__( 'Sign Up!', 'wordpress-seo' ),
 
-	// Reference: js/src/components/MailchimpSignup.js:114
+	// Reference: js/src/components/MailchimpSignup.js:109
 	__( 'MailChimp signup failed:', 'wordpress-seo' ),
 
-	// Reference: js/src/components/MediaUpload.js:107
-	__( 'Choose image', 'wordpress-seo' ),
+	// Reference: js/src/components/MediaUpload.js:141 js/src/components/MediaUpload.js:18
+	// Reference: js/src/components/MediaUpload.js:17
+	__( 'Choose an image', 'wordpress-seo' ),
 
-	// Reference: js/src/components/MediaUpload.js:97
-	__( 'company logo image preview', 'wordpress-seo' ),
+	// Reference: js/src/components/MediaUpload.js:122
+	__( 'image preview', 'wordpress-seo' ),
 
-	// Reference: js/src/components/MediaUpload.js:90
+	// Reference: js/src/components/MediaUpload.js:100
 	__( 'Remove the image', 'wordpress-seo' ),
 
-	// Reference: js/src/components/MediaUpload.js:20
-	// Reference: js/src/components/MediaUpload.js:19
-	__( 'Choose an image', 'wordpress-seo' )
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestion.js:48
+	__( 'Copy link', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestion.js:51
+	__( 'Copy link to suggested article: %s', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestions.js:129
+	__( 'This is a list of related content to which you could link in your post. {{a}}Read our article about site structure{{/a}} to learn more about how internal linking can help improve your SEO.', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestions.js:174
+	__( 'Consider linking to these {{a}}cornerstone articles:{{/a}}', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestions.js:198
+	__( 'Consider linking to these articles:', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestions.js:21
+	__( 'We could not find any relevant articles on your website that you could link to from your post.', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestions.js:24
+	__( 'Once you add a bit more copy, we\'ll give you a list of related content here to which you could link in your post.', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestions.js:57
+	__( 'Copied!', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestions.js:76
+	__( 'Not supported!', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/LinkSuggestions/LinkSuggestions.js:93
+	__( 'Read {{a}}our article about site structure{{/a}} to learn more about how internal linking can help improve your SEO.', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/Plugin/CornerstoneContent/components/CornerstoneToggle.js:26
+	__( 'Mark as cornerstone content', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/Plugin/HelpCenter/HelpCenter.js:78
+	__( 'Need help?', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/Plugin/Shared/components/KeywordInput.js:146
+	__( 'Are you trying to use multiple keyphrases? You should add them separately below.', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/Plugin/SocialPreviews/Facebook/components/FacebookImage.js:146
+	__( 'The given image url cannot be loaded', 'wordpress-seo' ),
+
+	// Reference: node_modules/yoast-components/composites/Plugin/SocialPreviews/Facebook/components/FacebookImage.js:150
+	__( 'The image you selected is too small for Facebook', 'wordpress-seo' )
 );
 /* THIS IS THE END OF THE GENERATED FILE */

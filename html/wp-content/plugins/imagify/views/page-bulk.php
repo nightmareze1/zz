@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 ?>
 <div class="wrap imagify-settings imagify-bulk">
 
@@ -104,37 +104,22 @@ defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
 
 					<?php if ( $user && 1 === $user->plan_id ) { ?>
 						<div class="imagify-col-content">
-							<?php
-							$unconsumed_quota  = $user->get_percent_unconsumed_quota();
-							$meteo_icon        = '<img src="' . IMAGIFY_ASSETS_IMG_URL . 'sun.svg" width="63" height="64" alt="" />';
-							$bar_class         = 'positive';
-							$is_display_bubble = false;
-
-							if ( $unconsumed_quota >= 21 && $unconsumed_quota <= 50 ) {
-								$bar_class  = 'neutral';
-								$meteo_icon = '<img src="' . IMAGIFY_ASSETS_IMG_URL . 'cloudy-sun.svg" width="63" height="64" alt="" />';
-							} elseif ( $unconsumed_quota <= 20 ) {
-								$bar_class         = 'negative';
-								$is_display_bubble = true;
-								$meteo_icon        = '<img src="' . IMAGIFY_ASSETS_IMG_URL . 'stormy.svg" width="64" height="63" alt="" />';
-							}
-							?>
 							<div class="imagify-flex imagify-vcenter">
-								<span class="imagify-meteo-icon imagify-noshrink"><?php echo $meteo_icon; ?></span>
+								<span class="imagify-meteo-icon imagify-noshrink"><?php echo $this->get_quota_icon(); ?></span>
 								<div class="imagify-space-left imagify-full-width">
 
 									<p>
 										<?php
 										printf(
 											/* translators: %s is a data quota. */
-											__( 'You have %s space credit left' , 'imagify' ),
-											'<span class="imagify-unconsumed-percent">' . $unconsumed_quota . '%</span>'
+											__( 'You have %s space credit left', 'imagify' ),
+											'<span class="imagify-unconsumed-percent">' . $this->get_quota_percent() . '%</span>'
 										);
 										?>
 									</p>
 
-									<div class="imagify-bar-<?php echo $bar_class; ?>">
-										<div class="imagify-unconsumed-bar imagify-progress" style="width: <?php echo $unconsumed_quota . '%'; ?>;"></div>
+									<div class="<?php echo $this->get_quota_class(); ?>">
+										<div class="imagify-unconsumed-bar imagify-progress" style="width: <?php echo $this->get_quota_percent() . '%'; ?>;"></div>
 									</div>
 								</div>
 							</div>
@@ -149,9 +134,9 @@ defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
 								<div class="imagify-block-secondary">
 									<p class="imagify-section-title imagify-h3-like">
 										<?php
-										if ( ! $unconsumed_quota ) {
+										if ( ! $this->get_quota_percent() ) {
 											esc_html_e( 'Oops, It\'s Over!', 'imagify' );
-										} elseif ( $unconsumed_quota <= 20 ) {
+										} elseif ( $this->get_quota_percent() <= 20 ) {
 											esc_html_e( 'Oops, It\'s almost over!', 'imagify' );
 										} else {
 											esc_html_e( 'You\'re new to Imagify?', 'imagify' );
@@ -188,27 +173,27 @@ defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
 		?>
 
 		<div class="imagify-bulk-submit imagify-flex imagify-vcenter">
-				<div class="imagify-pr2">
-					<p>
-						<?php wp_nonce_field( 'imagify-bulk-upload', 'imagifybulkuploadnonce' ); ?>
-						<button id="imagify-bulk-action" type="button" class="button button-primary">
-							<span class="dashicons dashicons-admin-generic"></span>
-							<span class="button-text"><?php _e( 'Imagif\'em all', 'imagify' ); ?></span>
-						</button>
-					</p>
-				</div>
-				<?php if ( ! is_wp_error( get_imagify_max_image_size() ) ) { ?>
-					<p>
-						<?php
-						printf(
-							/* translators: %s is a file size. */
-							esc_html__( 'All images greater than %s will be optimized when using a paid plan.', 'imagify' ),
-							esc_html( imagify_size_format( get_imagify_max_image_size() ) )
-						);
-						?>
-					</p>
-				<?php } ?>
-			</div><!-- .imagify-bulk-submit -->
+			<div class="imagify-pr2">
+				<p>
+					<?php wp_nonce_field( 'imagify-bulk-optimize', 'imagifybulkuploadnonce' ); ?>
+					<button id="imagify-bulk-action" type="button" class="button button-primary">
+						<span class="dashicons dashicons-admin-generic"></span>
+						<span class="button-text"><?php _e( 'Imagif’em all', 'imagify' ); ?></span>
+					</button>
+				</p>
+			</div>
+			<?php if ( ! is_wp_error( get_imagify_max_image_size() ) ) { ?>
+				<p>
+					<?php
+					printf(
+						/* translators: %s is a file size. */
+						esc_html__( 'All images greater than %s (after resizing, if any) will be optimized when using a paid plan.', 'imagify' ),
+						esc_html( imagify_size_format( get_imagify_max_image_size() ) )
+					);
+					?>
+				</p>
+			<?php } ?>
+		</div><!-- .imagify-bulk-submit -->
 	</div><!-- .imagify-settings-section -->
 
 	<?php
@@ -224,16 +209,13 @@ defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
 		<?php
 
 		if ( ! $display_infos ) {
-			if ( ! isset( $unconsumed_quota ) ) {
-				$user             = $user ? $user : new Imagify_User();
-				$unconsumed_quota = $user->get_percent_unconsumed_quota();
-			}
 			?>
 			<script type="text/html" id="tmpl-imagify-bulk-infos">
 				<?php
 				$this->print_template( 'part-bulk-optimization-infos', array(
-					'quota'   => $unconsumed_quota,
-					'library' => ! empty( $data['groups']['library'] ),
+					'quota'       => $data['unconsumed_quota'],
+					'quota_class' => $data['quota_class'],
+					'library'     => ! empty( $data['groups']['library'] ),
 				) );
 				?>
 			</script>

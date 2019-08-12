@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 add_filter( 'manage_media_columns', '_imagify_manage_media_columns' );
 /**
@@ -12,7 +12,7 @@ add_filter( 'manage_media_columns', '_imagify_manage_media_columns' );
  * @return array
  */
 function _imagify_manage_media_columns( $columns ) {
-	if ( imagify_current_user_can( 'optimize' ) ) {
+	if ( imagify_get_context( 'wp' )->current_user_can( 'optimize' ) ) {
 		$columns['imagify_optimized_file'] = __( 'Imagify', 'imagify' );
 	}
 
@@ -34,9 +34,9 @@ function _imagify_manage_media_custom_column( $column_name, $attachment_id ) {
 		return;
 	}
 
-	$attachment = get_imagify_attachment( 'wp', $attachment_id, 'manage_media_custom_column' );
+	$process = imagify_get_optimization_process( $attachment_id, 'wp' );
 
-	echo get_imagify_media_column_content( $attachment );
+	echo get_imagify_media_column_content( $process );
 }
 
 add_action( 'restrict_manage_posts', '_imagify_attachments_filter_dropdown' );
@@ -47,23 +47,23 @@ add_action( 'restrict_manage_posts', '_imagify_attachments_filter_dropdown' );
  * @author Jonathan Buttigieg
  */
 function _imagify_attachments_filter_dropdown() {
-	if ( 'upload.php' !== $GLOBALS['pagenow'] ) {
+	if ( ! Imagify_Views::get_instance()->is_wp_library_page() ) {
 		return;
 	}
 
 	$optimized   = imagify_count_optimized_attachments();
 	$unoptimized = imagify_count_unoptimized_attachments();
 	$errors      = imagify_count_error_attachments();
-	$status      = isset( $_GET['imagify-status'] ) ? $_GET['imagify-status'] : 0; // WPCS: CSRF ok.
+	$status      = isset( $_GET['imagify-status'] ) ? wp_unslash( $_GET['imagify-status'] ) : 0; // WPCS: CSRF ok.
 	$options     = array(
-		'optimized'   => __( 'Optimized','imagify' ),
-		'unoptimized' => __( 'Unoptimized','imagify' ),
-		'errors'      => __( 'Errors','imagify' ),
+		'optimized'   => _x( 'Optimized', 'Media Files', 'imagify' ),
+		'unoptimized' => _x( 'Unoptimized', 'Media Files', 'imagify' ),
+		'errors'      => _x( 'Errors', 'Media Files', 'imagify' ),
 	);
 
-	echo '<label class="screen-reader-text" for="filter-by-optimization-status">' . __( 'Filter by status','imagify' ) . '</label>';
+	echo '<label class="screen-reader-text" for="filter-by-optimization-status">' . __( 'Filter by status', 'imagify' ) . '</label>';
 	echo '<select id="filter-by-optimization-status" name="imagify-status">';
-		echo '<option value="0" selected="selected">' . __( 'All images','imagify' ) . '</option>';
+		echo '<option value="0" selected="selected">' . __( 'All Media Files', 'imagify' ) . '</option>';
 
 	foreach ( $options as $value => $label ) {
 		echo '<option value="' . $value . '" ' . selected( $status, $value, false ) . '>' . $label . ' (' . ${$value} . ')</option>';
@@ -82,11 +82,11 @@ add_filter( 'request', '_imagify_sort_attachments_by_status' );
  * @return array
  */
 function _imagify_sort_attachments_by_status( $vars ) {
-	if ( 'upload.php' !== $GLOBALS['pagenow'] || empty( $_GET['imagify-status'] ) ) { // WPCS: CSRF ok.
+	if ( empty( $_GET['imagify-status'] ) || ! Imagify_Views::get_instance()->is_wp_library_page() ) { // WPCS: CSRF ok.
 		return $vars;
 	}
 
-	$status       = $_GET['imagify-status']; // WPCS: CSRF ok.
+	$status       = wp_unslash( $_GET['imagify-status'] ); // WPCS: CSRF ok.
 	$meta_key     = '_imagify_status';
 	$meta_compare = '=';
 	$relation     = array();

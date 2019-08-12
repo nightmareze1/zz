@@ -1,6 +1,8 @@
 <?php 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
 $output = '
-<div class="ln-fx">{{repeater}}</div>';
+<div {{if_id}}id="{{id}}"{{ifend_id}} class="ln-fx {{user_class}}">{{repeater}}</div>';
 $css = '
 {{module-class}}.counter-mod{
 	margin:{{margin_css}};
@@ -36,7 +38,7 @@ $css = '
 }
 ';
 global $redux_builder_amp;
-if($redux_builder_amp['amp-rtl-select-option']){
+if(ampforwp_get_setting('amp-rtl-select-option')){
 $css .= '/** RTL CSS **/
 
 ';
@@ -124,6 +126,22 @@ return array(
 								'tab'		=>'design',
 								'default'	=>'#333',
 								'content_type'=>'css'
+							),
+						array(
+								'type'		=>'text',
+								'name'		=>"id",
+								'label'		=>'ID',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
+						),
+						array(
+								'type'		=>'text',
+								'name'		=>"user_class",
+								'label'		=>'Class',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
 							),
 						array(
 								'type'		=>'spacing',

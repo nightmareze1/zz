@@ -1,4 +1,9 @@
-<?php class AMPFORWP_Woo_Widget extends WP_Widget {
+<?php 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+class AMPFORWP_Woo_Widget extends WP_Widget {
 
   // Set up the widget name and description.
   public function __construct() {
@@ -34,8 +39,7 @@
     $ampforwp_number_of_products  = $instance[ 'num_of_products' ];
     $ampforwp_show_price          = $instance[ 'show_price' ];
 
-    $exclude_ids = get_option('ampforwp_exclude_post');
-    $exclude_ids = (array) $exclude_ids;
+    $exclude_ids = ampforwp_exclude_posts();
 
      $q = new WP_Query( array(
       'post_type'           => 'product',
@@ -46,7 +50,7 @@
       'posts_per_page'      => esc_attr( $ampforwp_number_of_products )
      ) );
 
-    echo '<h4 class="wc_widgettitle">' . esc_attr( $ampforwp_title) . '</h4>';
+    echo '<h4 class="wc_widgettitle">' . esc_html( $ampforwp_title) . '</h4>';
     echo '<div class="widget-wrap amp-wp-content">' ;
 
      if ( $q->have_posts() ) : ?>
@@ -66,7 +70,7 @@
             $thumb_width = ampforwp_get_post_thumbnail('width');
             $thumb_height = ampforwp_get_post_thumbnail('height'); ?>
 
-             <amp-img src='<?php echo esc_url( $thumb_url ); ?>' width="<?php echo $thumb_width; ?>" height="<?php echo $thumb_height; ?>" layout="responsive"></amp-img> <?php
+             <amp-img src='<?php echo esc_url( $thumb_url ); ?>' width="<?php echo esc_attr($thumb_width); ?>" height="<?php echo esc_attr($thumb_height); ?>" layout="responsive"></amp-img> <?php
            }
 
            if ( $product->is_on_sale() && $on_sale_logo_on_product=='yes' ) { ?>

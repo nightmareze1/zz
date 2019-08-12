@@ -8,6 +8,7 @@ jQuery(document).ready(function($) {
     var widget = $(this);
     var widget_width = widget.width();
 
+    if (ai_debug) console.log ('');
     if (ai_debug) console.log ("WIDGET:", widget.width (), widget.prop ("tagName"), widget.attr ("id"));
 
     var already_sticky_js = false;
@@ -38,7 +39,7 @@ jQuery(document).ready(function($) {
     if (sticky_widget_mode == 0) {
       // CSS
       if (sidebar.css ("position") != "sticky" || isNaN (parseInt (sidebar.css ("top"))) || sidebar.css ("top") < new_sidebar_top) {
-        sidebar.css ("position", "sticky").css ("top", new_sidebar_top);
+        sidebar.css ("position", "sticky").css ("position", "-webkit-sticky").css ("top", new_sidebar_top);
 
         if (ai_debug) console.log ("CSS STICKY SIDEBAR, TOP:", new_sidebar_top);
       }

@@ -1,14 +1,14 @@
 /*Bolt Icon*/  
 .ampforwp-blurb-add:hover{
-	cursor: pointer;
+    cursor: pointer;
 }
 .ampforwp-blurb-add.button {
-	margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 .ampforwp-blurb-additional .preview-image {
-	max-width:100%;
-	width : 70px;
-	height : 70px;
+    max-width:100%;
+    width : 70px;
+    height : 70px;
 }
 #toplevel_page_amp_options a .wp-menu-image:before{display: none}
 
@@ -20,8 +20,8 @@ body #toplevel_page_amp_options .wp-menu-image{
     -webkit-background-size: 20px auto;
     background-size: 20px auto;
 }
-.amp_content_builder .redux-group-tab-link-a span:after {
-/*    content: "NEW";*/
+.ampforwp_new_features .redux-group-tab-link-a span:after {
+    content: "NEW";
     color: #fff;
     font-size: 10px;
     background: #4452a7;
@@ -278,7 +278,7 @@ right:0;  z-index: 99999;
   bottom: 0px;
   right: 0pc;
 }
-.dashicons-sos:before, .dashicons-no-alt{
+.dashicons-admin-comments:before, .dashicons-no-alt{
     font-family: dashicons;
     font-style: normal;
 }
@@ -315,15 +315,10 @@ right:0;  z-index: 99999;
   -o-transform: rotate(45deg);
   transform: rotate(45deg);
 }
-.a-f-wp-help-container .a-f-wp-help-tear.green {
-  background: green;
-  transform: rotate(0deg);
-  border-radius: 5px;
-}
 .a-f-wp-help-container span {
   position: absolute;
   left: 26px;
-  top: 28px;
+  top: 29px;
   -webkit-transform: translateX(-50%) translateY(-50%);
   -moz-transform: translateX(-50%) translateY(-50%);
   -ms-transform: translateX(-50%) translateY(-50%);
@@ -351,9 +346,15 @@ right:0;  z-index: 99999;
     text-transform: uppercase;
     line-height: 0; 
     border-bottom: 1px solid #E7E7E7; 
-    margin-bottom: 10px;
+    margin-bottom: 30px;
     padding-bottom: 15px !important;
-}  
+} 
+/*** Layout Screenshot-Image CSS ***/
+#redux_builder_amp-ampforwp_layouts_core .amppb_ad-layout-layout {
+    margin-bottom: 30px;
+}
+
+/*** Layout Screenshot-Image CSS End ***/
 .amp-layouts-desc{
     position: absolute;
     font-size: 13px;
@@ -365,7 +366,9 @@ right:0;  z-index: 99999;
 .ampforwp-new-element .form-table tr{
     border-top: 0px;
 }
-
+.amp-design-selector th, .amp-design-selector td {
+    padding-top: 40px;
+}
 .amppb_ad-layout-layout .amppb_ad-layout-wrapper{
         padding: 0px;
     background: #F7F7F7;
@@ -568,8 +571,11 @@ visibility: hidden;
     right: -26px;
     margin-bottom: 6px !important;
     opacity: 0;
-    transition: opacity 0.3s;}
-
+    transition: opacity 0.3s;
+}
+.afw-help-subtitle a{
+    color:#fff;
+}
 .afw-tooltip .afw-help-subtitle::after {
     content: "";
     position: absolute;
@@ -639,4 +645,294 @@ visibility: hidden;
 .backtoextensionlist{
     cursor: pointer;
 }
-.redux_field_search, .redux-main #redux-sticky{display: none}
+.redux-main #redux-sticky{display: none}
+
+#info-ampforwp-beta-mode-notice{color: #263238; margin: 20px; background: #FFF9C4;border-color: #908204;}
+
+.redux-container #redux-intro-text .dashicons-admin-generic:before, .activated-plugins { color: #666 }
+
+/*** RTL CSS ***/
+.rtl .redux_field_th span:first-child {
+    right: auto;
+    left: 2%;
+}
+.rtl .redux-main .redux-field-container{
+    margin-left: 50px;
+        width: 90%;
+}
+.rtl .redux-main .button.remove-image{
+    margin-right: 10px;
+}
+.rtl .redux-sidebar .redux-group-tab-link-a i {
+    right: auto;
+    left: 10px;
+}
+.rtl .redux-main .child_opt .redux_field_th {
+    margin-right: 10px;
+}
+.rtl .redux_field_th {
+    padding: 20px 20px 20px 10px !important;
+}
+.rtl .redux-container #redux-header .display_header{
+    float: right;
+}
+.rtl .redux-container #redux-intro-text {
+    left: 5px;
+    right: auto;
+}
+.rtl .redux-amp-search-icon .dashicons-before:before{
+    vertical-align:middle;
+}
+.rtl .redux-container-switch .switch-options{
+    text-align:right;
+}
+.rtl .redux-main .child_opt fieldset {
+    padding: 8px 25px 8px 10px;
+}
+.rtl .redux-main .child_opt th, .rtl .redux-main .child_opt td {
+    padding: 0px 0px 0px 0px !important;
+}
+.rtl .redux-main .child_opt fieldset {
+    right: 0;
+}
+.rtl .redux-main .redux-field-container {
+    padding: 18px 15px 18px 0;
+}
+.rtl .redux-main .afw-tooltip .afw-help-subtitle{
+     left: -16px;
+}
+.rtl .afw-tooltip .afw-help-subtitle::after{
+    display: none
+}
+/*** Free Vs Pro CSS ***/
+.rtl .fr h1, .rtl .pr h1{
+ padding: 0px 35px 20px 0px;
+}
+.rtl .ext{
+    padding: 45px 50px 45px 0px;
+}
+.rtl .fe-t h4{
+    padding:0px 8px 0px 0px;
+}
+.rtl .lt {
+    padding-right: 50px;
+    padding-left:0;
+}
+
+/** Show AMP Current Page RTL**/
+.rtl .meta-radio-two{
+    float:right;
+}
+.rtl .ampforwp-preview-button-container{
+    float: left;
+}
+.rtl .prfx-row-content{
+    width:100%;
+    display:inline-block;
+    clear:both;
+}
+
+#redux_builder_amp-hide-amp-categories .inner-child span:before{
+    content: "- "
+}
+span.switch-text {
+    margin-left: 5px;
+}
+#redux_builder_amp-ampforwp_pwa_module .redux_field_th{
+    padding: 0px 20% 0px 10px !important;
+    float: left;    top: 5px;
+    position: relative;
+}
+.ampforwp-st-data-update{
+    color: #000;
+    font-size: 16px;
+}
+.ampforwp-st-data-update .row{width: 100%;  font-size: 12px;}
+.ampforwp-st-data-update .col-3{
+    width: 45%;
+    float: left;
+    font-size: 14px;
+    color: #333;}
+.ampforwp-st-data-update .col-1{width: 30%;float: left;} 
+.ampforwp-st-data-update .col-3 li:before , .ampforwp-ads-data-update .col-3 li:before{
+    content: "\f147";
+    font-family: dashicons;
+    position: relative;
+    top: 1px;
+    left: -2px;
+    color: #4CAF50;
+}
+.ampforwp-recommendation-btn{
+    color: #555;
+    border-color: #ccc;
+    background: #f7f7f7;
+    box-shadow: 0 1px 0 #ccc;
+    vertical-align: top;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 26px;
+    height: 32px;
+    margin: 0;
+    padding: 1px 12px 1px 8px;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    -webkit-appearance: none;
+    border-radius: 3px;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+.ampforwp-recommendation-btn .update-message p:before{
+	
+    position: absolute;
+    top: 5px;
+    font-size: 18px;
+    
+}
+.ampforwp-recommendation-btn p:before{
+    margin-right: 4px; content: "\f463"
+}
+.ampforwp-recommendation-btn.updated-message p:before{
+    color:#79ba49;
+    content: '\f147';
+    left: -3px;
+    position: relative;
+    font-size: 26px;
+    top: -1px;
+}
+.ampforwp-recommendation-btn .button-link{
+    padding-left:6px;
+    top: 0;
+    text-decoration: none;
+    font-size: 14px;
+    top: 4px;
+    letter-spacing: 0px;
+    color: #2c2c2c;
+}
+.ampforwp-recommendation-btn a{
+    text-decoration: none;
+    color: #333;
+}
+.ampforwp-recommendation-btn:active{
+    background: #eee;
+    border-color: #999;
+    box-shadow: inset 0 2px 5px -3px rgba(0,0,0,.5);
+    -webkit-transform: translateY(1px);
+    transform: translateY(1px);
+}
+#section-ampforwp-sd_modules_section h3{
+	background:#FFF9C4 !important
+}
+.amp_recommend_learnmore {
+    position: relative;
+    font-size: 14px;
+    top: 7px;
+    left: 12px;
+}
+#finalized-import-structure-data-from-amp{
+    margin-left:8px;vertical-align: baseline
+}
+.ampforwp-rate-stars{
+    display:inline-block;
+    color:#ffb900;
+    position:relative;
+    top:3px;
+}
+.ampforwp-rate-stars svg{
+    fill:#ffb900;
+}
+.ampforwp-rate-stars svg:hover{
+    fill:#ffb900
+}
+.ampforwp-rate-stars svg:hover ~ svg{
+    fill:none;
+}
+div#section-amp-ads_1,table#section-table-amp-ads_1{
+    max-width: 75%; 
+}
+div#section-ampforwp-ads-section , table#section-table-ampforwp-ads-section{
+    max-width: 24%;
+    float: right;
+    position: relative;
+    margin-top: -37px;
+}
+
+div#section-ampforwp-ads-section:after {
+    content: '';
+}
+
+div#section-ampforwp-ads-section h3:before{
+    content: "NEW";
+    color: #fff;
+    background: #4452a7;
+    padding: 5px 6px;
+    border-radius: 30px;
+    font-weight: normal;
+    position: relative;
+    top: 1px;
+    left: -6px;
+    font-size: 10px;
+    line-height: 10px;
+}
+.redux-main .redux-field-container{
+    padding: 18px 10px 18px 0;
+}
+.adsactive { 
+    max-width: 100%!important;
+    float: none!important;
+    margin-top:0!important;
+}
+.adsactive + #section-table-ampforwp-ads-section {
+    max-width:100%; 
+    float: none ;
+}
+.hide-wrapper {
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    background: black;
+    z-index: 999;
+    opacity: 0.6;
+}
+.amp-watermark-wrapper{
+    background: #fff;
+    box-shadow: 2px 2px 9px #333;
+    opacity: 1;
+    border-radius: 6px;
+    width: 40%;
+    margin: 0px auto;
+    position: absolute;
+    padding: 10px 30px 40px 30px;
+    text-align: center;
+    margin-top: 200px;
+    left: 30%;
+    z-index: 999;}
+.amp-watermark-wrapper a{
+    text-decoration: none;
+    font-size:20px;
+    color:#000;
+}
+.amp-watermark-wrapper h3{
+    margin: 16px 0 0px 0px;
+}
+.amp-watermark-wrapper p{
+    margin: 3px 0 20px 0;
+    color: #666;
+}
+.amp-watermark-wrapper span{
+    font-size: 16px;
+    background: #ed1c24;
+    color: #fff;
+    border-radius: 70px;
+    padding: 6px 15px 8px 16px;
+
+}
+.redux-group-menu .template-mode-amp .el+.group_title:after{  
+content: "Template Mode"; 
+display: inline-block; 
+font-size: 10px;  
+text-transform: none; 
+width: 100%; 
+font-weight: normal; 
+} 

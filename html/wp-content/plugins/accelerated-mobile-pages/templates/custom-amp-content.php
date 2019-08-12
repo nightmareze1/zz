@@ -1,4 +1,9 @@
 <?php
+use AMPforWP\AMPVendor\AMP_Content;
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 // Adding Custom meta Sanitizer to sanitize the custom content added throught tinymce post meta
 add_filter( 'amp_post_template_data', 'ampforwp_custom_post_content_sanitizer', 10, 2 );
 
@@ -27,7 +32,8 @@ function ampforwp_custom_post_content_sanitizer( $data, $post ) {
         $amp_current_post_id = pll_get_post(get_option('page_on_front'));
       }
     	$amp_custom_post_content_input = get_post_meta($amp_current_post_id, 'ampforwp_custom_content_editor', true);
-      $amp_custom_post_content_check  = get_post_meta($amp_current_post_id, 'ampforwp_custom_content_editor_checkbox', true);
+      $amp_custom_post_content_input = html_entity_decode($amp_custom_post_content_input);
+      $amp_custom_post_content_check = get_post_meta($amp_current_post_id, 'ampforwp_custom_content_editor_checkbox', true);
 
       	if ( empty( $amp_custom_post_content_input ) ) {
             $data['ampforwp_amp_content'] = false;
@@ -47,6 +53,7 @@ function ampforwp_custom_post_content_sanitizer( $data, $post ) {
           				    'AMP_Facebook_Embed_Handler'    => array(),
                   'AMP_Pinterest_Embed_Handler'   => array(),
           				    'AMP_Gallery_Embed_Handler'     => array(),
+                      'AMP_Playlist_Embed_Handler'    => array(),
               ) ),
               apply_filters(  'amp_content_sanitizers', array(
           				    'AMP_Style_Sanitizer'     => array(),
@@ -84,25 +91,25 @@ function ampforwp_custom_content_meta_register() {
 
     if ( $user_level ) {
         if ( $redux_builder_amp['amp-on-off-for-all-posts'] ) {
-          add_meta_box( 'custom_content_editor', __( 'Custom AMP Editor', 'accelerated-mobile-pages' ), 'amp_content_editor_title_callback', 'post','normal', 'default' );
+          add_meta_box( 'custom_content_editor', esc_html__( 'Custom AMP Editor', 'accelerated-mobile-pages' ), 'amp_content_editor_title_callback', 'post','normal', 'default' );
         }
 
         if ( $redux_builder_amp['amp-on-off-for-all-pages'] ) {
-          add_meta_box( 'custom_content_editor', __( 'Custom AMP Editor','accelerated-mobile-pages' ), 'amp_content_editor_title_callback', 'page','normal', 'default' );
+          add_meta_box( 'custom_content_editor', esc_html__( 'Custom AMP Editor','accelerated-mobile-pages' ), 'amp_content_editor_title_callback', 'page','normal', 'default' );
         }
         // Custom AMP Editor for Custom Post Types
         $post_types = ampforwp_get_all_post_types();
         if ( $post_types ) {
           foreach ( $post_types  as $post_type ) {
             if ( 'post' !== $post_type && 'page' !== $post_type ) {
-              add_meta_box( 'custom_content_editor', __( 'Custom AMP Editor', 'accelerated-mobile-pages' ), 'amp_content_editor_title_callback', $post_type ,'normal', 'default' );
+              add_meta_box( 'custom_content_editor', esc_html__( 'Custom AMP Editor', 'accelerated-mobile-pages' ), 'amp_content_editor_title_callback', $post_type ,'normal', 'default' );
             }
           }
         }
 
         // Assign Pagebuilder Meta Box // Legecy pagebuilder
         if ( $redux_builder_amp['ampforwp-content-builder'] ) {
-          add_meta_box( 'custom_content_sidebar', __( 'AMP Page Builder', 'accelerated-mobile-pages' ), 'amp_content_sidebar_callback', 'page','side', 'default' );
+          add_meta_box( 'custom_content_sidebar', esc_html__( 'AMP Page Builder', 'accelerated-mobile-pages' ), 'amp_content_sidebar_callback', 'page','side', 'default' );
         }  
     }
 
@@ -118,8 +125,8 @@ function amp_content_sidebar_callback( $post ) {
   $amp_content_sidebar = get_post_meta($current_post_id, 'ampforwp_custom_sidebar_select', true);
   $amp_content_sidebar = esc_attr($amp_content_sidebar); ?>
   <select name="ampforwp_custom_sidebar_select" id="ampforwp-sidebars-page-sidebar-name">
-      <option <?php if ( isset ( $amp_content_sidebar ) ) selected( $amp_content_sidebar, 'none' ); ?> value="none"><?php _e( 'None', 'accelerated-mobile-pages' ); ?></option>
-      <option <?php if ( isset ( $amp_content_sidebar ) ) selected( $amp_content_sidebar, 'layout-builder' ); ?> value="layout-builder"><?php _e( 'Page Builder (AMP)', 'accelerated-mobile-pages' ); ?></option>
+      <option <?php if ( isset ( $amp_content_sidebar ) ) selected( $amp_content_sidebar, 'none' ); ?> value="none"><?php esc_attr_e( 'None', 'accelerated-mobile-pages' ); ?></option>
+      <option <?php if ( isset ( $amp_content_sidebar ) ) selected( $amp_content_sidebar, 'layout-builder' ); ?> value="layout-builder"><?php esc_attr_e( 'Page Builder (AMP)', 'accelerated-mobile-pages' ); ?></option>
   </select>
 <p>Assign an AMP Page Builder Widget Area which will be used AMP page.<br /><a href="https://ampforwp.com/tutorials/page-builder">(Need Help?)</a></p>
 
@@ -143,19 +150,23 @@ function amp_content_editor_title_callback( $post ) {
     <label for="meta-checkbox">
     	<p>
         <input type="checkbox" name="ampforwp_custom_content_editor_checkbox" id="meta-checkbox" value="yes" <?php if ( isset ( $amp_content_on_off ) ) checked( $amp_content_on_off, 'yes' ); ?> />
-    		<?php echo __( 'Use This Content as AMP Content','accelerated-mobile-pages' )?>   </p>
-        <?php echo __('<p>If you want to add some special tags, then please use normal HTML into this area, it will automatically convert them into AMP compatible tags.</p>','accelerated-mobile-pages') ?>
+    		<?php esc_attr_e( 'Use This Content as AMP Content','accelerated-mobile-pages' )?>   </p>
+        <p><?php esc_attr_e('If you want to add some special tags, then please use normal HTML into this area, it will automatically convert them into AMP compatible tags.','accelerated-mobile-pages') ?></p>
     </label>
 
   <!--HTML content Ends here-->
   <?php
   $content = get_post_meta ( $amp_current_post_id, 'ampforwp_custom_content_editor', true );
+  $content = html_entity_decode($content);
   $editor_id = 'ampforwp_custom_content_editor';
   wp_editor( $content, $editor_id );
 }
 
 // Save Rating Meta Field function
 function amp_content_editor_meta_save( $post_id ) {
+    if ( ! current_user_can('edit_posts') && ! current_user_can('edit_pages') ) {
+         return ;
+    }
   // Checks save status
     $is_autosave    = wp_is_post_autosave( $post_id );
     $is_revision    = wp_is_post_revision( $post_id );
@@ -169,22 +180,29 @@ function amp_content_editor_meta_save( $post_id ) {
     //if there is data to be saved to DB
     // Save data of Custom AMP Editor
     if ( isset( $_POST['ampforwp_custom_content_editor'] ) ) {
-      update_post_meta($post_id, 'ampforwp_custom_content_editor', $_POST[ 'ampforwp_custom_content_editor' ] );
+      $unsan_ampforwp_custom_content_editor = htmlentities($_POST[ 'ampforwp_custom_content_editor' ]);
+      if ( function_exists('sanitize_textarea_field') ) {
+        $ampforwp_custom_content_editor = sanitize_textarea_field( $unsan_ampforwp_custom_content_editor );
+      }
+      else{
+        $ampforwp_custom_content_editor = implode( "\n", array_map( 'sanitize_text_field', explode( "\n", $unsan_ampforwp_custom_content_editor ) ));
+      }
+      update_post_meta($post_id, 'ampforwp_custom_content_editor',  $ampforwp_custom_content_editor );
     }
     // Save data of Custom AMP Editor CheckBox
     if ( isset( $_POST['ampforwp_custom_content_editor'] ) ) { 
       $ampforwp_custom_editor_checkbox = null;      
       if ( isset($_POST['ampforwp_custom_content_editor_checkbox']) ) {
-        $ampforwp_custom_editor_checkbox = $_POST[ 'ampforwp_custom_content_editor_checkbox' ];
+        $ampforwp_custom_editor_checkbox = sanitize_text_field($_POST[ 'ampforwp_custom_content_editor_checkbox' ]);
       }
-      update_post_meta($post_id, 'ampforwp_custom_content_editor_checkbox', $ampforwp_custom_editor_checkbox );
-      
-    }
 
+      update_post_meta($post_id, 'ampforwp_custom_content_editor_checkbox', $ampforwp_custom_editor_checkbox ); 
+    }
 
     // Save data of Sidebar Select
     if ( isset( $_POST['ampforwp_custom_sidebar_select'] ) ) {
-        update_post_meta($post_id, 'ampforwp_custom_sidebar_select', $_POST[ 'ampforwp_custom_sidebar_select' ] );
+      $ampforwp_custom_sidebar_select = sanitize_text_field($_POST['ampforwp_custom_sidebar_select'] );
+        update_post_meta($post_id, 'ampforwp_custom_sidebar_select', $ampforwp_custom_sidebar_select );
     }
 }
 add_action ( 'save_post' , 'amp_content_editor_meta_save' );

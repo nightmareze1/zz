@@ -1,6 +1,6 @@
 <?php
-
-require_once( AMP__DIR__ . '/includes/embeds/class-amp-base-embed-handler.php' );
+namespace AMPforWP\AMPVendor;
+require_once( AMP__VENDOR__DIR__ . '/includes/embeds/class-amp-base-embed-handler.php' );
 
 // Much of this class is borrowed from Jetpack embeds
 class AMP_Instagram_Embed_Handler extends AMP_Base_Embed_Handler {
@@ -66,18 +66,15 @@ class AMP_Instagram_Embed_Handler extends AMP_Base_Embed_Handler {
 		}
 
 		$this->did_convert_elements = true;
-
-		return AMP_HTML_Utils::build_tag(
-			'amp-instagram',
-			array(
+		$attrs = array(
 				'data-shortcode' => $args['instagram_id'],
 				'layout' => 'responsive',
 				'width' => $this->args['width'],
 				'height' => $this->args['height'],
 				'data-captioned' => '',
-				'data-block-on-consent' => '',
-			)
-		);
+			);
+		$attrs = ampforwp_amp_consent_check( $attrs );
+		return AMP_HTML_Utils::build_tag('amp-instagram', $attrs);
 	}
 
 	private function get_instagram_id_from_url( $url ) {

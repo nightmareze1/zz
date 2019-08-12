@@ -33,9 +33,10 @@ exports.AiHtmlHighlightRules = AiHtmlHighlightRules;
 function add_ai_highlighting_rules (highlighter, highlight_rules) {
 
   highlighter.$ai_shortcodes  = highlighter.$lang.arrayToMap ("adinserter".split ("|"));
-  highlighter.$ai_separators1 = highlighter.$lang.arrayToMap ("http|rotate|count".split ("|"));
-  highlighter.$ai_separators2  = highlighter.$lang.arrayToMap ("amp".split ("|"));
-  highlighter.$ai_attributes  = highlighter.$lang.arrayToMap ("block|code|name|ignore|check|debugger|adb|css|text|selectors|custom-field|data|share|time".split ("|"));
+  highlighter.$ai_separators1 = highlighter.$lang.arrayToMap ("http|count".split ("|"));
+  highlighter.$ai_separators2 = highlighter.$lang.arrayToMap ("head|amp".split ("|"));
+  highlighter.$ai_separators3 = highlighter.$lang.arrayToMap ("rotate".split ("|"));
+  highlighter.$ai_attributes  = highlighter.$lang.arrayToMap ("block|code|name|group|ignore|check|debugger|adb|css|text|selectors|custom-field|data|share|time|counter|category|tag|taxonomy|id|url|url-parameter|referrer|ip-address|country".split ("|"));
 
   //WP shortcodes
   highlighter.$rules ['start'].unshift (
@@ -72,8 +73,11 @@ function add_ai_highlighting_rules (highlighter, highlight_rules) {
     {
       token: function (attribute) {
                return !highlighter.$ai_shortcode                                           ? "entity.other.attribute-name.xml" :
-                      highlighter.$ai_separators1.hasOwnProperty (attribute.toLowerCase()) ? "entity.other.attribute-name.xml" :
+                      highlighter.$ai_separators1.hasOwnProperty (attribute.toLowerCase()) ? "string" :
                       highlighter.$ai_separators2.hasOwnProperty (attribute.toLowerCase()) ? "identifier" :
+                      highlighter.$ai_separators3.hasOwnProperty (attribute.toLowerCase()) ? "variable.language" :
+//                      highlighter.$ai_separators4.hasOwnProperty (attribute.toLowerCase()) ? "paren" :
+//                      highlighter.$ai_separators5.hasOwnProperty (attribute.toLowerCase()) ? "keyword" :
                       highlighter.$ai_attributes.hasOwnProperty  (attribute.toLowerCase()) ? "entity.other.attribute-name.xml" : "text";
              },
       regex: "[a-zA-Z][-a-zA-Z0-9]*"

@@ -1,30 +1,41 @@
 <?php
 function ampforwp_framework_get_comments(){
 	global $redux_builder_amp;
+	$display_comments_on = "";
+	$display_comments_on = ampforwp_get_comments_status();
+	if ( $display_comments_on ) {
+		if ( $redux_builder_amp['ampforwp-facebook-comments-support']  ) { 
+		 	echo ampforwp_framework_get_facebook_comments(); 
+		}
 
-	if ( $redux_builder_amp['ampforwp-facebook-comments-support'] ) { 
-		echo ampforwp_framework_get_facebook_comments();
-	}
-
-	if ( $redux_builder_amp['ampforwp-disqus-comments-support'] )  {
-		 ampforwp_framework_get_disqus_comments();
-	}
-  
-	if ( isset($redux_builder_amp['wordpress-comments-support']) && true == $redux_builder_amp['wordpress-comments-support'] ) {
-		do_action('ampforwp_before_comment_hook'); ?>
-			<div class="amp-comments">
-				<?php
-				// Gather comments for a specific page/post
-				$postID = $comments = $max_page =  "";
-				$postID = get_the_ID();
-				$comments = get_comments(array(
-						'post_id' => $postID,
-						'status' => 'approve' //Change this to the type of comments to be displayed
-				));
-				
-				if ( $comments ) { ?>
-					<div id="comments" class="amp-comments-wrapper">
-				            <h3><span><?php echo ampforwp_translation($redux_builder_amp['amp-translator-view-comments-text'], 'View Comments' )?></span></h3>
+		if ( $redux_builder_amp['ampforwp-disqus-comments-support'] )  {
+			 ampforwp_framework_get_disqus_comments();
+		}
+		if ( $redux_builder_amp['ampforwp-vuukle-comments-support'] )  {
+			 ampforwp_framework_get_vuukle_comments();
+		}
+		if ( $redux_builder_amp['ampforwp-spotim-comments-support']  )  {
+			 ampforwp_framework_get_spotim_comments();
+		}
+	  
+		if ( isset($redux_builder_amp['wordpress-comments-support']) && true == $redux_builder_amp['wordpress-comments-support'] ) {
+			do_action('ampforwp_before_comment_hook'); ?>
+				<div class="amp-comments">
+					<?php
+					// Gather comments for a specific page/post
+					$postID = $comments = $max_page =  "";
+					$postID = get_the_ID();
+					if ( ampforwp_is_front_page() ) {
+						$postID = ampforwp_get_frontpage_id();
+					}
+					$comments = get_comments(array(
+							'post_id' => $postID,
+							'status' => 'approve' //Change this to the type of comments to be displayed
+					));
+					
+					if ( $comments ) { ?>
+						<div id="comments" class="amp-comments-wrapper">
+				            <h3><span><?php echo esc_html(ampforwp_translation($redux_builder_amp['amp-translator-view-comments-text'], 'View Comments' ));?></span></h3>
 				            <ul><?php
 								// Display the list of comments
 								function ampforwp_custom_translated_comment($comment, $args, $depth){
@@ -43,7 +54,7 @@ function ampforwp_framework_get_comments(){
 			         						<?php } ?>
 												<div class="comment-author vcard">
 													 <?php
-													 printf(__('<b class="fn">%s</b> <span class="says">'.ampforwp_translation($redux_builder_amp['amp-translator-says-text'],'says').':</span>'), get_comment_author_link()) ?>
+													 printf('<b class="fn">%s</b> <span class="says">'.esc_html(ampforwp_translation(ampforwp_get_setting('amp-translator-says-text'),'says')).':</span>', get_comment_author_link()) ?>
 												</div>
 												<div class="comment-metadata">
 													<a href="<?php echo htmlspecialchars( trailingslashit( get_comment_link( $comment->comment_ID ) ) ) ?>">
@@ -59,7 +70,11 @@ function ampforwp_framework_get_comments(){
 						                          $sanitizer = new AMPFORWP_Content( $comment_content, array(), apply_filters( 'ampforwp_content_sanitizers', array( 
 						                          		'AMP_Img_Sanitizer' => array(),
 						                          		'AMP_Video_Sanitizer' => array(),
-						                          		'AMP_Style_Sanitizer' => array() ) ) );
+						                          		'AMP_Style_Sanitizer' => array(),
+						                          		'AMP_Iframe_Sanitizer' =>
+						                          			array(
+                                   								'add_placeholder' => true,
+                                							) ) ) );
 						                         $sanitized_comment_content =  $sanitizer->get_amp_content();
 						                          echo make_clickable( $sanitized_comment_content );   ?>
 											</div>
@@ -76,54 +91,59 @@ function ampforwp_framework_get_comments(){
 			                        'max_depth'   		=> 5,
 			                        'avatar_size'		=> 0,
 			                        'callback'			=> 'ampforwp_custom_translated_comment',
-			                        'reverse_top_level' => true //Show the latest comments at the top of the list
+			                        'reverse_top_level' => false //Show the latest comments at the top of the list
 								), $comments);  ?>
 						    </ul> <?php 
-						    $max_page = get_comment_pages_count($comments, AMPFORWP_COMMENTS_PER_PAGE);
-						    $args = array(
-								'base' 			=> add_query_arg( array('cpage' => '%#%', 'amp' => '1'), get_permalink() ),
-								'format' 		=> '',
-								'total' 		=> $max_page,
-								'echo' 			=> false,
-								'add_fragment' 	=> '#comments',		
-							);
-					    if ( paginate_comments_links($args) ) { ?>
-							<div class="cmts-wrap">
-				     			<?php echo paginate_comments_links( $args ); ?>
-				     		</div>
-			     		<?php } ?>
-					</div> <!-- .amp-comments-wrapper -->
-					<?php // if amp-comments extension is enabled then hide this button
+							    $max_page = get_comment_pages_count($comments, AMPFORWP_COMMENTS_PER_PAGE);
+							    $args = array(
+									'base' 			=> add_query_arg( array('cpage' => '%#%', 'amp' => '1'), get_permalink() ),
+									'format' 		=> '',
+									'total' 		=> $max_page,
+									'echo' 			=> false,
+									'add_fragment' 	=> '#comments',		
+								);
+						    if ( paginate_comments_links($args) ) { ?>
+								<div class="cmts-wrap">
+					     			<?php echo paginate_comments_links( $args ); ?>
+					     		</div>
+				     		<?php } ?>
+						</div> <!-- .amp-comments-wrapper -->
+						<?php // if amp-comments extension is enabled then hide this button
+					} // if ( $comments )
 					if ( ! defined( 'AMP_COMMENTS_VERSION' ) ) { ?>
-						<div class="cmts-btn-wrap">
-							<?php if ( comments_open() ) { ?>
-						    	<a href="<?php echo ampforwp_comment_button_url(); ?>" rel="nofollow"><?php echo ampforwp_translation( $redux_builder_amp['amp-translator-leave-a-comment-text'], 'Leave a Comment'  ); ?></a> <?php
+						<div class="amp-comment-button">
+							<?php if ( comments_open($postID) ) { ?>
+						    	<a href="<?php echo ampforwp_comment_button_url(); ?>" title="<?php echo ampforwp_get_setting('amp-translator-leave-a-comment-text')?>" rel="nofollow"><?php echo esc_html(ampforwp_translation( $redux_builder_amp['amp-translator-leave-a-comment-text'], 'Leave a Comment' ) ); ?></a> <?php
 							} else {
-								echo "<p class='nocomments'>". ampforwp_translation( $redux_builder_amp['amp-translator-comments-closed'], 'Comments are closed'  ) ." </p>";
+								echo "<p class='nocomments'>". esc_html( ampforwp_translation( $redux_builder_amp['amp-translator-comments-closed'], 'Comments are closed'  ) )." </p>";
 							}?>
 						</div> <?php 
-					}
-				} // if ( $comments )?>
-			</div>
-		<?php do_action('ampforwp_after_comment_hook');
-	}
+					}?>
+				</div>
+			<?php do_action('ampforwp_after_comment_hook');
+		}
+	} // end $display_comments_on
 }
 
 //Facebook Comments
 function ampforwp_framework_get_facebook_comments(){
 global $redux_builder_amp;
-	$facebook_comments_markup = '';
+	$facebook_comments_markup = $lang = $locale = '';
+	$lang = $redux_builder_amp['ampforwp-fb-comments-lang'];
+	$locale = 'data-locale = "'.$lang.'"';
 	if ( $redux_builder_amp['ampforwp-facebook-comments-support'] ) {
 	if( ampforwp_is_non_amp() && isset($redux_builder_amp['ampforwp-amp-convert-to-wp']) && $redux_builder_amp['ampforwp-amp-convert-to-wp']) {
 		$facebook_comments_markup = '<div class="fb-comments" data-href="' . get_permalink() . '" data-width="800px" data-numposts="'.$redux_builder_amp['ampforwp-number-of-fb-no-of-comments'].'"></div>';
 	}
 	else {  
 		$facebook_comments_markup = '<section class="amp-facebook-comments">';
-		$facebook_comments_markup .= '<amp-facebook-comments data-block-on-consent width=486 height=357
-	    		layout="responsive" data-numposts=';
-		$facebook_comments_markup .= '"'. $redux_builder_amp['ampforwp-number-of-fb-no-of-comments']. '" ';
-
-		$facebook_comments_markup .= 'data-href=" ' . get_permalink() . ' "';
+		$facebook_comments_markup .= '<amp-facebook-comments width=486 height=357
+	    		layout="responsive" '. esc_attr($locale) .' data-numposts=';
+		$facebook_comments_markup .= '"'. esc_attr($redux_builder_amp['ampforwp-number-of-fb-no-of-comments']). '"';
+	    if(ampforwp_get_data_consent()){
+	    	$facebook_comments_markup .= ' data-block-on-consent ';
+	    }
+		$facebook_comments_markup .= 'data-href="' . esc_html(get_permalink()) . '"';
 	    $facebook_comments_markup .= '></amp-facebook-comments></section>';
 	}
 		return $facebook_comments_markup;
@@ -146,7 +166,7 @@ function ampforwp_framework_get_disqus_comments(){
 	}
 
 	if( $redux_builder_amp['ampforwp-disqus-comments-name'] !== '' ) {
-		global $post; $post_slug=$post->post_name;
+		global $post; $post_slug = rawurlencode($post->post_name);
 
 		$disqus_script_host_url = "https://ampforwp.appspot.com/?api=". AMPFORWP_DISQUS_URL;
 
@@ -154,41 +174,120 @@ function ampforwp_framework_get_disqus_comments(){
 			$disqus_script_host_url = esc_url( $redux_builder_amp['ampforwp-disqus-host-file'] );
 		}
 
-		$disqus_url = $disqus_script_host_url.'?disqus_title='.$post_slug.'&url='.get_permalink().'&disqus_name='. esc_url( $redux_builder_amp['ampforwp-disqus-comments-name'] ) ."/embed.js"  ;
+		$disqus_url = $disqus_script_host_url.'?disqus_title='.$post_slug.'&url='.rawurlencode(get_permalink()).'&disqus_name='. esc_url( ampforwp_get_setting('ampforwp-disqus-comments-name') ) ."/embed.js"  ;
 		?>
 		<section class="amp-disqus-comments">
 			<amp-iframe
-				height=<?php echo $height ?>
-				width=<?php echo $width ?>
-				layout="<?php echo $layout ?>"
+				height=<?php echo esc_attr($height); ?>
+				width=<?php echo esc_attr($width); ?>
+				layout="<?php echo esc_attr($layout); ?>"
 				sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
 				frameborder="0"
-				data-block-on-consent
-				src="<?php echo $disqus_url ?>" >
-				<div overflow tabindex="0" role="button" aria-label="Read more"><?php echo __('Disqus Comments Loading...','accelerated-mobile-pages') ?></div>
+				<?php if(ampforwp_get_data_consent()){?>data-block-on-consent <?php } ?>
+				src="<?php echo esc_url($disqus_url); ?>" >
+				<div overflow tabindex="0" role="button" aria-label="Read more"><?php echo esc_html__('Disqus Comments Loading...','accelerated-mobile-pages') ?></div>
 			</amp-iframe>
 		</section>
 	<?php
 	}
 }
 
+function ampforwp_framework_get_vuukle_comments(){
+	global $post, $redux_builder_amp; 
+	$apiKey ='';
+	$tag_name ='';
+	$img = get_the_post_thumbnail_url();
+	$tags = get_the_tags($post->ID);
+	if( isset($redux_builder_amp['ampforwp-vuukle-comments-apiKey']) && $redux_builder_amp['ampforwp-vuukle-comments-apiKey'] !== ""){
+		$apiKey = $redux_builder_amp['ampforwp-vuukle-comments-apiKey'];
+	}
+	$siteUrl = trim(site_url(), '/');  
+	if (!preg_match('#^http(s)?://#', $siteUrl)) {
+	      $siteUrl = 'http://' . $siteUrl;
+	}
+	if($img ==  false){
+		$img = plugins_url('accelerated-mobile-pages/images/150x150.png');
+	}  
+   	if($tags){
+  		foreach($tags as $individual_tag) {
+ 				$tag_name = $individual_tag->name;
+		}
+   	}
+    $urlParts = parse_url($siteUrl);
+    $siteUrl = preg_replace('/^www\./', '', $urlParts['host']);// remove www
+	$srcUrl = 'https://cdn.vuukle.com/amp.html?';
+	$srcUrl = add_query_arg('url' ,get_permalink(), $srcUrl);
+	$srcUrl = add_query_arg('host' ,$siteUrl, $srcUrl);
+	$srcUrl = add_query_arg('id' , $post->ID, $srcUrl);
+	$srcUrl = add_query_arg('title' , urlencode($post->post_title), $srcUrl);
+	$srcUrl = add_query_arg('img' , esc_url($img), $srcUrl);
+	$srcUrl = add_query_arg('tags' , urlencode($tag_name), $srcUrl);
+
+ 	$vuukle_html = '<amp-iframe width="600" height="350" layout="responsive" sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-forms" resizable frameborder="0" src="'.esc_url($srcUrl).'">
+
+		<div overflow tabindex="0" role="button" aria-label="Show comments">Show comments</div>';
+	echo $vuukle_html;
+}
+
+function ampforwp_framework_get_spotim_comments(){
+	global $post, $redux_builder_amp; 
+	$spotId ='';
+	if( isset($redux_builder_amp['ampforwp-spotim-comments-apiKey']) && $redux_builder_amp['ampforwp-spotim-comments-apiKey'] !== ""){
+		$spotId = $redux_builder_amp['ampforwp-spotim-comments-apiKey'];
+	}
+	$srcUrl = 'https://amp.spot.im/production.html?';
+	$srcUrl = add_query_arg('spotId' ,get_permalink(), $srcUrl);
+	$srcUrl = add_query_arg('postId' , $post->ID, $srcUrl);
+	$spotim_html = '<amp-iframe width="375" height="815" resizable sandbox="allow-scripts allow-same-origin allow-popups allow-top-navigation" layout="responsive"
+	  frameborder="0" src="'.esc_url($srcUrl).'">
+	  <amp-img placeholder height="815" layout="fill" src="//amp.spot.im/loader.png"></amp-img>
+	  <div overflow class="spot-im-amp-overflow" tabindex="0" role="button" aria-label="Read more">Load more...</div>
+	</amp-iframe>';
+	echo $spotim_html;
+}
+
 // Comments Scripts
-add_filter( 'amp_post_template_data', 'ampforwp_framework_comments_scripts' );
+add_filter( 'ampforwp_post_template_data', 'ampforwp_framework_comments_scripts' );
 function ampforwp_framework_comments_scripts( $data ) {
 
 	$facebook_comments_check = ampforwp_framework_get_facebook_comments();
 	global $redux_builder_amp;
-	if ( $facebook_comments_check && $redux_builder_amp['ampforwp-facebook-comments-support'] && is_singular() && !is_front_page()) {
+	$is_pb_enabled = '';
+	$is_pb_enabled = checkAMPforPageBuilderStatus(get_the_ID());	
+	$display_comments_on = "";
+	$display_comments_on = ampforwp_get_comments_status();
+	$isBBPress = (function_exists('is_bbpress') ? is_bbpress() : false );
+	if ( $facebook_comments_check && true ==  ampforwp_get_setting('ampforwp-facebook-comments-support') && $display_comments_on && !is_front_page()  && !$is_pb_enabled && !$isBBPress ) {
 			if ( empty( $data['amp_component_scripts']['amp-facebook-comments'] ) ) {
 				$data['amp_component_scripts']['amp-facebook-comments'] = 'https://cdn.ampproject.org/v0/amp-facebook-comments-0.1.js';
 			}
 		}
-	if ( $redux_builder_amp['ampforwp-disqus-comments-support'] && is_singular()  && comments_open() ) {
+	if ( $redux_builder_amp['ampforwp-disqus-comments-support'] && $display_comments_on  && comments_open() && !$is_pb_enabled ) {
 		if( $redux_builder_amp['ampforwp-disqus-comments-name'] !== '' ) {
 			if ( empty( $data['amp_component_scripts']['amp-iframe'] ) ) {
 				$data['amp_component_scripts']['amp-iframe'] = 'https://cdn.ampproject.org/v0/amp-iframe-0.1.js';
 			}
 		}
-	}	
+	}
+	if ( isset($redux_builder_amp['ampforwp-vuukle-comments-support'])
+	 	&& $redux_builder_amp['ampforwp-vuukle-comments-support']
+	  	&& $display_comments_on  && comments_open() && !$is_pb_enabled 
+	) {
+			if ( empty( $data['amp_component_scripts']['amp-iframe'] ) ) {
+				$data['amp_component_scripts']['amp-iframe'] = 'https://cdn.ampproject.org/v0/amp-iframe-0.1.js';
+			}
+			if (ampforwp_get_setting('ampforwp-vuukle-Ads-before-comments') && empty( $data['amp_component_scripts']['amp-ad'] ) ) {
+				$data['amp_component_scripts']['amp-ad'] = 'https://cdn.ampproject.org/v0/amp-ad-0.1.js';
+			}
+	}
+	//spotim
+	if ( isset($redux_builder_amp['ampforwp-spotim-comments-support'])
+	 	&& $redux_builder_amp['ampforwp-spotim-comments-support']
+	 	&& $display_comments_on  && comments_open() ) {
+		if ( empty( $data['amp_component_scripts']['amp-iframe'] ) ) {
+			$data['amp_component_scripts']['amp-iframe'] = 'https://cdn.ampproject.org/v0/amp-iframe-0.1.js';
+		}
+		
+	}
 		return $data;
 }

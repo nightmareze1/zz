@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 /**
  * Class that regroups things about "custom folders".
@@ -14,7 +14,7 @@ class Imagify_Custom_Folders {
 	 *
 	 * @var string
 	 */
-	const VERSION = '1.0.1';
+	const VERSION = '1.1';
 
 
 	/** ----------------------------------------------------------------------------------------- */
@@ -38,7 +38,7 @@ class Imagify_Custom_Folders {
 		}
 
 		$filesystem = imagify_get_filesystem();
-		$backup_dir = $filesystem->get_abspath() . 'imagify-backup/';
+		$backup_dir = $filesystem->get_site_root() . 'imagify-backup/';
 
 		/**
 		 * Filter the backup directory path (custom folders).
@@ -79,14 +79,14 @@ class Imagify_Custom_Folders {
 	 */
 	public static function get_file_backup_path( $file_path ) {
 		$file_path  = wp_normalize_path( (string) $file_path );
-		$abspath    = imagify_get_filesystem()->get_abspath();
+		$site_root  = imagify_get_filesystem()->get_site_root();
 		$backup_dir = self::get_backup_dir_path();
 
 		if ( ! $file_path ) {
 			return false;
 		}
 
-		return str_replace( $abspath, $backup_dir, $file_path );
+		return preg_replace( '@^' . preg_quote( $site_root, '@' ) . '@', $backup_dir, $file_path );
 	}
 
 
@@ -164,54 +164,71 @@ class Imagify_Custom_Folders {
 	 * @author Grégory Viguier
 	 *
 	 * @param array $args An array of arguments.
-	 *                    At least: 'file_id'. At best (less queries): 'file_id', 'file_path' (or 'path' for the placeholder), and 'backup_path'.
+	 *                    At least: 'file_id'. At best: 'file_id', 'file_path' (or 'path' for the placeholder), and 'backup_path'.
 	 */
-	public static function delete_file( $args = array() ) {
-		$args = array_merge( array(
+	public static function delete_file( $args = [] ) {
+		$args = array_merge( [
 			'file_id'     => 0,
 			'file_path'   => '',
 			'path'        => '',
 			'backup_path' => '',
-			'file'        => false,
-		), $args );
+			'process'     => false,
+		], $args );
 
 		$filesystem = imagify_get_filesystem();
-		$file       = $args['file'] && is_a( $args['file'], 'Imagify_File_Attachment' ) ? $args['file'] : false;
 
-		// The file.
+		// Fill the blanks.
+		if ( $args['process'] && $args['process'] instanceof \Imagify\Optimization\Process\ProcessInterface ) {
+			$process = $args['process'];
+		} else {
+			$process = imagify_get_optimization_process( $args['file_id'], 'custom-folders' );
+		}
+
+		if ( ! $process->is_valid() ) {
+			// You fucked up!
+			return;
+		}
+
 		if ( ! $args['file_path'] && $args['path'] ) {
 			$args['file_path'] = Imagify_Files_Scan::remove_placeholder( $args['path'] );
 		}
 
 		if ( ! $args['file_path'] && $args['file_id'] ) {
-			$file = $file ? $file : get_imagify_attachment( 'File', $args['file_id'], 'delete_custom_file' );
-			$args['file_path'] = $file->get_original_path();
+			$args['file_path'] = $process->get_media()->get_original_path();
 		}
 
-		if ( $args['file_path'] && $filesystem->exists( $args['file_path'] ) ) {
-			$filesystem->delete( $args['file_path'] );
-		}
-
-		// The backup file.
 		if ( ! $args['backup_path'] && $args['file_path'] ) {
 			$args['backup_path'] = self::get_file_backup_path( $args['file_path'] );
 		}
 
 		if ( ! $args['backup_path'] && $args['file_id'] ) {
-			$file = $file ? $file : get_imagify_attachment( 'File', $args['file_id'], 'delete_custom_file' );
-			$args['backup_path'] = $file->get_raw_backup_path();
+			$args['backup_path'] = $process->get_media()->get_raw_backup_path();
 		}
 
+		// Trigger a common hook.
+		imagify_trigger_delete_media_hook( $process );
+
+		// The file.
+		if ( $args['file_path'] && $filesystem->exists( $args['file_path'] ) ) {
+			$filesystem->delete( $args['file_path'] );
+		}
+
+		// The backup file.
 		if ( $args['backup_path'] && $filesystem->exists( $args['backup_path'] ) ) {
 			$filesystem->delete( $args['backup_path'] );
 		}
 
-		// In the database.
-		if ( $file ) {
-			$file->delete_row();
-		} else {
-			Imagify_Files_DB::get_instance()->delete( $args['file_id'] );
+		// Webp.
+		$mime_type = $filesystem->get_mime_type( $args['file_path'] );
+		$is_image  = $mime_type && strpos( $mime_type, 'image/' ) === 0;
+		$webp_path = $is_image ? imagify_path_to_webp( $args['file_path'] ) : false;
+
+		if ( $webp_path && $filesystem->is_writable( $webp_path ) ) {
+			$filesystem->delete( $webp_path );
 		}
+
+		// In the database.
+		$process->get_media()->delete_row();
 	}
 
 	/**
@@ -221,39 +238,50 @@ class Imagify_Custom_Folders {
 	 * @access public
 	 * @author Grégory Viguier
 	 *
-	 * @param  object $file             An Imagify_File_Attachment object.
-	 * @param  bool   $is_folder_active Tell if the folder is active.
-	 * @return int|bool|object          The file ID if modified. False if not modified. A WP_Error object if the entry has been removed from the database.
-	 *                                  The entry is removed from the database if:
-	 *                                  - The file doesn't exist anymore.
-	 *                                  - Or if its folder is not active and: the file has been modified, or the file is not optimized by Imagify, or the file is orphan (its folder is not in the database anymore).
+	 * @param  ProcessInterface $process          A \Imagify\Optimization\Process\ProcessInterface object.
+	 * @param  bool             $is_folder_active Tell if the folder is active.
+	 * @return int|bool|object  The file ID if modified. False if not modified. A WP_Error object if the entry has been removed from the database.
+	 *                          The entry is removed from the database if:
+	 *                          - The file doesn't exist anymore.
+	 *                          - Or if its folder is not active and: the file has been modified, or the file is not optimized by Imagify, or the file is orphan (its folder is not in the database anymore).
 	 */
-	public static function refresh_file( $file, $is_folder_active = null ) {
+	public static function refresh_file( $process, $is_folder_active = null ) {
 		global $wpdb;
 
-		$file_path   = $file->get_original_path();
-		$backup_path = $file->get_backup_path();
-		$filesystem  = imagify_get_filesystem();
-		$modified    = false;
+		if ( ! $process->is_valid() ) {
+			return new \WP_Error( 'invalid_media', __( 'This media is not valid.', 'imagify' ) );
+		}
+
+		$filesystem = imagify_get_filesystem();
+		$media      = $process->get_media();
+		$file_path  = $media->get_original_path();
+		$mime_type  = $filesystem->get_mime_type( $file_path );
+		$is_image   = $mime_type && strpos( $mime_type, 'image/' ) === 0;
+		$webp_path  = $is_image ? imagify_path_to_webp( $file_path ) : false;
+		$has_webp   = $webp_path && $filesystem->is_writable( $webp_path );
+		$modified   = false;
 
 		if ( ! $file_path || ! $filesystem->exists( $file_path ) ) {
 			/**
 			 * The file doesn't exist anymore.
 			 */
-			if ( $backup_path ) {
-				// Delete the backup file.
-				$filesystem->delete( $backup_path );
-			}
+			// Delete the backup file.
+			$process->delete_backup();
 
 			// Get the folder ID before removing the row.
-			$folder_id = $file->get_row();
+			$folder_id = $media->get_row();
 			$folder_id = $folder_id['folder_id'];
 
 			// Remove the entry from the database.
-			$file->delete_row();
+			$media->delete_row();
 
 			// Remove the corresponding folder if inactive and have no files left.
 			self::remove_empty_inactive_folders( $folder_id );
+
+			// Delete the webp version.
+			if ( $has_webp ) {
+				$filesystem->delete( $webp_path );
+			}
 
 			return new WP_Error( 'no-file', __( 'The file was missing or its path could not be retrieved from the database. The entry has been deleted from the database.', 'imagify' ) );
 		}
@@ -261,8 +289,8 @@ class Imagify_Custom_Folders {
 		/**
 		 * The file still exists.
 		 */
-		$old_data = $file->get_row();
-		$new_data = array();
+		$old_data = $media->get_row();
+		$new_data = [];
 
 		// Folder ID.
 		if ( $old_data['folder_id'] ) {
@@ -293,24 +321,27 @@ class Imagify_Custom_Folders {
 		}
 
 		// The file is modified or is not optimized.
-		if ( $new_data['modified'] || ! $file->is_optimized() ) {
+		if ( $new_data['modified'] || ! $process->get_data()->is_optimized() ) {
 			if ( ! isset( $is_folder_active ) ) {
 				$is_folder_active = $folder && $folder['active'];
 			}
 
 			// Its folder is not active: remove the entry from the database and delete the backup.
 			if ( ! $is_folder_active ) {
-				if ( $backup_path ) {
-					// Delete the backup file.
-					$filesystem->delete( $backup_path );
-				}
+				// Delete the backup file.
+				$process->delete_backup();
 
 				// Remove the entry from the database.
-				$file->delete_row();
+				$media->delete_row();
 
 				// Remove the corresponding folder if inactive and have no files left.
 				if ( $old_data['folder_id'] ) {
 					self::remove_empty_inactive_folders( $old_data['folder_id'] );
+				}
+
+				// Delete the webp version.
+				if ( $has_webp ) {
+					$filesystem->delete( $webp_path );
 				}
 
 				return new WP_Error( 'folder-not-active', __( 'The file has been modified or was not optimized: its folder not being selected in the settings, the entry has been deleted from the database.', 'imagify' ) );
@@ -325,13 +356,18 @@ class Imagify_Custom_Folders {
 			$modified  = true;
 			$mime_type = ! empty( $old_data['mime_type'] ) ? $old_data['mime_type'] : $filesystem->get_mime_type( $file_path );
 
-			if ( strpos( $mime_type, 'image/' ) === 0 ) {
+			if ( $is_image ) {
 				$size = $filesystem->get_image_size( $file_path );
+
+				// Delete the webp version.
+				if ( $has_webp ) {
+					$filesystem->delete( $webp_path );
+				}
 			} else {
 				$size = false;
 			}
 
-			$new_data = array_merge( $new_data, array(
+			$new_data = array_merge( $new_data, [
 				'file_date'          => $filesystem->get_date( $file_path ),
 				'width'              => $size ? $size['width']  : 0,
 				'height'             => $size ? $size['height'] : 0,
@@ -341,30 +377,44 @@ class Imagify_Custom_Folders {
 				'optimization_level' => null,
 				'status'             => null,
 				'error'              => null,
-			) );
+				'data'               => [],
+			] );
 
-			if ( $backup_path ) {
-				// Delete the backup of the previous file.
-				$filesystem->delete( $backup_path );
-			}
+			// Delete the backup of the previous file.
+			$process->delete_backup();
 		} else {
 			// Update file data to make sure nothing is missing.
-			$path      = $backup_path ? $backup_path : $file_path;
-			$mime_type = ! empty( $old_data['mime_type'] ) ? $old_data['mime_type'] : $filesystem->get_mime_type( $path );
-			$file_date = ! empty( $old_data['file_date'] ) && '0000-00-00 00:00:00' !== $old_data['file_date'] ? $old_data['file_date'] : $filesystem->get_date( $path );
+			$backup_path = $media->get_backup_path();
+			$path        = $backup_path ? $backup_path : $file_path;
+			$mime_type   = ! empty( $old_data['mime_type'] ) ? $old_data['mime_type'] : $filesystem->get_mime_type( $path );
+			$file_date   = ! empty( $old_data['file_date'] ) && '0000-00-00 00:00:00' !== $old_data['file_date'] ? $old_data['file_date'] : $filesystem->get_date( $path );
 
-			if ( strpos( $mime_type, 'image/' ) === 0 ) {
+			if ( $is_image ) {
 				$size = $filesystem->get_image_size( $path );
 			} else {
 				$size = false;
 			}
 
-			$new_data = array_merge( $new_data, array(
+			$new_data = array_merge( $new_data, [
 				'file_date'     => $file_date,
 				'width'         => $size ? $size['width']  : 0,
 				'height'        => $size ? $size['height'] : 0,
 				'original_size' => $filesystem->size( $path ),
-			) );
+			] );
+
+			// Webp.
+			$webp_size = 'full' . $process::WEBP_SUFFIX;
+
+			if ( $has_webp && empty( $old_data['data'][ $webp_size ]['success'] ) ) {
+				$webp_file_size = $filesystem->size( $webp_path );
+
+				$old_data['data'][ $webp_size ] = [
+					'success'        => true,
+					'original_size'  => $new_data['original_size'],
+					'optimized_size' => $webp_file_size,
+					'percent'        => round( ( ( $new_data['original_size'] - $webp_file_size ) / $new_data['original_size'] ) * 100, 2 ),
+				];
+			}
 		}
 
 		// Save the new data.
@@ -373,10 +423,10 @@ class Imagify_Custom_Folders {
 		ksort( $new_data );
 
 		if ( $old_data !== $new_data ) {
-			$file->update_row( $new_data );
+			$media->update_row( $new_data );
 		}
 
-		return $modified ? $file->get_id() : false;
+		return $modified ? $media->get_id() : false;
 	}
 
 
@@ -393,7 +443,7 @@ class Imagify_Custom_Folders {
 	 *
 	 * @param  array $args A list of arguments to tell more precisely what to fetch:
 	 *                         - bool $active True to fetch only "active" folders (checked in the settings). False to fetch only folders that are not "active".
-	 * @return array       An array of arrays containing the following keys:
+	 * @return array       An array of arrays containing the following values:
 	 *                         - int    $folder_id   The folder ID.
 	 *                         - string $path        The folder path, with placeholder.
 	 *                         - int    $active      1 if the folder should be optimized. 0 otherwize.
@@ -402,7 +452,7 @@ class Imagify_Custom_Folders {
 	 *                         Array(
 	 *                             [7] => Array(
 	 *                                 [folder_id] => 7
-	 *                                 [path] => {{ABSPATH}}/custom-path/
+	 *                                 [path] => {{ROOT}}/custom-path/
 	 *                                 [active] => 1
 	 *                                 [folder_path] => /absolute/path/to/custom-path/
 	 *                             )
@@ -478,7 +528,7 @@ class Imagify_Custom_Folders {
 	 *                                [_2] => Array(
 	 *                                    [file_id]            => 2
 	 *                                    [folder_id]          => 7
-	 *                                    [path]               => {{ABSPATH}}/custom-path/image-1.jpg
+	 *                                    [path]               => {{ROOT}}/custom-path/image-1.jpg
 	 *                                    [optimization_level] => null
 	 *                                    [status]             => null
 	 *                                    [file_path]          => /absolute/path/to/custom-path/image-1.jpg
@@ -486,7 +536,7 @@ class Imagify_Custom_Folders {
 	 *                                [_3] => Array(
 	 *                                    [file_id]            => 3
 	 *                                    [folder_id]          => 7
-	 *                                    [path]               => {{ABSPATH}}/custom-path/image-2.jpg
+	 *                                    [path]               => {{ROOT}}/custom-path/image-2.jpg
 	 *                                    [optimization_level] => 2
 	 *                                    [status]             => success
 	 *                                    [file_path]          => /absolute/path/to/custom-path/image-2.jpg
@@ -808,9 +858,9 @@ class Imagify_Custom_Folders {
 		foreach ( $results as $file ) {
 			$file      = $files_db->cast_row( $file );
 			$folder_id = $file['folder_id'];
-			$file      = get_imagify_attachment( 'File', $file, 'synchronize_files_from_folders' );
+			$process   = imagify_get_optimization_process( $file, 'custom-folders' );
 
-			self::refresh_file( $file, $folders[ $folder_id ]['active'] );
+			self::refresh_file( $process, $folders[ $folder_id ]['active'] );
 		}
 
 		foreach ( $folders as $folder_id => $folder ) {
@@ -947,7 +997,7 @@ class Imagify_Custom_Folders {
 				continue;
 			}
 
-			if ( Imagify_Files_Scan::is_path_forbidden( $full_path ) ) {
+			if ( Imagify_Files_Scan::is_path_forbidden( trailingslashit( $full_path ) ) ) {
 				continue;
 			}
 
@@ -1017,14 +1067,15 @@ class Imagify_Custom_Folders {
 		}
 
 		$active_folder_ids = array();
-		$has_abspath       = false;
+		$has_site_root     = false;
 
 		foreach ( $active_folders as $i => $active_folder ) {
 			$active_folders[ $i ] = $folders_db->cast_row( $active_folder );
 			$active_folder_ids[]  = $active_folders[ $i ][ $folders_key ];
 
-			if ( '{{ABSPATH}}/' === $active_folders[ $i ]['path'] ) {
-				$has_abspath = true;
+			if ( '{{ROOT}}/' === $active_folders[ $i ]['path'] ) {
+				$has_site_root = true;
+				break;
 			}
 		}
 
@@ -1044,7 +1095,7 @@ class Imagify_Custom_Folders {
 			$inactive_file              = $files_db->cast_row( $inactive_file );
 			$inactive_file['full_path'] = Imagify_Files_Scan::remove_placeholder( $inactive_file['path'] );
 
-			if ( $has_abspath ) {
+			if ( $has_site_root ) {
 				$inactive_file['dirname'] = $filesystem->dir_path( $inactive_file['full_path'] );
 			}
 
@@ -1060,7 +1111,7 @@ class Imagify_Custom_Folders {
 					$file_ids_by_folder[ $folder_id ] = array();
 				}
 
-				if ( '{{ABSPATH}}/' === $active_folder['path'] ) {
+				if ( '{{ROOT}}/' === $active_folder['path'] ) {
 					// For the site's root: only direct childs.
 					if ( $inactive_file['dirname'] === $active_folder['full_path'] ) {
 						// This file is in the site's root folder.
@@ -1199,7 +1250,7 @@ class Imagify_Custom_Folders {
 		sort( $placeholders );
 
 		foreach ( $placeholders as $i => $placeholder_path ) {
-			if ( '{{ABSPATH}}/' === $placeholder_path ) {
+			if ( '{{ROOT}}/' === $placeholder_path ) {
 				continue;
 			}
 

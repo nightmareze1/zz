@@ -8,29 +8,13 @@ elseif ( ! defined('AMPFORWP_CUSTOM_THEME') ) {
 
 	require_once(  AMPFORWP_CUSTOM_THEME . '/functions.php' );
 	//Filter the Template files to override previous ones
-	//add_filter( 'amp_post_template_file', 'ampforwp_custom_header_file', 10, 2 );
 	add_filter( 'amp_post_template_file', 'ampforwp_designing_custom_template', 10, 3 );
-	//add_filter( 'amp_post_template_file', 'ampforwp_custom_footer_file', 10, 2 );
-
-	// Custom Header
-	function ampforwp_custom_header_file( $file, $type ) {
-		if ( 'header' === $type ) {
-			$file = AMPFORWP_CUSTOM_THEME . '/header.php';
-		}
-		return $file;
-	}
 
 	// Custom Template Files
 	function ampforwp_designing_custom_template( $file, $type, $post ) {
 	 global $redux_builder_amp;
-		// Single file
-	    /*if ( is_single() ) {
-			if( 'single' === $type && ! ('product' === $post->post_type) ) {
-				$file = AMPFORWP_CUSTOM_THEME . '/single.php';
-		 	}
-		}*/
-		// 404 Template
 
+		// 404 Template
 	 	if( 'single' === $type && is_404() ) {
 			$file = AMPFORWP_CUSTOM_THEME . '/404.php';
 	 	}
@@ -199,7 +183,7 @@ elseif ( ! defined('AMPFORWP_CUSTOM_THEME') ) {
 				if ( ! empty( $object->post_type ) ) {
 					$template = get_page_template_slug( $object );
 					if ( $template && 0 === validate_file( $template ) ) {
-						$templates[] = $template;
+						$templates[] = AMPFORWP_CUSTOM_THEME.'/'.$template;
 					}
 
 					$name_decoded = urldecode( $object->post_name );
@@ -234,7 +218,7 @@ elseif ( ! defined('AMPFORWP_CUSTOM_THEME') ) {
 
 				$templates = array();
 				if ( $template && 0 === validate_file( $template ) )
-					$templates[] = $template;
+					$templates[] = AMPFORWP_CUSTOM_THEME.'/'.$template;
 				if ( $pagename ) {
 					$pagename_decoded = urldecode( $pagename );
 					if ( $pagename_decoded !== $pagename ) {
@@ -260,20 +244,3 @@ elseif ( ! defined('AMPFORWP_CUSTOM_THEME') ) {
 		}
 	 	return $file;
 	}
-
-	// Custom Footer
-	function ampforwp_custom_footer_file( $file, $type ) {
-		if ( 'footer' === $type ) {
-			$file = AMPFORWP_CUSTOM_THEME . '/footer.php';
-		}
-		return $file;
-	}
-	// Load the Core Styles of Custom Theme
-	//add_action('amp_css', 'ampforwp_custom_style');
-	function ampforwp_custom_style() { 
-		global $redux_builder_amp; 
-		require_once( AMPFORWP_CUSTOM_THEME . '/style.php' );
-		// Custom CSS
-		echo $redux_builder_amp['css_editor']; 
-	}
-

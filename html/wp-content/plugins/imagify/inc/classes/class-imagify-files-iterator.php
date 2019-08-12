@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 /**
  * Class allowing to filter DirectoryIterator, to return only files that Imagify can optimize and folders.
@@ -17,7 +17,7 @@ class Imagify_Files_Iterator extends FilterIterator {
 	 * @since  1.7
 	 * @author Grégory Viguier
 	 */
-	const VERSION = '1.0.1';
+	const VERSION = '1.0.2';
 
 	/**
 	 * Tell if the iterator will return both folders and images, or only images.
@@ -65,15 +65,28 @@ class Imagify_Files_Iterator extends FilterIterator {
 	public function accept() {
 		static $extensions, $has_extension_method;
 
-		// Forbidden file/folder paths and names.
 		$file_path = $this->current()->getPathname();
+
+		// Prevent triggering an open_basedir restriction error.
+		$file_name = $this->filesystem->file_name( $file_path );
+
+		if ( '.' === $file_name || '..' === $file_name ) {
+			return false;
+		}
+
+		// Forbidden file/folder paths and names.
+		$is_dir = $this->isDir();
+
+		if ( $is_dir ) {
+			$file_path = trailingslashit( $file_path );
+		}
 
 		if ( Imagify_Files_Scan::is_path_forbidden( $file_path ) ) {
 			return false;
 		}
 
 		// OK for folders.
-		if ( $this->include_folders && $this->isDir() ) {
+		if ( $this->include_folders && $is_dir ) {
 			return true;
 		}
 

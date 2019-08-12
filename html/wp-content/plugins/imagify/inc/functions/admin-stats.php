@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 /**
  * Count number of attachments.
@@ -280,10 +280,12 @@ function imagify_count_saving_data( $key = '' ) {
 				unset( $attachment_data['sizes']['full'] );
 
 				// Increment the thumbnails sizes.
-				foreach ( $attachment_data['sizes'] as $size_data ) {
-					if ( ! empty( $size_data['success'] ) ) {
-						$original_size  += $size_data['original_size']  ? $size_data['original_size']  : 0;
-						$optimized_size += $size_data['optimized_size'] ? $size_data['optimized_size'] : 0;
+				if ( $attachment_data['sizes'] ) {
+					foreach ( $attachment_data['sizes'] as $size_data ) {
+						if ( ! empty( $size_data['success'] ) ) {
+							$original_size  += $size_data['original_size']  ? $size_data['original_size']  : 0;
+							$optimized_size += $size_data['optimized_size'] ? $size_data['optimized_size'] : 0;
+						}
 					}
 				}
 			}
@@ -348,15 +350,16 @@ function imagify_count_saving_data( $key = '' ) {
 					continue;
 				}
 
-				$original_data = $attachment_data['sizes']['full'];
-
-				if ( empty( $original_data['success'] ) ) {
+				if ( empty( $attachment_data['sizes']['full']['success'] ) ) {
 					/**
-					 * Case where this attachment has multiple '_imagify_status' metas, and is fetched (in the above query) as a "success" while the '_imagify_data' says otherwise.
-					 * Don't ask how it's possible, I don't know.
+					 * - Case where this attachment has multiple '_imagify_status' metas, and is fetched (in the above query) as a "success" while the '_imagify_data' says otherwise.
+					 * - Case where this meta has no "full" entry.
+					 * Don't ask how it's possible, I don't know ¯\(°_o)/¯
 					 */
 					continue;
 				}
+
+				$original_data = $attachment_data['sizes']['full'];
 
 				++$count;
 
@@ -367,10 +370,12 @@ function imagify_count_saving_data( $key = '' ) {
 				unset( $attachment_data['sizes']['full'], $original_data );
 
 				// Increment the thumbnails sizes.
-				foreach ( $attachment_data['sizes'] as $size_data ) {
-					if ( ! empty( $size_data['success'] ) ) {
-						$original_size  += ! empty( $size_data['original_size'] )  ? $size_data['original_size']  : 0;
-						$optimized_size += ! empty( $size_data['optimized_size'] ) ? $size_data['optimized_size'] : 0;
+				if ( $attachment_data['sizes'] ) {
+					foreach ( $attachment_data['sizes'] as $size_data ) {
+						if ( ! empty( $size_data['success'] ) ) {
+							$original_size  += ! empty( $size_data['original_size'] )  ? $size_data['original_size']  : 0;
+							$optimized_size += ! empty( $size_data['optimized_size'] ) ? $size_data['optimized_size'] : 0;
+						}
 					}
 				}
 
@@ -593,9 +598,6 @@ function imagify_calculate_total_image_size( $image_ids, $partial_total_images, 
 			'full' => get_imagify_attached_file( $results['filenames'][ $image_id ] ),
 		);
 
-		/** This filter is documented in inc/functions/process.php. */
-		$files['full'] = apply_filters( 'imagify_file_path', $files['full'] );
-
 		$sizes = isset( $results['data'][ $image_id ]['sizes'] ) ? $results['data'][ $image_id ]['sizes'] : array();
 
 		if ( $sizes && is_array( $sizes ) ) {
@@ -718,7 +720,7 @@ function imagify_get_bulk_stats( $types, $args = array() ) {
 		$data['optimized_human']               += $saving_data['optimized_size'];
 	}
 
-	if ( isset( $types['custom-folders'] ) ) {
+	if ( isset( $types['custom-folders|custom-folders'] ) ) {
 		/**
 		 * Custom folders.
 		 */
@@ -738,8 +740,11 @@ function imagify_get_bulk_stats( $types, $args = array() ) {
 	 */
 	if ( $args['fullset'] ) {
 		// User account.
-		$user = new Imagify_User();
-		$data['unconsumed_quota'] = is_wp_error( $user ) ? 0 : $user->get_percent_unconsumed_quota();
+		$views = Imagify_Views::get_instance();
+
+		$data['unconsumed_quota'] = $views->get_quota_percent();
+		$data['quota_class']      = $views->get_quota_class();
+		$data['quota_icon']       = $views->get_quota_icon();
 	}
 
 	/**

@@ -1,5 +1,7 @@
 <?php 
-$output = '<div class="ln-fx">{{repeater}}</div>';
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
+$output = '<div {{if_id}}id="{{id}}"{{ifend_id}} class="ln-fx {{if_user_class}}{{user_class}}{{ifend_user_class}}">{{repeater}}</div>';
 $css = '
 {{if_condition_blurb_layout_type==1}}
 {{module-class}} .ln-fx{width:100%;display:flex; flex-wrap:wrap;margin:{{margin_css}};padding:{{padding_css}};}
@@ -7,9 +9,10 @@ $css = '
 {{module-class}}.blurb-mod{margin:{{margin_css}};padding:{{padding_css}};}
 
 {{module-class}} .blu-mod .blurb-txt{font-size: {{text-size}};font-weight: {{fnt_wght}};color:{{font_color_picker}};}
-{{module-class}} .blu-mod .ico-pic{font-size:{{ic-size}};color:{{ic_color_picker}};margin-bottom:30px;display:inline-block;background:{{bg_color_picker}};border-radius:50%;padding:15px;}
+{{module-class}} .blu-mod .ico-pic{font-size:{{ic-size}};color:{{ic_color_picker}};
+	margin:{{ic_margin_gap}};display:inline-block;background:{{bg_color_picker}};border-radius:50%;padding:15px;}
 {{module-class}} .blu-mod{font-size: 15px;line-height: 1.7;}
-{{module-class}} .blu-mod p{margin: 15px 0px 0px 0px;}
+{{module-class}} .blu-mod p{margin: {{mrgn_css}};}
 
 
  {{module-class}} .blu-mod{
@@ -53,9 +56,9 @@ $css = '
 }
 
 
-';
+'; 
 global $redux_builder_amp;
-if($redux_builder_amp['amp-rtl-select-option']){
+if(ampforwp_get_setting('amp-rtl-select-option')){
 	$css .= '/** RTL CSS **/
 	.blu-mod{
 	    margin: 0 0% 3% 3%;
@@ -78,9 +81,9 @@ return array(
 		'default_tab'=> 'customizer',
 		'tabs' => array(
               'customizer'=>'Content',
+              'layout' => 'Layout',
               'design'=>'Design',
-              'advanced' => 'Advanced',
-			  'layout' => 'Layout'
+              'advanced' => 'Advanced'
             ),
 		'fields' => array(
 						array(    
@@ -120,6 +123,20 @@ return array(
 								'label'		=>'Icon Background',
 								'tab'		=>'design',
 								'default'	=>'#43c45d',
+								'content_type'=>'css',
+							),
+						array(
+								'type'		=>'spacing',
+								'name'		=>"ic_margin_gap",
+								'label'		=>'Icon Gapping',
+								'tab'		=>'design',
+								'default'	=>
+					                            array(
+					                                'top'=>'0px',
+					                                'right'=>'0px',
+					                                'bottom'=>'30px',
+					                                'left'=>'0px',
+					                            ),
 								'content_type'=>'css',
 							),
 						array(
@@ -168,6 +185,19 @@ return array(
 								'tab'		=>'design',
 								'default'	=>'#f4f4f4',
 								'content_type'=>'css'
+							),
+						array(
+								'type'		=>'spacing',
+								'name'		=>"mrgn_css",
+								'label'		=>'Content Gapping',
+								'tab'		=>'design',
+								'default'	=>array(
+													'left'=>'0px',
+													'right'=>'0px',
+													'top'=>'15px',
+													'bottom'=>'0px'
+												),
+								'content_type'=>'css',
 							),
 						array(
                                 'type'      =>'checkbox_bool',
@@ -267,19 +297,35 @@ return array(
                             ),
 								'content_type'=>'css',
 							),
-							array(
-								'type'		=>'spacing',
-								'name'		=>"padding_gpg",
-								'label'		=>'Padding',
-								'tab'		=>'design',
-								'default'	=>array(
-													'left'=>'30px',
-													'right'=>'30px',
-													'top'=>'50px',
-													'bottom'=>'50px'
-												),
-								'content_type'=>'css',
-							),
+						array(
+							'type'		=>'spacing',
+							'name'		=>"padding_gpg",
+							'label'		=>'Padding',
+							'tab'		=>'design',
+							'default'	=>array(
+												'left'=>'30px',
+												'right'=>'30px',
+												'top'=>'50px',
+												'bottom'=>'50px'
+											),
+							'content_type'=>'css',
+						),
+						array(
+							'type'		=>'text',
+							'name'		=>"id",
+							'label'		=>'ID',
+							'tab'		=>'advanced',
+							'default'	=>'',
+							'content_type'=>'html'
+						),
+						array(
+							'type'		=>'text',
+							'name'		=>"user_class",
+							'label'		=>'Class',
+							'tab'		=>'advanced',
+							'default'	=>'',
+							'content_type'=>'html'
+						),
 						array(
 								'type'		=>'spacing',
 								'name'		=>"margin_css",

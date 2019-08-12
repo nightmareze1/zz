@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 /**
  * Class that handles the admin notices.
@@ -14,7 +14,7 @@ class Imagify_Notices extends Imagify_Notices_Deprecated {
 	 *
 	 * @var string
 	 */
-	const VERSION = '1.0';
+	const VERSION = '1.0.1';
 
 	/**
 	 * Name of the transient storing temporary notices.
@@ -195,7 +195,7 @@ class Imagify_Notices extends Imagify_Notices_Deprecated {
 	public function admin_post_dismiss_notice() {
 		imagify_check_nonce( self::DISMISS_NONCE_ACTION );
 
-		$notice  = ! empty( $_GET['notice'] ) ? esc_html( $_GET['notice'] ) : false;
+		$notice  = ! empty( $_GET['notice'] ) ? esc_html( wp_unslash( $_GET['notice'] ) ) : false;
 		$notices = $this->get_notice_ids();
 		$notices = array_flip( $notices );
 
@@ -248,7 +248,7 @@ class Imagify_Notices extends Imagify_Notices_Deprecated {
 			imagify_die();
 		}
 
-		$plugin  = esc_html( $_GET['plugin'] );
+		$plugin  = esc_html( wp_unslash( $_GET['plugin'] ) );
 		$plugins = $this->get_conflicting_plugins();
 		$plugins = array_flip( $plugins );
 
@@ -271,7 +271,7 @@ class Imagify_Notices extends Imagify_Notices_Deprecated {
 	public function renew_almost_over_quota_notice() {
 		global $wpdb;
 
-		$results = $wpdb->get_results( $wpdb->prepare( "SELECT umeta_id, user_id FROM $wpdb->usermeta WHERE meta_key = %s AND meta_value LIKE '%almost-over-quota%'", self::DISMISS_META_NAME ) );
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT umeta_id, user_id FROM $wpdb->usermeta WHERE meta_key = %s AND meta_value LIKE %s", self::DISMISS_META_NAME, '%almost-over-quota%' ) );
 
 		if ( ! $results ) {
 			return;
@@ -888,7 +888,7 @@ class Imagify_Notices extends Imagify_Notices_Deprecated {
 	protected function user_can( $notice_id ) {
 		$capability = isset( self::$capabilities[ $notice_id ] ) ? self::$capabilities[ $notice_id ] : 'manage';
 
-		return imagify_current_user_can( $capability );
+		return imagify_get_context( 'wp' )->current_user_can( $capability );
 	}
 
 	/**

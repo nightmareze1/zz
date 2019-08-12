@@ -1,6 +1,6 @@
 <?php
-
-require_once AMP__DIR__ . '/includes/sanitizers/class-amp-base-sanitizer.php';
+namespace AMPforWP\AMPVendor;
+require_once AMP__VENDOR__DIR__ . '/includes/sanitizers/class-amp-base-sanitizer.php';
 
 /**
  * Converts Playbuzz embed to <amp-playbuzz>
@@ -106,9 +106,7 @@ class AMP_Playbuzz_Sanitizer extends AMP_Base_Sanitizer {
 
 		$out['height'] = self::$height;
 
-		if ( ! isset( $out['data-block-on-consent'] ) ) {
-			$out['data-block-on-consent'] = '';
-		}
+		$out = ampforwp_amp_consent_check( $out );
 
 		return $out;
 	}

@@ -1,6 +1,6 @@
 <?php
-
-require_once( AMP__DIR__ . '/includes/embeds/class-amp-base-embed-handler.php' );
+namespace AMPforWP\AMPVendor;
+require_once( AMP__VENDOR__DIR__ . '/includes/embeds/class-amp-base-embed-handler.php' );
 
 class AMP_SoundCloud_Embed_Handler extends AMP_Base_Embed_Handler {
 	const URL_PATTERN = '#https?://api\.soundcloud\.com/tracks/.*#i';
@@ -74,16 +74,13 @@ class AMP_SoundCloud_Embed_Handler extends AMP_Base_Embed_Handler {
 		}
 
 		$this->did_convert_elements = true;
-
-		return AMP_HTML_Utils::build_tag(
-			'amp-soundcloud',
-			array(
+		$attrs = array(
 				'data-trackid' => $args['track_id'],
 				'layout' => 'fixed-height',
 				'height' => $this->args['height'],
-				'data-block-on-consent' => '',
-			)
-		);
+			);
+		$attrs = ampforwp_amp_consent_check( $attrs );
+		return AMP_HTML_Utils::build_tag('amp-soundcloud',$attrs);
 	}
 
 	private function get_track_id_from_url( $url ) {

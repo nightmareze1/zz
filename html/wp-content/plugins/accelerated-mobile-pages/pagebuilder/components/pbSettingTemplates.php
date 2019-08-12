@@ -1,4 +1,5 @@
-<?php
+<?php // Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit; 
 $arraySetting = array(
                    'tabs'=> array(
                                 'layout'=>'Layout Directory',
@@ -26,10 +27,10 @@ global $savedlayoutTemplate;
                                 <?php
                                 foreach($arraySetting['tabs'] as $key=>$sidebarlink){
                                 ?>
-                                <li @click="settingShowTabs('<?php echo $key; ?>')"
+                                <li @click="settingShowTabs('<?php echo esc_attr($key); ?>')"
                                class="link"
-                               :class="{'active': (modalCrrentTab=='<?php echo $key ?>')}"> 
-                                  <?php echo $sidebarlink; ?>
+                               :class="{'active': (modalCrrentTab=='<?php echo esc_attr($key) ?>')}"> 
+                                  <?php echo esc_html($sidebarlink); ?>
                                 </li>
                                 <?php } ?>
                             </ul>
@@ -64,6 +65,7 @@ global $savedlayoutTemplate;
                                     </button>
                                     
                                 </div>
+                                <span class="layout-rem-msg" v-if="this.layoutMsg">{{this.layoutMsg}}</span>
                                 <div class="amppb-layout-library-wrapper" v-if="showsavedLayouts.length">
                                 <h4>List Of Saved Layouts</h4>
 
@@ -71,10 +73,10 @@ global $savedlayoutTemplate;
                                             <div class="amppb-layout-wrapper">
                                                 <div class="amppb-layout-screenshot" style="visibility:hidden;"></div>
                                                 <div class="amppb-layout-bottom">
-                                                    <h4 class="amppb-layout-title">{{layout.post_title}}</h4>
-                                                    <div class="amppb-layout-button">
-                                                        
+                                                    <h4 class="amppb-layout-title ste-tlt">{{layout.post_title}}</h4>
+                                                    <div class="amppb-layout-button saved-layout">
                                                         <button type="button" class="button" :data-layout='layout.post_content' @click="importLayout($event)">Import</button>
+                                                        <button type="button" class="button button-info del-btn" :data-layout='layout.post_content' @click="removeSavedLayout(layout.post_id)">Remove</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -102,35 +104,35 @@ global $savedlayoutTemplate;
                                         <div class="amppb-layout-layout">
                                             <div class="amppb-layout-wrapper">
                                                 <h4 class="amppb-layout-title"><?php
-                                                        if(strtolower($layoutName)=='upcoming'){
-                                                            echo "<a class='layouts_pro_lbl' href='https://ampforwp.com/amp-layouts' target='_blank'>PRO</a>".$lay[$firstLayout]['name'];
+                                                        if(strpos($layoutName, '-upcomming')!==False){
+                                                            echo "<a class='layouts_pro_lbl' href='https://ampforwp.com/amp-layouts' target='_blank'>PRO</a>".esc_html($lay[$firstLayout]['name']);
                                                         }else{
-                                                            echo ucfirst($layoutName); 
+                                                            echo esc_html(ucfirst($layoutName), 'accelerated-mobile-pages'); 
                                                         } ?></h4>
                                                 <div class="amppb-layout-screenshot">
                                                     <?php
-                                                     if(strtolower($layoutName)=='upcoming'){
+                                                     if(strpos($layoutName, '-upcomming')!==False){
                                                             ?>
-                                                    <a href="<?php echo $lay[$firstLayout]["preview_demo"]; ?>" target="_blank"><img src="<?php echo $lay[$firstLayout]['preview_img']; ?>"></a>
+                                                    <a href="<?php echo esc_url($lay[$firstLayout]["preview_demo"]); ?>" target="_blank"><img src="<?php echo esc_url($lay[$firstLayout]['preview_img']); ?>"></a>
                                                     <?php
                                                         }else{
                                                     ?>
-                                                    <img src="<?php echo $lay[$firstLayout]['preview_img']; ?>" @click="viewSpacialLayouts($event);"
+                                                    <img src="<?php echo esc_url($lay[$firstLayout]['preview_img']); ?>" @click="viewSpacialLayouts($event);"
                                                     data-info='<?php echo json_encode($lay); ?>'
-                                                    data-heading="<?php echo ucfirst($layoutName); ?>">
+                                                    data-heading="<?php echo esc_attr( ucfirst($layoutName) ); ?>">
                                                     <?php } ?>
                                                 </div>
                                                 <div class="amppb-layout-bottom">
                                                     <div class="amppb-layout-button">
                                                         <?php
-                                                        if(strtolower($layoutName)=='upcoming'){
+                                                        if(strpos($layoutName, '-upcomming')!==False){
                                                             ?>
-                                                        <a target="_blank" class="button button-lg" href="<?php echo $lay[$firstLayout]["preview_demo"]; ?>">View Layout</a>
+                                                        <a target="_blank" class="button button-lg" href="<?php echo esc_url($lay[$firstLayout]["preview_demo"]); ?>">View Layout</a>
                                                             <?php
                                                         }else{
                                                         ?>
                                                         <button type="button" class="button button-lg"@click="viewSpacialLayouts($event);" data-info='<?php echo json_encode($lay); ?>'
-                                                        data-heading="<?php echo ucfirst($layoutName); ?>">View Layout</button>
+                                                        data-heading="<?php echo esc_attr(ucfirst($layoutName)); ?>">View Layout</button>
                                                         <?php } ?>
                                                     </div>
                                                 </div>
@@ -171,7 +173,7 @@ global $savedlayoutTemplate;
                                 <div class="amppb-modal-col-2">
                                     <div class="exportcompleteData">
                                         <iframe id="amppb-panels-export-iframe" style="display: none;" name="amppb-panels-export-iframe"></iframe>
-                                        <form action="<?php echo admin_url('admin-ajax.php?action=amppb_export_layout_data') ?>" target="amppb-panels-export-iframe"  method="post">
+                                        <form action="<?php echo esc_url_raw( admin_url('admin-ajax.php?action=amppb_export_layout_data&verify_nonce='.wp_create_nonce('verify_pb')) ); ?>" target="amppb-panels-export-iframe"  method="post">
                                             <label class="import-export-label">Export Current Layout</label>
                                             <button type="submit" class="button button-primary button-large">
                                                 Export

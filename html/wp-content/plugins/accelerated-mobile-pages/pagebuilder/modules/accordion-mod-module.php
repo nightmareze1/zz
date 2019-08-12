@@ -1,16 +1,8 @@
 <?php 
-add_filter( 'amp_post_template_data', 'ampforwp_framework_pagebuilder_accordions_scripts' );
-function ampforwp_framework_pagebuilder_accordions_scripts( $data ) {
-
-			if ( empty( $data['amp_component_scripts']['amp-accordion'] ) ) {
-				$data['amp_component_scripts']['amp-accordion'] = 'https://cdn.ampproject.org/v0/amp-accordion-0.1.js';
-			}
-		
-	
-		return $data;
-}
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
 $output = 
-'<amp-accordion>{{repeater}}</amp-accordion>';
+'<amp-accordion {{if_id}}id="{{id}}"{{ifend_id}} {{if_user_class}}class="{{user_class}}{{ifend_user_class}}">{{repeater}}</amp-accordion>';
 $css = '
 .accordion-mod{margin:{{margin_css}};padding:{{padding_css}};}
 amp-accordion section[expanded] .show-more {display: none;}
@@ -40,6 +32,22 @@ return array(
 								'content_type'=>'css'
 							),
 						array(
+								'type'		=>'text',
+								'name'		=>"id",
+								'label'		=>'ID',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
+							),
+						array(
+								'type'		=>'text',
+								'name'		=>"user_class",
+								'label'		=>'Class',
+								'tab'		=>'advanced',
+								'default'	=>'',
+								'content_type'=>'html'
+							),
+						array(
 								'type'		=>'spacing',
 								'name'		=>"margin_css",
 								'label'		=>'Margin',
@@ -53,6 +61,13 @@ return array(
                             ),
 								'content_type'=>'css',
 							),
+							array(		
+		 						'type'		=>'require_script',		
+		 						'name'		=>"accordion_script",		
+		 						'label'		=>'amp-accordion',
+		 						'default'	=>'https://cdn.ampproject.org/v0/amp-accordion-0.1.js',
+		 						'content_type'=>'js',
+	 						),
 							array(
 								'type'		=>'spacing',
 								'name'		=>"padding_css",
@@ -94,7 +109,7 @@ return array(
           'front_template'=>
         	'<section>
 			    <h5 class="acc-lbl">{{acc_title}}</h5>
-			    <p class="acc-desc">{{ass_desc}}</p>
+			    <div class="acc-desc">{{ass_desc}}</div>
 			</section>'
           ),
 	);

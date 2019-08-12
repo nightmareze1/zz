@@ -1,25 +1,36 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 /**
  * Get all mime types which could be optimized by Imagify.
  *
  * @since 1.7
+ * @since 1.8 Added $type parameter.
  *
- * @return array The mime types.
+ * @param  string $type One of 'image', 'not-image'. Any other value will return all mime types.
+ * @return array        The mime types.
  */
-function imagify_get_mime_types() {
-	return array(
-		'jpg|jpeg|jpe' => 'image/jpeg',
-		'png'          => 'image/png',
-		'gif'          => 'image/gif',
-	);
+function imagify_get_mime_types( $type = null ) {
+	$mimes = array();
+
+	if ( 'not-image' !== $type ) {
+		$mimes = array(
+			'jpg|jpeg|jpe' => 'image/jpeg',
+			'png'          => 'image/png',
+			'gif'          => 'image/gif',
+		);
+	}
+
+	if ( 'image' !== $type ) {
+		$mimes['pdf'] = 'application/pdf';
+	}
+
+	return $mimes;
 }
 
 /**
  * Tell if an attachment has a supported mime type.
  * Was previously Imagify_AS3CF::is_mime_type_supported() since 1.6.6.
- * Ironically, this function is used in Imagify::is_mime_type_supported() since 1.6.9.
  *
  * @since  1.6.8
  * @author Grégory Viguier
@@ -83,26 +94,6 @@ function imagify_get_post_statuses() {
 	$statuses = apply_filters( 'imagify_post_statuses', $statuses );
 
 	return $statuses;
-}
-
-/**
- * Tell if the attachment has the required WP metadata.
- *
- * @since  1.6.12
- * @since  1.7 Also checks that the '_wp_attached_file' meta is valid (not a URL or anything funny).
- * @author Grégory Viguier
- *
- * @param  int $attachment_id The attachment ID.
- * @return bool
- */
-function imagify_attachment_has_required_metadata( $attachment_id ) {
-	$file = get_post_meta( $attachment_id, '_wp_attached_file', true );
-
-	if ( ! $file || preg_match( '@://@', $file ) || preg_match( '@^.:\\\@', $file ) ) {
-		return false;
-	}
-
-	return (bool) wp_get_attachment_metadata( $attachment_id, true );
 }
 
 /**
@@ -209,7 +200,7 @@ function get_imagify_attachment_backup_path( $file_path ) {
 		return false;
 	}
 
-	return str_replace( $upload_basedir, $backup_dir, $file_path );
+	return preg_replace( '@^' . preg_quote( $upload_basedir, '@' ) . '@', $backup_dir, $file_path );
 }
 
 /**
@@ -258,7 +249,7 @@ function get_imagify_attachment_url( $file_path ) {
 	// Check that the upload base exists in the (absolute) file location.
 	if ( 0 === strpos( $file_path, $upload_basedir ) ) {
 		// Replace file location with url location.
-		return str_replace( $upload_basedir, $upload_baseurl, $file_path );
+		return preg_replace( '@^' . preg_quote( $upload_basedir, '@' ) . '@', $upload_baseurl, $file_path );
 	}
 
 	if ( false !== strpos( '/' . $file_path, '/wp-content/uploads/' ) ) {
@@ -278,7 +269,15 @@ function get_imagify_attachment_url( $file_path ) {
  *                Removed the filter, added crop value to each size.
  * @author Grégory Viguier
  *
- * @return array Data for all currently registered thumbnail sizes (width, height, crop, name).
+ * @return array {
+ *     Data for the currently registered thumbnail sizes.
+ *     Size names are used as array keys.
+ *
+ *     @type int    $width  The image width.
+ *     @type int    $height The image height.
+ *     @type bool   $crop   True to crop, false to resize.
+ *     @type string $name   The size name.
+ * }
  */
 function get_imagify_thumbnail_sizes() {
 	// All image size names.

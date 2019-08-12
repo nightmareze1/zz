@@ -1,6 +1,19 @@
 <?php
-
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 /**
+ * Aqua Resizer plugin
+ * Version 1.2.2
+ *
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://sam.zoy.org/wtfpl/
+ *
+ * Thanks to Aqua Resizer Team for some excellent contributions!
+ *
+ *
  * Title         : Aqua Resizer
  * Description   : Resizes WordPress images on the fly
  * Version       : 1.2.2
@@ -93,26 +106,44 @@ if(!class_exists('Aq_Resize')) {
                 elseif(!strncmp($url,$relative_prefix,strlen($relative_prefix))){ //if url begins with // make $upload_url begin with // as well
                     $upload_url = str_replace(array( 0 => "$http_prefix", 1 => "$https_prefix"),$relative_prefix,$upload_url);
                 }
+                $is_cdn  = '';
+                $cdn_url = '';
 
 
-                // Check if $img_url is local.
+                // Check if $img_url is not local.
                 if ( false === strpos( $url, $upload_url ) ) {
+                    $is_cdn  = true;
+                    $cdn_url_main = $cdn_url = $url;
                     // Return the original array
-                    return array (
-                        0 => $url,
-                        1 => $width,
-                        2 => $height
-                    );
-                    //throw new Aq_Exception('Image must be local: ' . $url);
+                    $wp_upload_dir = wp_upload_dir();
+                    $dir_baseurl    = $wp_upload_dir['baseurl'];
+                    $dir_baseurl    = explode('/', $dir_baseurl);
+                    $dir_name       = end($dir_baseurl); 
+                    $cdn_url        = explode($dir_name, $cdn_url);
+                    if ( ! isset($cdn_url[1]) ) {
+                       $cdn_url = array();
+                       $cdn_url[1] = '';
+                    }
+                    $hybid_url = $upload_url . $cdn_url[1];
+                    // this will append crop path in the url to generate the image locally 
+                    $url = $hybid_url;
                 }
                 // Define path of image.
                 $rel_path = str_replace( $upload_url, '', $url );
-                $img_path = $upload_dir . $rel_path;
+                $img_path = '';
+                if($rel_path){
+                    $img_path = $upload_dir . $rel_path;
+                }
 
                 // Check if img path exists, and is an image indeed.
-                if ( ! file_exists( $img_path ) or ! getimagesize( $img_path ) )
-                    throw new Aq_Exception('Image file does not exist (or is not an image): ' . $img_path);
-
+                if ( ! file_exists( $img_path ) or ! getimagesize( $img_path ) ){
+                    // Return the Original CDN array
+                    return array (
+                                0 => $cdn_url_main,
+                                1 => $width,
+                                2 => $height
+                            );
+                }
                 // Get image info.
                 $info = pathinfo( $img_path );
                 $ext = $info['extension'];
@@ -155,8 +186,6 @@ if(!class_exists('Aq_Resize')) {
                                         1 => $width,
                                         2 => $height
                                     );
-                           /* throw new Aq_Exception('Unable to get WP_Image_Editor: ' . 
-                                                   $editor->get_error_message() . ' (is GD or ImageMagick installed?)');*/
                         }
 
                         $resized_file = $editor->save();
@@ -169,6 +198,16 @@ if(!class_exists('Aq_Resize')) {
                         }
 
                     }
+                }
+                 // Check if it is CDN then reglue the url to its original state
+                if ( $is_cdn ) {
+                    
+                    $img_url = explode('/', $img_url);
+                    $cdn_url = explode('/', $cdn_url_main);
+                    $img_end = end($img_url);
+                    $cdn_end = end($cdn_url);
+                    $cdn_url_main = str_replace($cdn_end, $img_end, $cdn_url_main);
+                    $img_url = $cdn_url_main;
                 }
 
                 // Okay, leave the ship.
@@ -190,7 +229,8 @@ if(!class_exists('Aq_Resize')) {
                 return $image;
             }
             catch (Aq_Exception $ex) {
-                error_log('Aq_Resize.process() error: ' . $ex->getMessage());
+                // Throwing errors for the images stored on CDN #2285
+                /*error_log('Aq_Resize.process() error: ' . $ex->getMessage());*/
 
                 if ($this->throwOnError) {
                     // Bubble up exception.
@@ -252,8 +292,21 @@ if(!function_exists('ampforwp_aq_resize')) {
             $url = $sitepress->convert_url( $url, $sitepress->get_default_language() );
         }
         /* WPML Fix */
+         /* EWWW Image Optimizer (ExactDN) Compatible*/
+        global $exactdn;
+        if ( class_exists( 'ExactDN' ) && $exactdn->get_exactdn_domain() ) {
+            $args  = array(
+                'resize' => "$width,$height",
+            );
+            $image = array(
+                0 => $exactdn->generate_url( $url, $args ),
+                1 => $width,
+                2 => $height,
+            );
+            return $image;
+        } 
         /* Jetpack Compatible*/
-        if( class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'photon' ) ) {
+        elseif( class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'photon' ) ) {
             $args = array(
                 'resize' => "$width,$height"
             );
@@ -262,9 +315,12 @@ if(!function_exists('ampforwp_aq_resize')) {
                         1 => $width,
                         2 => $height
                     );
-            //print_r(jetpack_photon_url( $url, $args ));die;
             return $image;
-        } else {
+        }
+        elseif( function_exists('fifu_activate') || is_plugin_active('fifu-premium/fifu-premium.php') ){
+            return fifu_amp_url($url, $width, $height); 
+        } 
+        else {
             $aq_resize = Aq_Resize::getInstance();
             return $aq_resize->process( $url, $width, $height, $crop, $single, $upscale );
         }

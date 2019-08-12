@@ -1,45 +1,183 @@
 === HTML Editor Syntax Highlighter ===
 Contributors: nixdns, arniebradfo, rraub, collinprice
 Donate link: https://www.paypal.me/mukhortov/5
-Tags: syntax highlighter, codemirror, text editor, code highlighter, code coloring, editor, html editor, theme editor, plugin editor, syntax, highlighting, highlighter, syntax highlighting, codemirror.js, code,
-Requires at least: 4.0.15
-Tested up to: 4.9.1
-Stable tag: 2.2.3
-License: GPL-2.0
+Tags: syntax highlighter, codemirror, text editor, code highlighter, code coloring, editor, html editor, gutenberg, code editor, theme editor, plugin editor, syntax, highlighting, highlighter, syntax highlighting, codemirror.js, code, 
+Requires at least: 4.0
+Tested up to: 5.2.2
+Stable tag: 2.4.2
+License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Add syntax highlighting to the all WordPress code editors using Codemirror.js
+Add syntax highlighting to WordPress code editors using CodeMirror.js
 
 == Description ==
 
-Add syntax highlighting in the WordPress Post & Page HTML text editor and the Theme & Plugin editors using Codemirror.js
+Add syntax highlighting in the Classic Post & Page HTML text editor, Gutenberg Code Editor, and Theme & Plugin editors using CodeMirror.js
 
 = Features =
 
 * Syntax highlighting in the Post/Page HTML editor
-* _NEW:_ Syntax highlighting in the Theme & Plugin editors
-* Syntax highlighting for WordPress shortcodes
+* _NEW:_ Syntax highlighting in the Gutenberg _Code Editor_ (not _Visual Editor_)
+* Syntax highlighting in the Theme & Plugin editors
+* Syntax highlighting for WordPress `[shortcodes/]`
 * Save your posts and pages pressing `Ctrl+S` (`Cmd+S` on Mac)
 * Restore cursor position after page is reloaded
-* Huge Selection of themes and other customization options
-* Fullscreen mode: toggle with F11/Esc hotkeys
+* Huge selection of themes and other customization options
+* Fullscreen mode: toggle with `F11`/`Esc` hotkeys
 
 If you would like to contribute to this plugin, view the [github repo](https://github.com/mukhortov/HESH-WordPress-Plugin).
 
+If you're a regular user of this plugin, please consider taking a short [User Experience Survey](https://goo.gl/forms/xvaHgd7sZEbBbFAL2) to provide feedback that will help shape the new version 3.0.
+
+
 == Frequently Asked Questions ==
 
-= Does it work with Internet Explorer? =
-Not really... It is partially supported in IE 11. Known bugs are tracked [here](https://github.com/mukhortov/HESH-WordPress-Plugin/issues/41), but won't be fixed. Anything less that IE 10 isn't even supported by Microsoft anymore. If you are using Internet Explorer you should get a [better browser](https://www.mozilla.org/en-US/firefox/new/).
+
+= Does it work with Gutenberg? =
+
+__Yes!__ _Partially..._ Since version 2.3.0, it works with the Gutenberg _Code Editor_, but only the _Code Editor_, not the _Visual Editor_. Press `Ctrl+Shift+Alt+M` / `Cmd+Shift+Alt+M` to switch between the _Visual Editor_ and the _Code Editor_.
+
+It __does not__ work with blocks in the Gutenberg _Visual Editor_. This means it __does not__ highlight code in:
+* The _Edit as HTML_ section of every block
+* The _Custom HTML_ block
+* The _Shortcode_ block
+See the last screenshot for a visual example.
+
+It may work with other code related parts of Gutenberg in the future. [Track the progress here.](https://github.com/mukhortov/HESH-WordPress-Plugin/issues/72)
+
+
+= I want the Classic Editor back! =
+
+Since WordPress version 5.0, Gutenberg is the default editor. If you want this plugin to work the way it used to, you'll have to download the [Classic Editor plugin](https://wordpress.org/plugins/classic-editor/).
+
+
+= Can I search and/or replace? =
+
+__Function: WINDOWS / MAC__
+__Start searching:__   `Ctrl-F` / `Cmd-F`
+__Find next:__         `Ctrl-G` / `Cmd-G`
+__Find previous:__     `Shift-Ctrl-G` / `Shift-Cmd-G`
+__Replace:__           `Shift-Ctrl-F` / `Cmd-Opt-F`
+__Replace all:__       `Shift-Ctrl-R` / `Shift-Cmd-Opt-F`
+__Persistent search:__ `Alt-F` (dialog doesn't auto-close, `Enter` to find next, `Shift-Enter` to find previous)
+__Jump to line:__      `Alt-G` 
+
+
+= Why are p and br tags are being removed? =
+
+Wordpress has a feature called the _['auto p'](https://codex.wordpress.org/Function_Reference/wpautop)_ filter which:
+
+> "Changes double line-breaks in the text into HTML paragraphs."
+
+For example, _auto p_ will take some standard post content like this:
+
+`
+Some long text
+that has many lines.
+
+And paragraphs in it.
+`
+
+and turn it into something like this:
+
+`
+<p>Some long text<br/>
+that has many lines</p>
+<p>And paragraphs in it.</p>
+`
+
+Like your little brother, it thinks it’s helping, even if it isn’t.
+
+__What can I do about it?__
+* __Disable auto p:__ There are several plugins you can use to disable _auto p_ in the _Classic Editor_. I’d recommend [Toggle wpautop](https://wordpress.org/plugins/toggle-wpautop/).
+* __Show the p tags:__ The plugin [TinyMCE Advanced](https://wordpress.org/plugins/tinymce-advanced/) has an _Advanced Option_ to _'Keep paragraph tags'_. This option will still add the _"auto p"_ tags but won't strip them out of the visible code.
+
+You can read more about this issues this may cause in this [support thread](https://wordpress.org/support/topic/tags-being-stripped-in-classic-block-content-after-wp-upgrade/).
+
+
+= Why is my code is being reformatting when I switch to the Visual Editor and back? =
+
+The WordPress _Visual Editor_ needs to reformat code in order to function correctly. This is not something that this plugin can fix. __You can disable the Visual Editor entirely__ by going to: _Users_ > _Your Profile_ > _Visual Editor: check 'Disable the visual editor when writing'_.
+
+= Scrollbars are not appearing! / Scroll position is not reset! / Code window is not resizable!
+
+You may have the _'Enable full-height editor and distraction-free functionality'_ turned on. This is a native WordPress feature that changes the scrolling and fullscreen behavior of both the _Code Editor_ and _Visual Editor_.
+
+__To Disable Full-height Editor:__ Go to _'Screen Options'_ (in the top right of the editor page), then uncheck _'Enable full-height editor and distraction-free functionality'_ in the _Additional Settings_ section.
+
 
 = How do I use Fullscreen? =
-The fullscreen button on the top right of the editor will do one of two things depending on the _"Enable full-height editor and distraction-free functionality"_ setting in your _"Screen Options"_ (in the top right of the editor page):
-* On: Toggles the "distraction free mode".
-* Off: Toggles the "fullscreen mode".
 
-= Can I search? =
-Yes! Seach with `Ctrl+F` (`Cmd+F` on Mac). Replace with `Ctrl+alt+F` (`Cmd+alt+F` on Mac).
+The fullscreen button on the top right of the editor will do one of two things depending on the _'Enable full-height editor and distraction-free functionality'_ setting in your _'Screen Options'_ (in the top right of the editor page):
+* __Full-height Editor _Enabled_:__ Toggles the _'distraction free mode'_.
+* __Full-height Editor _Disabled_:__ Toggles the _'fullscreen mode'_.
+
+__Keybindings:__ `F11` will toggle fullscreen on and off, and `esc` will close fullscreen.
+
+
+= Does it work with Internet Explorer? =
+
+__Not really...__ It is partially supported in IE 11. Known bugs are tracked [here](https://github.com/mukhortov/HESH-WordPress-Plugin/issues/41), but won't be fixed. Anything less that IE 10 isn't even supported by Microsoft anymore. If you are using Internet Explorer you should get a [better browser](https://www.mozilla.org/en-US/firefox/new/).
+
+
 
 == Changelog ==
+
+= 2.4.2 =
+* removing survey notice
+
+= 2.4.1 =
+* fixed bug: notification would not dismiss if the visual editor was open
+* fix bug: Setting Form can now submit from memory, not just when the dom is in the page.
+
+= 2.4.0 =
+* updating a major number so I can review downloads more accurately.
+* reorganized the codebase
+* Reverting the name-change of `hesh.php`
+This name-change of `html-editor-syntax-highlighter.php` to `hesh.php` caused the plugin to deactivate itself because the php file was missing. Reverting the name-change of `hesh.php` will cause this all over again, but hey.
+
+= 2.3.5 =
+* remove Github Updater headers
+* testing WP update Process
+
+= 2.3.4 =
+* fixing typo `$this->$surveyLink` to `$this->surveyLink`
+
+= 2.3.3 =
+* Updated Release process
+* Fix bug: #80 Only activate on pages where the editor will run
+* Added UX survey notice.
+
+= 2.3.2 =
+* added a seventh screenshot
+* removed [`smartIndent`](https://codemirror.net/doc/manual.html#option_smartIndent) because its annoying
+* fixed gulp watch task
+* updated FAQ
+
+= 2.3.1 =
+* Fixing JS error in issue #81 _(Hopefully?)_
+* Updating authorship so James can get a job. Will revert to Petr Later...
+
+= 2.3.0 =
+* Support for Gutenberg Code Editor!
+* Added new themes: Codepen and Wordpress (which is now the default).
+* Created new screenshots for the plugin page.
+* New Logo based on `<W/>`.
+* Updated FAQ with Gutenberg info.
+* Changed build steps to only export one `.css` and `.js` file
+
+= 2.2.6 =
+* added Gutenberg information after the update to WordPress version 5.0
+
+= 2.2.5 =
+* fixed bug: #75 removing `f` typo
+
+= 2.2.4 =
+* fixed bug: Allow Multiple Instances of CodeMirror on a page #71
+* fixed bug: js error when custom post type does not support 'editor' feature #62
+
+= 2.2.3 =
+* A patch for WP 4.9. No more double editors in theme/plugin editors.
 
 = 2.2.2 =
 * fixed bug: github updater in production issue #52
@@ -50,7 +188,7 @@ Yes! Seach with `Ctrl+F` (`Cmd+F` on Mac). Replace with `Ctrl+alt+F` (`Cmd+alt+F
 
 = 2.2.0 = 
 * added search & replace with dialog
-* added highlighing options
+* added highlighting options
 * added auto-close tags and brackets option
 * added code-folding option
 * added scrollbars option
@@ -94,7 +232,7 @@ Yes! Seach with `Ctrl+F` (`Cmd+F` on Mac). Replace with `Ctrl+alt+F` (`Cmd+alt+F
 * Ctrl-S / Cmd-S saving will now select "Save Draft" if the post has not been published yet
 * Switched to an [npm](https://www.npmjs.com/) and [grunt.js](http://gruntjs.com/) based build so new versions of CodeMirror can be applied easier
 * Updated CodeMirror to its latest version
-* Fixed FireFox bug: `<select>` dropdown would not display due to `::active` state `transform` property
+* Fixed FireFox bug: `<select>` drop-down would not display due to `::active` state `transform` property
 * Fixed bug: toolbar covering text at small screen width
 * Fixed bug: `switchEditors is undefined`
 * Updated Css for wp 4.5
@@ -207,6 +345,9 @@ Initial release.
 
 
 == Screenshots ==
-1. Syntax highlighting in the Post/Page HTML editor.
-2. Settings Panel.
-3. Syntax highlighting in the Theme/Plugin editor.
+1. Syntax highlighting in the Classic Post/Page HTML editor.
+2. Quick Settings Panel.
+3. Advanced Settings Panel.
+4. Syntax highlighting in the Theme/Plugin editor.
+5. Syntax highlighting in the Gutenberg Code Editor.
+6. Example code highlighting.

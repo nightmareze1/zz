@@ -1,226 +1,172 @@
 function ai_insert (insertion, selector, insertion_code) {
-  jQuery (selector).each (function (index, element) {
+  if (selector.indexOf (':eq') != - 1) {
+    var elements = jQuery (selector);
+  } else var elements = document.querySelectorAll (selector);
 
-    if (typeof jQuery(this).attr ('id') != 'undefined') {
-      selector_string = '#' + jQuery(this).attr ('id');
+  Array.prototype.forEach.call (elements, function (element, index) {
+    var ai_debug = typeof ai_debugging !== 'undefined'; // 1
+//    var ai_debug = false;
+
+    if (element.hasAttribute ('id')) {
+      selector_string = '#' + element.getAttribute ('id');
     } else
-    if (typeof jQuery(this).attr ('class') != 'undefined') {
-      selector_string = '.' + jQuery(this).attr ('class').replace (' ', '.');
+    if (element.hasAttribute ('class')) {
+      selector_string = '.' + element.getAttribute ('class').replace (new RegExp (' ', 'g'), '.');
     } else
     selector_string = '';
 
-    var insertion_function = insertion;
-    var ai_code = jQuery (insertion_code);
+    if (ai_debug) console.log ('');
+    if (ai_debug) console.log ('AI INSERT', insertion, selector, '(' + element.tagName.toLowerCase() + selector_string + ')');
 
-    jQuery ('.ai-selector-counter', ai_code).text (index + 1);
-    jQuery ('.ai-debug-name.ai-main', ai_code).text (insertion.toUpperCase () + ' ' + jQuery(this).prop ('tagName').toLowerCase() + selector_string);
+    var template = document.createElement ('div');
+    template.innerHTML = insertion_code;
 
-    jQuery(this)[insertion_function] (ai_code);
+    var ai_selector_counter = template.getElementsByClassName ("ai-selector-counter")[0];
+    if (ai_selector_counter != null) {
+      ai_selector_counter.innerText = index + 1;
+    }
+
+    var ai_debug_name_ai_main = template.getElementsByClassName ("ai-debug-name ai-main")[0];
+    if (ai_debug_name_ai_main != null) {
+      var insertion_name = '';
+      if (insertion == 'before') {
+        insertion_name = ai_front.insertion_before;
+      } else
+      if (insertion == 'after') {
+        insertion_name = ai_front.insertion_after;
+      } else
+      if (insertion == 'prepend') {
+        insertion_name = ai_front.insertion_prepend;
+      } else
+      if (insertion == 'append') {
+        insertion_name = ai_front.insertion_append;
+      } else
+      if (insertion == 'replace-content') {
+        insertion_name = ai_front.insertion_replace_content;
+      } else
+      if (insertion == 'replace-element') {
+        insertion_name = ai_front.insertion_replace_element;
+      }
+
+      ai_debug_name_ai_main.innerText = insertion_name + ' ' + selector + ' (' + element.tagName.toLowerCase() + selector_string + ')';
+    }
+
+    var range = document.createRange ();
+    var fragment = range.createContextualFragment (template.innerHTML);
+
+    if (insertion == 'before') {
+      element.parentNode.insertBefore (fragment, element);
+    } else
+    if (insertion == 'after') {
+      element.parentNode.insertBefore (fragment, element.nextSibling);
+    } else
+    if (insertion == 'prepend') {
+      element.insertBefore (fragment, element.firstChild);
+    } else
+    if (insertion == 'append') {
+      element.insertBefore (fragment, null);
+    } else
+    if (insertion == 'replace-content') {
+      element.innerHTML = template.innerHTML;
+    } else
+    if (insertion == 'replace-element') {
+      element.parentNode.insertBefore (fragment, element);
+      element.parentNode.removeChild (element);
+    }
   });
 }
 
-function ai_insert_viewport (element) {
+function ai_insert_code (element) {
 
-  var ai_debug = typeof ai_debugging !== 'undefined';
+  function hasClass (element, cls) {
+    if (element == null) return false;
 
-  if (ai_debug) console.log ('AI VIEWPORT INSERTION: class', element.attr ('class'));
+    if (element.classList) return element.classList.contains (cls); else
+      return (' ' + element.className + ' ').indexOf (' ' + cls + ' ') > - 1;
+  }
 
-  var visible = element.is(':visible');
-  var block   = element.data ('block');
+  function addClass (element, cls) {
+    if (element == null) return;
+
+    if (element.classList) element.classList.add (cls); else
+      element.className += ' ' + cls;
+  }
+
+  function removeClass (element, cls) {
+    if (element == null) return;
+
+    if (element.classList) element.classList.remove (cls); else
+      element.className = element.className.replace (new RegExp ('(^|\\b)' + cls.split (' ').join ('|') + '(\\b|$)', 'gi'), ' ');
+  }
+
+  var ai_debug = typeof ai_debugging !== 'undefined'; // 2
+//  var ai_debug = false;
+
+  if (ai_debug) console.log ('AI INSERT ELEMENT class:', element.getAttribute ('class'));
+
+  var visible = !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+  var block   = element.getAttribute ('data-block');
 
   if (visible) {
-    var insertion_code = element.data ('code');
-    var insertion_type = element.data ('insertion');
-    var selector       = element.data ('selector');
+    var insertion_code = element.getAttribute ('data-code');
+    var insertion_type = element.getAttribute ('data-insertion');
+    var selector       = element.getAttribute ('data-selector');
 
-    if (typeof insertion_code != 'undefined') {
-      if (typeof insertion_type != 'undefined' && typeof selector != 'undefined') {
+    if (insertion_code != null) {
+      if (insertion_type != null && selector != null) {
 
-        var selector_exists = jQuery (selector).length
+        var selector_exists = document.querySelectorAll (selector).length;
+
         if (ai_debug) console.log ('AI VIEWPORT VISIBLE: block', block, insertion_type, selector, selector_exists ? '' : 'NOT FOUND');
 
-        ai_insert (insertion_type, selector, jQuery.base64Decode (insertion_code));
-        if (selector_exists) element.removeClass ('ai-viewports');
+        if (selector_exists) {
+          ai_insert (insertion_type, selector, b64d (insertion_code));
+          removeClass (element, 'ai-viewports');
+        }
       } else {
-
           if (ai_debug) console.log ('AI VIEWPORT VISIBLE: block', block);
 
-          var ai_code = jQuery(jQuery.base64Decode (insertion_code));
-          element.after (ai_code);
-          element.removeClass ('ai-viewports');
+          var range = document.createRange ();
+          var fragment = range.createContextualFragment (b64d (insertion_code));
+          element.parentNode.insertBefore (fragment, element.nextSibling);
+
+          removeClass (element, 'ai-viewports');
         }
+    }
+
+    var ai_check_block_data = element.getElementsByClassName ('ai-check-block');
+    if (typeof ai_check_block_data [0] != 'undefined') {
+      ai_check_block_data [0].parentNode.removeChild (ai_check_block_data [0]);
     }
   } else {
       if (ai_debug) console.log ('AI VIEWPORT NOT VISIBLE: block', block);
 
-      var debug_bar = element.prev ();
-      if (debug_bar.hasClass ('ai-debug-bar') && debug_bar.hasClass ('ai-debug-script')) {
-        debug_bar.removeClass ('ai-debug-script')
-        debug_bar.addClass ('ai-debug-viewport-invisible')
+      var debug_bar = element.previousElementSibling;
+
+      if (hasClass (debug_bar, 'ai-debug-bar') && hasClass (debug_bar, 'ai-debug-script')) {
+        removeClass (debug_bar, 'ai-debug-script');
+        addClass (debug_bar, 'ai-debug-viewport-invisible');
       }
+
+      removeClass (element, 'ai-viewports');
     }
 }
 
-(function($){
-  // Insert remaining elements that depend on viewports
-  $(document).ready (function() {
-    $('.ai-viewports').each (function (index, element) {
-      ai_insert_viewport ($(this));
-    });
-  });
-})(jQuery);
+function b64e (str) {
+  // first we use encodeURIComponent to get percent-encoded UTF-8,
+  // then we convert the percent encodings into raw bytes which
+  // can be fed into btoa.
+  return btoa(encodeURIComponent (str).replace (/%([0-9A-F]{2})/g,
+    function toSolidBytes (match, p1) {
+      return String.fromCharCode ('0x' + p1);
+  }));
+}
 
-
-(function($){
-  // Insert remaining elements that depend on viewports
-  $(document).ready (function() {
-    $('.ai-viewports').each (function (index, element) {
-      ai_insert_viewport ($(this));
-    });
-  });
-})(jQuery);
-
-/**
-   * jQuery BASE64 functions
-   *
-   *  <code>
-   *    Encodes the given data with base64.
-   *    String $.base64Encode ( String str )
-   *    <br />
-   *    Decodes a base64 encoded data.
-   *    String $.base64Decode ( String str )
-   *  </code>
-   *
-   * Encodes and Decodes the given data in base64.
-   * This encoding is designed to make binary data survive transport through transport layers that are not 8-bit clean, such as mail bodies.
-   * Base64-encoded data takes about 33% more space than the original data.
-   * This javascript code is used to encode / decode data using base64 (this encoding is designed to make binary data survive transport through transport layers that are not 8-bit clean). Script is fully compatible with UTF-8 encoding. You can use base64 encoded data as simple encryption mechanism.
-   * If you plan using UTF-8 encoding in your project don't forget to set the page encoding to UTF-8 (Content-Type meta tag).
-   * This function orginally get from the WebToolkit and rewrite for using as the jQuery plugin.
-   *
-   * Example
-   *  Code
-   *    <code>
-   *      $.base64Encode("I'm Persian.");
-   *    </code>
-   *  Result
-   *    <code>
-   *      "SSdtIFBlcnNpYW4u"
-   *    </code>
-   *  Code
-   *    <code>
-   *      $.base64Decode("SSdtIFBlcnNpYW4u");
-   *    </code>
-   *  Result
-   *    <code>
-   *      "I'm Persian."
-   *    </code>
-   *
-   * @alias Muhammad Hussein Fattahizadeh < muhammad [AT] semnanweb [DOT] com >
-   * @link http://www.semnanweb.com/jquery-plugin/base64.html (no longer available?)
-   * @link https://gist.github.com/gists/1602210
-   * @see http://www.webtoolkit.info/
-   * @license http://www.gnu.org/licenses/gpl.html [GNU General Public License]
-   * @param {jQuery} {base64Encode:function(input))
-   * @param {jQuery} {base64Decode:function(input))
-   * @return string
-   */
-
-  (function($){
-
-    var keyString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-
-    var uTF8Encode = function(string) {
-      string = string.replace(/\x0d\x0a/g, "\x0a");
-      var output = "";
-      for (var n = 0; n < string.length; n++) {
-        var c = string.charCodeAt(n);
-        if (c < 128) {
-          output += String.fromCharCode(c);
-        } else if ((c > 127) && (c < 2048)) {
-          output += String.fromCharCode((c >> 6) | 192);
-          output += String.fromCharCode((c & 63) | 128);
-        } else {
-          output += String.fromCharCode((c >> 12) | 224);
-          output += String.fromCharCode(((c >> 6) & 63) | 128);
-          output += String.fromCharCode((c & 63) | 128);
-        }
-      }
-      return output;
-    };
-
-    var uTF8Decode = function(input) {
-      var string = "";
-      var i = 0;
-      var c = c1 = c2 = 0;
-      while ( i < input.length ) {
-        c = input.charCodeAt(i);
-        if (c < 128) {
-          string += String.fromCharCode(c);
-          i++;
-        } else if ((c > 191) && (c < 224)) {
-          c2 = input.charCodeAt(i+1);
-          string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-          i += 2;
-        } else {
-          c2 = input.charCodeAt(i+1);
-          c3 = input.charCodeAt(i+2);
-          string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-          i += 3;
-        }
-      }
-      return string;
-    }
-
-    $.extend({
-      base64Encode: function(input) {
-        var output = "";
-        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-        var i = 0;
-        input = uTF8Encode(input);
-        while (i < input.length) {
-          chr1 = input.charCodeAt(i++);
-          chr2 = input.charCodeAt(i++);
-          chr3 = input.charCodeAt(i++);
-          enc1 = chr1 >> 2;
-          enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-          enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-          enc4 = chr3 & 63;
-          if (isNaN(chr2)) {
-            enc3 = enc4 = 64;
-          } else if (isNaN(chr3)) {
-            enc4 = 64;
-          }
-          output = output + keyString.charAt(enc1) + keyString.charAt(enc2) + keyString.charAt(enc3) + keyString.charAt(enc4);
-        }
-        return output;
-      },
-      base64Decode: function(input) {
-        var output = "";
-        var chr1, chr2, chr3;
-        var enc1, enc2, enc3, enc4;
-        var i = 0;
-        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-        while (i < input.length) {
-          enc1 = keyString.indexOf(input.charAt(i++));
-          enc2 = keyString.indexOf(input.charAt(i++));
-          enc3 = keyString.indexOf(input.charAt(i++));
-          enc4 = keyString.indexOf(input.charAt(i++));
-          chr1 = (enc1 << 2) | (enc2 >> 4);
-          chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-          chr3 = ((enc3 & 3) << 6) | enc4;
-          output = output + String.fromCharCode(chr1);
-          if (enc3 != 64) {
-            output = output + String.fromCharCode(chr2);
-          }
-          if (enc4 != 64) {
-            output = output + String.fromCharCode(chr3);
-          }
-        }
-        output = uTF8Decode(output);
-        return output;
-      }
-    });
-  })(jQuery);
+function b64d (str) {
+  // Going backwards: from bytestream, to percent-encoding, to original string.
+  return decodeURIComponent (atob (str).split ('').map (function(c) {
+    return '%' + ('00' + c.charCodeAt (0).toString (16)).slice (-2);
+  }).join (''));
+}
 
 

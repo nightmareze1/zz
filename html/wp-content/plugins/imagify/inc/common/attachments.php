@@ -1,89 +1,60 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
-add_filter( 'wp_generate_attachment_metadata', '_imagify_optimize_attachment', IMAGIFY_INT_MAX, 2 );
+add_action( 'delete_attachment', 'imagify_trigger_delete_attachment_hook' );
 /**
- * Auto-optimize when a new attachment is generated.
+ * Trigger a common Imagify hook when an attachment is deleted.
  *
- * @since 1.0
- * @since 1.5 Async job.
- * @see   Imagify_Admin_Ajax_Post::imagify_async_optimize_upload_new_media_callback()
- *
- * @param  array $metadata      An array of attachment meta data.
- * @param  int   $attachment_id Current attachment ID.
- * @return array
- */
-function _imagify_optimize_attachment( $metadata, $attachment_id ) {
-
-	if ( ! Imagify_Requirements::is_api_key_valid() || ! get_imagify_option( 'auto_optimize' ) ) {
-		return $metadata;
-	}
-
-	/**
-	 * Allow to prevent automatic optimization for a specific attachment.
-	 *
-	 * @since  1.6.12
-	 * @author Grégory Viguier
-	 *
-	 * @param bool  $optimize      True to optimize, false otherwise.
-	 * @param int   $attachment_id Attachment ID.
-	 * @param array $metadata      An array of attachment meta data.
-	 */
-	$optimize = apply_filters( 'imagify_auto_optimize_attachment', true, $attachment_id, $metadata );
-
-	if ( ! $optimize ) {
-		return $metadata;
-	}
-
-	$context     = 'wp';
-	$action      = 'imagify_async_optimize_upload_new_media';
-	$_ajax_nonce = wp_create_nonce( 'new_media-' . $attachment_id );
-
-	imagify_do_async_job( compact( 'action', '_ajax_nonce', 'metadata', 'attachment_id', 'context' ) );
-
-	return $metadata;
-}
-
-add_action( 'delete_attachment', '_imagify_delete_backup_file' );
-/**
- * Delete the backup file when an attachement is deleted.
- *
- * @since 1.0
+ * @since  1.9
+ * @author Grégory Viguier
  *
  * @param int $post_id Attachment ID.
  */
-function _imagify_delete_backup_file( $post_id ) {
-	get_imagify_attachment( 'wp', $post_id, 'delete_attachment' )->delete_backup();
+function imagify_trigger_delete_attachment_hook( $post_id ) {
+	$process = imagify_get_optimization_process( $post_id, 'wp' );
+
+	if ( ! $process->is_valid() ) {
+		return;
+	}
+
+	imagify_trigger_delete_media_hook( $process );
 }
 
-add_action( 'shutdown', '_imagify_optimize_save_image_editor_file' );
+add_action( 'imagify_delete_media', 'imagify_cleanup_after_media_deletion' );
 /**
- * Optimize an attachment after being resized.
+ * Delete the backup file and the webp files when an attachement is deleted.
  *
- * @since 1.3.6
- * @since 1.4 Async job.
+ * @since  1.9
+ * @author Grégory Viguier
+ *
+ * @param ProcessInterface $process An optimization process.
  */
-function _imagify_optimize_save_image_editor_file() {
-	if ( ! isset( $_POST['action'], $_POST['do'], $_POST['postid'] ) || 'image-editor' !== $_POST['action'] || 'open' === $_POST['do'] ) { // WPCS: CSRF ok.
+function imagify_cleanup_after_media_deletion( $process ) {
+	if ( 'wp' !== $process->get_media()->get_context() ) {
 		return;
 	}
 
-	$attachment_id = absint( $_POST['postid'] );
+	/**
+	 * The optimization data will be automatically deleted by WP (post metas).
+	 * Delete the webp versions and the backup file.
+	 */
+	$process->delete_webp_files();
+	$process->delete_backup();
+}
 
-	if ( ! $attachment_id || ! Imagify_Requirements::is_api_key_valid() ) {
-		return;
+add_filter( 'ext2type', 'imagify_add_webp_type' );
+/**
+ * Add the webp extension to wp_get_ext_types().
+ *
+ * @since  1.9
+ * @author Grégory Viguier
+ *
+ * @param  array $ext2type Multi-dimensional array with extensions for a default set of file types.
+ * @return array
+ */
+function imagify_add_webp_type( $ext2type ) {
+	if ( ! in_array( 'webp', $ext2type['image'], true ) ) {
+		$ext2type['image'][] = 'webp';
 	}
-
-	check_ajax_referer( 'image_editor-' . $attachment_id );
-
-	$attachment = get_imagify_attachment( 'wp', $attachment_id, 'save_image_editor_file' );
-
-	if ( ! $attachment->get_data() ) {
-		return;
-	}
-
-	$body           = $_POST;
-	$body['action'] = 'imagify_async_optimize_save_image_editor_file';
-
-	imagify_do_async_job( $body );
+	return $ext2type;
 }

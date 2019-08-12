@@ -1,5 +1,5 @@
 <?php
-
+namespace AMPforWP\AMPVendor;
 function amp_get_permalink( $post_id ) {
 	$pre_url = apply_filters( 'amp_pre_get_permalink', false, $post_id );
 
@@ -11,8 +11,11 @@ function amp_get_permalink( $post_id ) {
 	if ( empty( $structure ) ) {
 		$amp_url = add_query_arg( AMP_QUERY_VAR, 1, get_permalink( $post_id ) );
 	} else {
- 			$amp_url = trailingslashit( get_permalink( $post_id ) );
- 			$amp_url = ampforwp_end_point_controller($amp_url);
+			$get_permalink = get_permalink( $post_id );
+			if( $get_permalink != false){
+				$amp_url = trailingslashit( $get_permalink );
+ 				$amp_url = ampforwp_end_point_controller($amp_url);
+ 			}
 	 	}
 
 	return apply_filters( 'amp_get_permalink', $amp_url, $post_id );
@@ -45,5 +48,5 @@ function is_amp_endpoint() {
 }
 
 function amp_get_asset_url( $file ) {
-	return plugins_url( sprintf( 'assets/%s', $file ), AMP__FILE__ );
+	return plugins_url( sprintf( 'assets/%s', $file ), AMPFORWP__FILE__ );
 }

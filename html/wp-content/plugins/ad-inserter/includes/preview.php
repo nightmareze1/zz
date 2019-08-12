@@ -31,11 +31,64 @@ function padding_margin_code ($close_button, $class, $sticky_parameters, $wrappe
 <?php
 }
 
+
+function check_count_rotate_code ($obj, $check, $count, $rotate) {
+
+  if ($obj->check_names !== null) : ?>
+    <div style="display: inline-block; margin: 10px 0;">
+      <div style="display: inline-block; vertical-align: middle;">
+        CHECK
+      </div>
+    <select id="check" style="min-width: 50px; margin: 0 10px 0 5px;">
+<?php
+    foreach ($obj->check_names as $index => $check_name) {
+      echo '<option value="', $index, '" ', $check == $index ? AD_SELECT_SELECTED : AD_EMPTY_VALUE, '>', $check_name, '</option>';
+    }
+?>
+    </select>
+    </div>
+<?php
+  endif;
+
+  if ($obj->count_names !== null) : ?>
+    <div style="display: inline-block; margin: 10px 0;">
+      <div style="display: inline-block; vertical-align: middle;">
+        COUNT
+      </div>
+    <select id="count" style="min-width: 50px; margin: 0 10px 0 5px;">
+<?php
+    foreach ($obj->count_names as $index => $count_name) {
+      echo '<option value="', $index, '" ', $count == $index ? AD_SELECT_SELECTED : AD_EMPTY_VALUE, '>', $count_name, '</option>';
+    }
+?>
+    </select>
+    </div>
+<?php
+  endif;
+
+  if ($obj->roate_names !== null) : ?>
+    <div style="display: inline-block; margin: 10px 0;">
+      <div style="display: inline-block; vertical-align: middle;">
+        ROTATE
+      </div>
+    <select id="rotate" style="min-width: 50px; margin: 0 10px 0 5px;">
+<?php
+    foreach ($obj->roate_names as $index => $roate_name) {
+      echo '<option value="', $index, '" ', $rotate == $index ? AD_SELECT_SELECTED : AD_EMPTY_VALUE, '>', $roate_name, '</option>';
+    }
+?>
+    </select>
+    </div>
+<?php
+  endif;
+}
+
+
 function generate_code_preview (
   $block,
   $preview_parameters) {
 
-  global $block_object, $ai_wp_data;
+  global $block_object, $ai_wp_data, $wp_version;
 
   $ai_wp_data [AI_WP_DEBUGGING] = 0;
 
@@ -55,7 +108,13 @@ function generate_code_preview (
   $close_button         = isset ($preview_parameters ['close'])             ? $preview_parameters ['close']             : $obj->get_close_button ();
   $process_php          = isset ($preview_parameters ['php'])               ? $preview_parameters ['php']               : $obj->get_process_php ();
   $show_label           = isset ($preview_parameters ['label'])             ? $preview_parameters ['label']             : $obj->get_show_label ();
-  $read_only            = isset ($preview_parameters ['read_only'])         ? $preview_parameters ['read_only']         : false;
+  $read_only            = isset ($preview_parameters ['read_only'])         ? $preview_parameters ['read_only']         : 0;
+  $iframe               = isset ($preview_parameters ['iframe'])            ? $preview_parameters ['iframe']            : 0;
+  $check                = isset ($preview_parameters ['check'])             ? $preview_parameters ['check']             : 0;
+  $count                = isset ($preview_parameters ['count'])             ? $preview_parameters ['count']             : 0;
+  $rotate               = isset ($preview_parameters ['rotate'])            ? $preview_parameters ['rotate']            : 0;
+
+  $separators = isset ($preview_parameters ['check']) || isset ($preview_parameters ['count']) || isset ($preview_parameters ['rotate']);
 
   $obj->wp_options [AI_OPTION_BLOCK_NAME]           = $block_name;
   $obj->wp_options [AI_OPTION_CODE]                 = $code;
@@ -69,11 +128,15 @@ function generate_code_preview (
   $obj->wp_options [AI_OPTION_PROCESS_PHP]          = $process_php;
   $obj->wp_options [AI_OPTION_SHOW_LABEL]           = $show_label;
 
+  // Don't show iframe in preview unless requested
+  if (!$iframe) $obj->wp_options [AI_OPTION_IFRAME] = false;
+
   $adsense = $block == 0;
   $sticky = false;
   $class = '';
   $sticky_parameters = '';
-  $functions = function_exists ('ai_load_settings_2');
+  $functions = function_exists ('ai_extract_features_2');
+  $iframe_resize = $iframe && $obj->get_iframe_height () == '';
 
   if (!$adsense) {
     switch ($alignment_type) {
@@ -107,6 +170,7 @@ function generate_code_preview (
   // Head code must be called before ai_getProcessedCode (to process head PHP)
   ob_start ();
   ai_wp_head_hook ();
+
   if ($functions && !$ai_wp_data [AI_CLOSE_BUTTONS]) {
     echo "<style type='text/css'>\n";
     echo ".ai-close {position: relative;}\n";
@@ -122,7 +186,18 @@ function generate_code_preview (
   // Disable AdSense Auto ads (page level ads)
   $head_code = str_replace ('enable_page_level_ads', 'disabled_page_level_ads', $head_code);
 
-  $block_code = $obj->ai_getProcessedCode (true, true, true);
+  $ai_wp_data [AI_FORCE_SERVERSIDE_CODE] = true;
+
+  $obj->check_index  = $check;
+  $obj->count_index  = $count;
+  $obj->rotate_index = $rotate;
+
+  $obj->hide_debug_labels = true;
+  $block_code = $obj->ai_getProcessedCode (true);
+  $obj->hide_debug_labels = false;
+  $ai_wp_data [AI_FORCE_SERVERSIDE_CODE] = false;
+
+  $head_code = ai_process_head_codes ($head_code);
 
   // Fix for relative urls
   $block_code = str_replace ('src="wp-content', 'src="../wp-content', $block_code);
@@ -132,11 +207,17 @@ function generate_code_preview (
 
 ?><html>
 <head>
-<title><?php echo AD_INSERTER_NAME; ?> <?php if ($sticky) echo 'Sticky '; ?>Code Preview</title>
+<title><?php echo AD_INSERTER_NAME; ?> <?php if ($sticky) _e ('Sticky Code Preview', 'ad-inserter'); else _e ('Code Preview', 'ad-inserter'); ?></title>
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
-<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js'></script>
-<link rel='stylesheet' href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css'>
+
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/jquery.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo admin_url ('load-scripts.php?c=0&amp;load%5B%5D=jquery-core,jquery-migrate,utils,jquery-ui-core&amp;ver='); ?><?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/ui/effect.min.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/ui/widget.min.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/ui/button.min.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<script type='text/javascript' src='<?php echo includes_url ('js/jquery/ui/spinner.min.js'); ?>?ver=<?php echo $wp_version, '+', AD_INSERTER_VERSION; ?>'></script>
+<link rel='stylesheet' href='<?php echo plugins_url ('css/jquery-ui-1.10.3.custom.min.css', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>' type='text/css' media='all' />
+
 <script src='<?php echo plugins_url ('includes/js/jquery.mousewheel.min.js', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>'></script>
 <script src='<?php echo plugins_url ('includes/js/jquery.ui.spinner.js', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>'></script>
 <link rel='stylesheet' href='<?php echo plugins_url ('css/jquery.ui.spinner.css', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>'>
@@ -147,7 +228,7 @@ function generate_code_preview (
 <script src='<?php echo plugins_url ('includes/aos/aos.js', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>'></script>
 <?php endif; ?>
 <script src='<?php echo plugins_url ('includes/js/ad-inserter-check.js', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>'></script>
-<link rel='stylesheet' href='<?php echo plugins_url ('css/ad-inserter.css', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>'>
+<link rel='stylesheet' href='<?php echo plugins_url ('css/ai-settings.css', AD_INSERTER_FILE); ?>?ver=<?php echo AD_INSERTER_VERSION; ?>'>
 <script>
 
   ajaxurl = "<?php echo admin_url ('admin-ajax.php'); ?>";
@@ -168,7 +249,19 @@ function generate_code_preview (
     }
   }
 
+  function update_wrapper_size () {
+    var wrapper = jQuery('#wrapper');
+    if (typeof wrapper.width () != 'undefined' && typeof wrapper.height () != 'undefined') {
+      var width  = parseInt (wrapper.width ());
+      var height = parseInt (wrapper.height ());
+      jQuery(".wrapper-size").html (width + "px &nbsp;&times;&nbsp;  " + height + "px").show ();
+      if (width * height != 0) jQuery(".wrapper-size").css ("color", "#333"); else jQuery(".wrapper-size").css ("color", "#c00");
+    }
+  }
+
   function initialize_preview () {
+
+    (function($) {
 
     var debug = typeof ai_debugging !== 'undefined';
     var block = <?php echo $block; ?>;
@@ -255,6 +348,100 @@ function generate_code_preview (
 
     const AI_ALIGNMENT_CSS_STICKY = '<?php echo AI_ALIGNMENT_CSS_STICKY; ?>';
 
+    function b64e (str) {
+      // first we use encodeURIComponent to get percent-encoded UTF-8,
+      // then we convert the percent encodings into raw bytes which
+      // can be fed into btoa.
+      return btoa (encodeURIComponent (str).replace (/%([0-9A-F]{2})/g,
+        function toSolidBytes (match, p1) {
+          return String.fromCharCode ('0x' + p1);
+      }));
+    }
+
+    function b64d (str) {
+      // Going backwards: from bytestream, to percent-encoding, to original string.
+      return decodeURIComponent (atob (str).split ('').map (function(c) {
+        return '%' + ('00' + c.charCodeAt (0).toString (16)).slice (-2);
+      }).join (''));
+    }
+
+    function open_window_post (url, name, params) {
+       var form = document.createElement("form");
+       form.setAttribute("method", "post");
+       form.setAttribute("action", url);
+       form.setAttribute("target", name);
+       for (var i in params) {
+         if (params.hasOwnProperty(i)) {
+           var input = document.createElement('input');
+           input.type = 'hidden';
+           input.name = i;
+           input.value = encodeURI (params[i]);
+           form.appendChild(input);
+         }
+       }
+       document.body.appendChild(form);
+       form.submit();
+       document.body.removeChild(form);
+    }
+
+    function load_preview_block () {
+      var alignment           = $("select#block-alignment option:selected").attr ('value');
+      var alignment_css       = wrapper.attr ('style');
+      var custom_css          = $("#custom-css").val ();
+      var close_button        = $("select#close-button-0 option:selected").attr ('value');
+
+      if (sticky) {
+        var horizontal          = $("select#horizontal-position option:selected").attr('value');
+        var vertical            = $("select#vertical-position option:selected").attr('value');
+        var vertical_margin     = spinner_vertical_margin.spinner ("value");
+        var horizontal_margin   = spinner_horizontal_margin.spinner ("value");
+        var animation           = $("select#animation option:selected").attr ('value');
+      } else {
+          var horizontal          = 0;
+          var vertical            = 0;
+          var vertical_margin     = 0;
+          var horizontal_margin   = 0;
+          var animation           = 0;
+        }
+
+      var check   = $("select#check option:selected").attr('value');
+      if (typeof check == 'undefined') check = 0; else check = parseInt (check);
+
+      var count   = $("select#count option:selected").attr('value');
+      if (typeof count == 'undefined') count = 0; else count = parseInt (count);
+
+      var rotate  = $("select#rotate option:selected").attr('value');
+      if (typeof rotate == 'undefined') rotate = 0; else rotate = parseInt (rotate);
+
+      var param = {
+        'action':             'ai_ajax_backend',
+        'read_only':          <?php echo $read_only; ?>,
+        'preview':            block,
+        'ai_check':           b64d ('<?php echo base64_encode (wp_create_nonce ("adinserter_data")); ?>'),
+        'name':               '<?php echo base64_encode ($block_name); ?>',
+        'code':               '<?php echo base64_encode ($code); ?>',
+        'alignment':          btoa (alignment),
+        'horizontal':         btoa (horizontal),
+        'vertical':           btoa (vertical),
+        'horizontal_margin':  btoa (horizontal_margin),
+        'vertical_margin':    btoa (vertical_margin),
+        'animation':          btoa (animation),
+        'alignment_css':      btoa (alignment_css),
+        'custom_css':         btoa (custom_css),
+        'php':                <?php echo $process_php ? '1' : '0'; ?>,
+        'label':              <?php echo $show_label ? '1' : '0'; ?>,
+        'close':              close_button,
+        'iframe':             <?php echo $iframe ? '1' : '0'; ?>,
+        'check':              check,
+        'count':              count,
+        'rotate':             rotate
+      };
+
+//      console.log (param);
+
+      open_window_post (ajaxurl, 'preview', param);
+    };
+
     function update_highlighting () {
       if ($('body').hasClass ("highlighted")) {
         $("#highlight-button").click ();
@@ -267,14 +454,14 @@ function generate_code_preview (
       if (window.innerWidth != $(window).width()) $("#right-arrow").hide (); else $("#right-arrow").show ();
     }
 
-    function update_wrapper_size () {
-      if (typeof wrapper.width () != 'undefined' && typeof wrapper.height () != 'undefined') {
-        var width  = parseInt (wrapper.width ());
-        var height = parseInt (wrapper.height ());
-        $(".wrapper-size").html (width + "px &nbsp;&times;&nbsp;  " + height + "px").show ();
-        if (width * height != 0) $(".wrapper-size").css ("color", "#333"); else $(".wrapper-size").css ("color", "#c00");
-      }
-    }
+//    function update_wrapper_size () {
+//      if (typeof wrapper.width () != 'undefined' && typeof wrapper.height () != 'undefined') {
+//        var width  = parseInt (wrapper.width ());
+//        var height = parseInt (wrapper.height ());
+//        $(".wrapper-size").html (width + "px &nbsp;&times;&nbsp;  " + height + "px").show ();
+//        if (width * height != 0) $(".wrapper-size").css ("color", "#333"); else $(".wrapper-size").css ("color", "#c00");
+//      }
+//    }
 
     $(window).resize(function() {
       update_highlighting ();
@@ -358,7 +545,7 @@ function generate_code_preview (
           settings.find ("#custom-css-" + block).val (new_custom_css);
         }
         settings.find ("select#close-button-" + block).val (new_close_button);
-        settings.find ("select#close-button2-" + block).val (new_close_button);
+        settings.find ("select#close-button-sticky-" + block).val (new_close_button);
 
         if (sticky) {
           var new_horizontal_position = $("select#horizontal-position option:selected").attr('value');
@@ -925,11 +1112,11 @@ function generate_code_preview (
     var start_time = new Date().getTime();
 
     if (sticky) {
-      spinner_horizontal_margin = create_spinner_sticky ("#spinner-horizontal-margin", "horizontal").spinner ("option", "min", - 600);
-      spinner_vertical_margin   = create_spinner_sticky ("#spinner-vertical-margin", "horizontal").spinner ("option", "min", - 600);
+      spinner_horizontal_margin = create_spinner_sticky ("#spinner-horizontal-margin", "horizontal").spinner ("option", "min", - 600).spinner ("option", "max", 5000);
+      spinner_vertical_margin   = create_spinner_sticky ("#spinner-vertical-margin", "horizontal").spinner ("option", "min", - 600).spinner ("option", "max", 5000);
 
-      spinner_horizontal_margin.spinner ("value", <?php echo $horizontal_margin; ?>);
-      spinner_vertical_margin.spinner   ("value", <?php echo $vertical_margin; ?>);
+      spinner_horizontal_margin.spinner ("value", <?php echo $horizontal_margin == '' ? "''" : $horizontal_margin; ?>);
+      spinner_vertical_margin.spinner   ("value", <?php echo $vertical_margin == '' ? "''" : $vertical_margin; ?>);
     } else {
         spinner_margin_top      = create_spinner ("#spinner-margin-top",      "margin-top", "horizontal").spinner ("option", "min", - $("#p1").outerHeight (true));
         spinner_margin_bottom   = create_spinner ("#spinner-margin-bottom",   "margin-bottom", "horizontal").spinner ("option", "min", - $("#p1").outerHeight (true));
@@ -1366,12 +1553,22 @@ function generate_code_preview (
         }
     });
 
+    $('.demo-code').click (function () {
+      wrapper.toggleClass ('fit-content');
+      $('.demo-code span.name').toggle ();
+      update_highlighting ();
+      update_wrapper_size ();
+    });
+
     update_width ();
 
     update_close_button ();
 
-<?php if (!$read_only) : ?>
+<?php if (!$read_only && !$separators) : ?>
     load_from_settings ();
+<?php endif; ?>
+<?php if ($separators) : ?>
+    process_display_elements ();
 <?php endif; ?>
 
     if (sticky) {
@@ -1381,7 +1578,8 @@ function generate_code_preview (
       update_sticky_elements (STICKY_CONTEXT_INIT);
     }
 
-    setTimeout (update_wrapper_size, 500);
+    setTimeout (update_wrapper_size, 250);
+    setTimeout (update_wrapper_size, 750);
 
     var current_time = new Date().getTime();
     if (debug) console.log ("TIME: " + ((current_time - start_time) / 1000).toFixed (3));
@@ -1420,7 +1618,6 @@ function generate_code_preview (
       $(this).attr ('title', titles [index]);
     });
 
-
     $("div.automatic-insertion").dblclick (function () {
       var selected_alignment = $("select#block-alignment option:selected");
       var alignment_value = selected_alignment.val ();
@@ -1443,6 +1640,20 @@ function generate_code_preview (
       }
 
     sticky_context = STICKY_CONTEXT_NONE;
+
+    $("select#check").change (function() {
+      load_preview_block ();
+    });
+
+    $("select#count").change (function() {
+      load_preview_block ();
+    });
+
+    $("select#rotate").change (function() {
+      load_preview_block ();
+    });
+
+    }) (jQuery);
   }
 
   jQuery(document).ready(function($) {
@@ -1597,6 +1808,10 @@ td.demo-code-padding-lr {
 }
 td.demo-code {
   text-align: center;
+  user-select: none;
+  text-decoration: none;
+  box-shadow: 0 0 0;
+  cursor: pointer;
 }
 #demo-box td.demo-code {
   height: 110px;
@@ -1616,16 +1831,21 @@ td.demo-wrapper-background {
 .ui-widget-content {
   background: transparent;
 }
+.fit-content {
+  width: fit-content;
+  width: -moz-fit-content;
+}
 .ui-spinner {
   border: 0;
 }
+
 .ui-spinner-horizontal, .ui-spinner-horizontal .ui-spinner-input {
   height: 14px;
 }
 .ui-spinner-horizontal .ui-spinner-input {
   width: 23px;
   outline: 0;
-  margin: -1px 12px 0 12px;
+  margin: 0 12px 0 12px;
 }
 
 .spinner.sticky .ui-spinner-horizontal .ui-spinner-input {
@@ -1694,7 +1914,7 @@ select {
 <?php
     $previous_width = 0;
     $previous_name = '';
-    for ($viewport = AD_INSERTER_VIEWPORTS - 1; $viewport > 0; $viewport --) {
+    for ($viewport = 6 - 1; $viewport > 0; $viewport --) {
       $viewport_name  = get_viewport_name ($viewport);
       $viewport_width = get_viewport_width ($viewport);
       if ($viewport_name != '' && $viewport_width != 0) {
@@ -1711,7 +1931,7 @@ select {
   </div>
 
 <?php if (!$read_only) : ?>
-  <div style="margin: 10px -8px 10px 0">
+  <div style="margin: 10px -8px 10px -8px">
     <table class="screen" cellspacing=0 cellspacing="0">
       <tr>
         <td><span>&#9667;</span></td>
@@ -1729,20 +1949,20 @@ select {
 
   <div id="blocked-warning" class="warning-enabled" style="padding: 2px 8px 2px 8px; margin: 8px 0 8px 0; border: 1px solid rgb(221, 221, 221); border-radius: 5px;">
     <div style="float: right; text-align: right; margin: 20px 0px 0px 0;">
-       This page was not loaded properly. Please check browser, plugins and ad blockers.
+       <?php _e ('This page was not loaded properly. Please check browser, plugins and ad blockers.', 'ad-inserter'); ?>
     </div>
-    <h3 style="color: red;" title="Error loading page">PAGE BLOCKED</h3>
+    <h3 style="color: red;" title="Error loading page"><?php _e ('PAGE BLOCKED', 'ad-inserter'); ?></h3>
 
     <div style="clear: both;"></div>
   </div>
 
   <div style="float: right; width: 90px; margin-left: 20px;">
-    <button id="highlight-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Highlight inserted code" >Highlight</button>
+    <button id="highlight-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="<?php _e ('Highlight inserted code', 'ad-inserter'); ?>" ><?php _e ('Highlight', 'ad-inserter'); ?></button>
 <?php if (!$read_only) : ?>
-    <button id="use-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Use current settings" >Use</button>
-    <button id="reset-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Reset to the block settings" >Reset</button>
+    <button id="use-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="<?php _e ('Use current settings', 'ad-inserter'); ?>" ><?php _e ('Use', 'ad-inserter'); ?></button>
+    <button id="reset-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="<?php _e ('Reset to block settings', 'ad-inserter'); ?>" ><?php _e ('Reset', 'ad-inserter'); ?></button>
 <?php endif; ?>
-    <button id="cancel-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="Close preview window" >Cancel</button>
+    <button id="cancel-button" type="button" style="margin: 0 0 10px 0; font-size: 12px; width: 90px; height: 35px; float: right;" title="<?php _e ('Close preview window', 'ad-inserter'); ?>" ><?php _e ('Cancel', 'ad-inserter'); ?></button>
   </div>
 
 <?php if (!$read_only) : ?>
@@ -1751,11 +1971,11 @@ select {
   <div style="float: left; max-width: 600px; margin-right: 20px">
 <?php endif; ?>
 
-    <h1 style="margin: 0;">Preview</h1>
+    <h1 style="margin: 0;"><?php _e ('Preview', 'ad-inserter'); ?></h1>
 <?php if ($block != 0) : ?>
-    <h2>Block <?php echo $block; ?></h2>
+    <h2><?php _e ('Block', 'ad-inserter'); ?> <?php echo $block; ?></h2>
 <?php else : ?>
-    <h2>AdSense ad unit</h2>
+    <h2><?php _e ('AdSense ad unit', 'ad-inserter'); ?></h2>
 <?php endif; ?>
     <h3 id="block-name" style="text-align: left;"><?php echo $block_name; ?></h3>
   </div>
@@ -1797,7 +2017,7 @@ select {
             <input id="spinner-padding-left" name="value">
           </span>
         </td>
-        <td class="demo-code"><p>Code block</p><p class="wrapper-size">&nbsp;</p></td>
+        <td class="demo-code"><p><span class="name"><?php _e ('Block', 'ad-inserter'); ?></span><span class="name" style="display: none;"><?php _e ('Code', 'ad-inserter'); ?></span></p><p class="wrapper-size">&nbsp;</p></td>
         <td class="demo-code-padding-lr" style="border-right: 1px solid #ccc;">
           <span class="spinner normal">
             <input id="spinner-padding-right" name="value">
@@ -1823,19 +2043,19 @@ select {
       <tr>
         <td class="demo-wrapper-margin-tb" style="border-right: 1px solid #ccc;" colspan="5">
           <span class="spinner normal">
-            <span style="float: left; margin-left: 6px;">wrapping div</span>
+            <span style="float: left; margin-left: 2px; min-width: 72px;"><?php _e ('wrapping div', 'ad-inserter'); ?></span>
             <span style="float: right; margin-right: 72px">&nbsp;</span>
             <input id="spinner-margin-bottom" name="value">
           </span>
         </td>
-        <td class="demo-wrapper-background">background</td>
+        <td class="demo-wrapper-background"><?php _e ('background', 'ad-inserter'); ?></td>
       </tr>
     </table>
 
     <table id="demo-box-no-wrapping" class="demo-box" style="display: none;" cellspacing=0 cellspacing="0">
       <tr>
-        <td class="demo-code" style="border-right: 1px solid #ccc;"><p>Code block</p><p class="wrapper-size">&nbsp;</p></td>
-        <td class="demo-wrapper-background">background</td>
+        <td class="demo-code" style="border-right: 1px solid #ccc;"><p><span class="name"><?php _e ('Block', 'ad-inserter'); ?></span><span class="name" style="display: none;"><?php _e ('Code', 'ad-inserter'); ?></span></p><p class="wrapper-size">&nbsp;</p></td>
+        <td class="demo-wrapper-background"><?php _e ('background', 'ad-inserter'); ?></td>
       </tr>
     </table>
   </div>
@@ -1846,15 +2066,25 @@ select {
 <?php if (!$read_only) : ?>
   <div id="alignment-editor" style="margin: 20px 0;">
 <?php else : ?>
+  <div style="margin: 10px 0;">
+<?php check_count_rotate_code ($obj, $check, $count, $rotate); ?>
+  </div>
   <div id="alignment-editor" style="margin: 20px 0; display: none;">
 <?php endif; ?>
+
 <?php if (defined ('AI_STICKY_SETTINGS') && AI_STICKY_SETTINGS && $sticky) : ?>
 
     <div style="">
 
+      <div style="margin: 10px 0;">
+<?php if (!$read_only) check_count_rotate_code ($obj, $check, $count, $rotate); ?>
+      </div>
+
       <div style="float: left;">
-        Alignment and Style&nbsp;&nbsp;&nbsp;
-        <select id="block-alignment" style="width:120px;">
+
+        <?php _e ('Alignment', 'ad-inserter'); ?>
+        &nbsp;&nbsp;&nbsp;
+        <select id="block-alignment" style="min-width: 120px;">
 <?php if (function_exists ('ai_preview_style_options')) ai_preview_style_options ($obj, $alignment_type, true); ?>
           <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-custom-css" value="<?php echo AI_ALIGNMENT_CUSTOM_CSS; ?>" data-title="<?php echo AI_TEXT_CUSTOM_CSS; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_CUSTOM_CSS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CUSTOM_CSS; ?></option>
         </select>
@@ -1873,7 +2103,7 @@ select {
     <div style="margin: 8px 0;">
       <div style="float: left;">
         <div style="margin: 4px 0;">
-          Horizontal position
+          <?php _e ('Horizontal position', 'ad-inserter'); ?>
           <select class="ai-image-selection" id="horizontal-position">
              <option
                data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>"
@@ -1920,7 +2150,7 @@ select {
         <div id="horizontal-positions"></div>
 
         <div class="spinner sticky" style="margin: 8px 0;">
-          <span>Horizontal margin </span>
+          <span><?php _e ('Horizontal margin', 'ad-inserter'); ?> </span>
           <input id="spinner-horizontal-margin" name="value">
           <span> px</span>
         </div>
@@ -1928,7 +2158,7 @@ select {
 
       <div style="float: right;">
         <div style="margin: 4px 0;">
-          Vertical position
+          <?php _e ('Vertical position', 'ad-inserter'); ?>
           <select id="vertical-position">
              <option
                data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>"
@@ -1969,7 +2199,7 @@ select {
         <div style="clear: both;"></div>
 
         <div class="spinner sticky" style="text-align: right; margin: 8px 0;">
-          <spa>Vertical margin </span>
+          <span><?php _e ('Vertical margin', 'ad-inserter'); ?> </span>
           <input id="spinner-vertical-margin" name="value">
           <span> px</span>
         </div>
@@ -1979,7 +2209,7 @@ select {
 
     <div style="margin: 8px 0;">
       <span style="vertical-align: middle;">
-        Animation
+        <?php _e ('Animation', 'ad-inserter'); ?>
         <select id="animation">
            <option value="<?php echo AI_ANIMATION_NONE; ?>" <?php echo ($animation  == AI_ANIMATION_NONE) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NONE; ?></option>
            <option value="<?php echo AI_ANIMATION_FADE; ?>" <?php echo ($animation  == AI_ANIMATION_FADE) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_FADE; ?></option>
@@ -1991,25 +2221,33 @@ select {
            <option value="<?php echo AI_ANIMATION_ZOOM_OUT; ?>" <?php echo ($animation  == AI_ANIMATION_ZOOM_OUT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_ZOOM_OUT; ?></option>
         </select>
       </span>
-      <button id="animate-button" type="button" style="margin: 0 0 0 10px; height: 30px; font-size: 12px;">Animate</button>
+      <button id="animate-button" type="button" style="margin: 0 0 0 10px; height: 30px; font-size: 12px;"><?php _e ('Animate', 'ad-inserter'); ?></button>
     </div>
 
 
 <?php else : ?>
 
     <div style="margin: 20px 0 0 0;">
-      Alignment and Style&nbsp;&nbsp;&nbsp;
-      <select id="block-alignment" style="width:120px;">
-         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-default" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_DEFAULT, true)); ?> value="<?php echo AI_ALIGNMENT_DEFAULT; ?>" data-title="<?php echo AI_TEXT_DEFAULT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_DEFAULT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DEFAULT; ?></option>
-         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-align-left" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_LEFT, true)); ?> value="<?php echo AI_ALIGNMENT_LEFT; ?>" data-title="<?php echo AI_TEXT_LEFT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_LEFT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_LEFT; ?></option>
-         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-center" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_CENTER, true)); ?> value="<?php echo AI_ALIGNMENT_CENTER; ?>" data-title="<?php echo AI_TEXT_CENTER; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_CENTER) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CENTER; ?></option>
-         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-align-right" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_RIGHT, true)); ?> value="<?php echo AI_ALIGNMENT_RIGHT; ?>" data-title="<?php echo AI_TEXT_RIGHT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_RIGHT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_RIGHT; ?></option>
-         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-float-left" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_FLOAT_LEFT, true)); ?> value="<?php echo AI_ALIGNMENT_FLOAT_LEFT; ?>" data-title="<?php echo AI_TEXT_FLOAT_LEFT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_FLOAT_LEFT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_FLOAT_LEFT; ?></option>
-         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-float-right" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_FLOAT_RIGHT, true)); ?> value="<?php echo AI_ALIGNMENT_FLOAT_RIGHT; ?>" data-title="<?php echo AI_TEXT_FLOAT_RIGHT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_FLOAT_RIGHT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_FLOAT_RIGHT; ?></option>
+
+      <?php check_count_rotate_code ($obj, $check, $count, $rotate); ?>
+
+      <div style="display: inline-block;">
+        <div style="display: inline-block; vertical-align: middle;">
+      <?php _e ('Alignment', 'ad-inserter'); ?>
+        </div>
+
+        <select id="block-alignment" style="min-width:120px; margin: 0 10px 0 5px;">
+           <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-default" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_DEFAULT, true)); ?> value="<?php echo AI_ALIGNMENT_DEFAULT; ?>" data-title="<?php echo AI_TEXT_DEFAULT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_DEFAULT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_DEFAULT; ?></option>
+           <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-align-left" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_LEFT, true)); ?> value="<?php echo AI_ALIGNMENT_LEFT; ?>" data-title="<?php echo AI_TEXT_LEFT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_LEFT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_LEFT; ?></option>
+           <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-center" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_CENTER, true)); ?> value="<?php echo AI_ALIGNMENT_CENTER; ?>" data-title="<?php echo AI_TEXT_CENTER; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_CENTER) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CENTER; ?></option>
+           <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-align-right" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_RIGHT, true)); ?> value="<?php echo AI_ALIGNMENT_RIGHT; ?>" data-title="<?php echo AI_TEXT_RIGHT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_RIGHT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_RIGHT; ?></option>
+           <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-float-left" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_FLOAT_LEFT, true)); ?> value="<?php echo AI_ALIGNMENT_FLOAT_LEFT; ?>" data-title="<?php echo AI_TEXT_FLOAT_LEFT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_FLOAT_LEFT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_FLOAT_LEFT; ?></option>
+           <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-float-right" <?php alt_styles_data ($obj->alignment_style (AI_ALIGNMENT_FLOAT_RIGHT, true)); ?> value="<?php echo AI_ALIGNMENT_FLOAT_RIGHT; ?>" data-title="<?php echo AI_TEXT_FLOAT_RIGHT; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_FLOAT_RIGHT) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_FLOAT_RIGHT; ?></option>
 <?php if (function_exists ('ai_preview_style_options')) ai_preview_style_options ($obj, $alignment_type); ?>
-         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-custom-css" value="<?php echo AI_ALIGNMENT_CUSTOM_CSS; ?>" data-title="<?php echo AI_TEXT_CUSTOM_CSS; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_CUSTOM_CSS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CUSTOM_CSS; ?></option>
-         <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-no-wrapping" value="<?php echo AI_ALIGNMENT_NO_WRAPPING; ?>" data-title="<?php echo AI_TEXT_NO_WRAPPING; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_NO_WRAPPING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NO_WRAPPING; ?></option>
-      </select>
+          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-custom-css" value="<?php echo AI_ALIGNMENT_CUSTOM_CSS; ?>" data-title="<?php echo AI_TEXT_CUSTOM_CSS; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_CUSTOM_CSS) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_CUSTOM_CSS; ?></option>
+          <option data-img-src="<?php echo plugins_url ('css/images/blank.png', AD_INSERTER_FILE); ?>" data-img-class="automatic-insertion preview im-no-wrapping" value="<?php echo AI_ALIGNMENT_NO_WRAPPING; ?>" data-title="<?php echo AI_TEXT_NO_WRAPPING; ?>" <?php echo ($alignment_type == AI_ALIGNMENT_NO_WRAPPING) ? AD_SELECT_SELECTED : AD_EMPTY_VALUE; ?>><?php echo AI_TEXT_NO_WRAPPING; ?></option>
+        </select>
+      </div>
       <span id="css-index" style="display: inline-block; min-width: 30px; min-height: 12px; margin: 0 0 0 10px; font-size: 14px;" title="CSS code index"></span>
       &nbsp;&nbsp;&nbsp;
       <span id="close-button-selection" style="display: <?php echo $alignment_type == AI_ALIGNMENT_NO_WRAPPING || $close_button == AI_CLOSE_NONE ? 'none': 'inline'; ?>;">
@@ -2027,8 +2265,8 @@ select {
           <span id="css-label" style="vertical-align: middle; margin: 4px 0 0 0 0; width: 36px; font-size: 14px; font-weight: bold; display: none;">CSS</span>
         </td>
         <td style="width: 100%; height: 32px; padding:0;">
-          <input id="custom-css" style="width: 100%; display: inline-block; padding: 5px 0 0 3px; border-radius: 4px; display: none; font-size: 12px; font-family: Courier, 'Courier New', monospace; font-weight: bold;" type="text" value="<?php echo $custom_css_code; ?>" size="70" maxlength="500" title="Custom CSS code for wrapping div" />
-          <span style="width: 100%; display: inline-block; padding: 5px 0 0 2px; font-family: Courier, 'Courier New', monospace; font-size: 12px; font-weight: bold; cursor: pointer; white-space: normal;">
+          <input id="custom-css" style="width: 100%; display: inline-block; padding: 5px 0 0 3px; border-radius: 4px; display: none; font-size: 12px; font-family: monospace, Courier, 'Courier New'; font-weight: bold;" type="text" value="<?php echo $custom_css_code; ?>" size="70" maxlength="500" title="Custom CSS code for wrapping div" />
+          <span style="width: 100%; display: inline-block; padding: 5px 0 0 5px; font-family: monospace, Courier, 'Courier New'; font-size: 12px; font-weight: bold; cursor: pointer; white-space: normal;">
             <span id="css-no-wrapping" style="vertical-align: middle; display: none;"></span>
             <span id="css-<?php echo AI_ALIGNMENT_DEFAULT; ?>" class="css-code" style="vertical-align: middle; display: none;" title="CSS code for wrapping div, click to edit"><?php echo $obj->alignment_style (AI_ALIGNMENT_DEFAULT); ?></span>
             <span id="css-<?php echo AI_ALIGNMENT_LEFT; ?>" class="css-code" style="vertical-align: middle;display: none;" title="CSS code for wrapping div, click to edit"><?php echo $obj->alignment_style (AI_ALIGNMENT_LEFT); ?></span>
@@ -2040,7 +2278,7 @@ select {
           </span>
         </td>
         <td padding:0;>
-          <button id="edit-css-button" type="button" style="margin: 0 0 0 10px; height: 30px; font-size: 12px; display: none;">Edit</button>
+          <button id="edit-css-button" type="button" style="margin: 0 0 0 10px; height: 30px; font-size: 12px; display: none;"><?php _e ('Edit', 'ad-inserter'); ?></button>
         </td>
       </tr>
     </table>
@@ -2049,77 +2287,77 @@ select {
 <?php if (!$sticky) { ?>
 
 <?php if (!$read_only) : ?>
-    <p id="p1">This is a preview of the code between dummy paragraphs. Here you can test various block alignments, visually edit margin and padding values of the wrapping div
-      or write CSS code directly and watch live preview. Highlight button highlights background, wrapping div margin and code area, while Reset button restores all the values to those of the current block.</p>
+    <p id="p1"><?php _e ('This is a preview of the code between dummy paragraphs. Here you can test various block alignments, visually edit margin and padding values of the wrapping div
+or write CSS code directly and watch live preview. Highlight button highlights background, wrapping div margin and code area, while Reset button restores all the values to those of the current block.', 'ad-inserter'); ?></p>
 <?php elseif (!$adsense) : ?>
-    <p id="p1">This is a preview of the saved code block between dummy paragraphs. It shows the code with the alignment and style as it is set for this code block. Highlight button highlights background, wrapping div margin and code area.</p>
+    <p id="p1"><?php _e ('This is a preview of the saved block between dummy paragraphs. It shows the code with the alignment and style as it is set for this block. Highlight button highlights background, wrapping div margin and code area.', 'ad-inserter'); ?></p>
 <?php else : ?>
-    <p id="p1">This is a preview of AdSense ad block between dummy paragraphs. AdSense ad code was loaded from your AdSense account. The ad block is displayed on a dummy page so it may be blank (no ads). Click on the Highlight button to highlight ad block.</p>
+    <p id="p1"><?php _e ('This is a preview of AdSense ad block between dummy paragraphs. AdSense ad code was loaded from your AdSense account. The ad block is displayed on a dummy page so it may be blank (no ads). Click on the Highlight button to highlight ad block.', 'ad-inserter'); ?></p>
 <?php endif; ?>
 
 <?php if (!$sticky) padding_margin_code ($close_button, $class, $sticky_parameters, $wrapper_css, $block_code); ?>
 
 <?php if (!$read_only) : ?>
-    <p id="p2">You can resize the window (and refresh the page to reload ads) to check display with different screen widths.
-      Once you are satisfied with alignment click on the Use button and the settings will be copied to the active block.</p>
-    <p id="p3">Please note that the code, block name, alignment and style are taken from the current block settings (may not be saved).
-      <strong>No Wrapping</strong> style inserts the code as it is so margin and padding can't be set. However, you can use own HTML code for the block.</p>
+    <p id="p2"><?php _e ('You can resize the window (and refresh the page to reload ads) to check display with different screen widths.
+Once you are satisfied with alignment click on the Use button and the settings will be copied to the active block.', 'ad-inserter'); ?></p>
+    <p id="p3"><?php _e ("Please note that the code, block name, alignment and style are taken from the current block settings (may not be saved).
+<strong>No wrapping</strong> style inserts the code as it is so margin and padding can't be set. However, you can use own HTML code for the block.", 'ad-inserter'); ?></p>
 <?php else : ?>
 <?php endif; ?>
 
-    <p id="p4">Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a code block.
-Free Ad Inserter supports 16 code blocks, Ad Inserter Pro supports up to 96 code blocks (depending on the license type).
-The settings page is divided into tabs - 16 code blocks and general plugin settings. Black number means inactive code block (code is not inserted anywhere),
-red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.</p>
+    <p id="p4"><?php _e ("Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a block.
+Free Ad Inserter supports 16 blocks, Ad Inserter Pro supports up to 96 blocks (depending on the license type).
+The settings page is divided into tabs - 16 blocks and general plugin settings. Black number means inactive block (code is not inserted anywhere),
+red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.", 'ad-inserter'); ?></p>
 
-    <p id="p5">Few very important things you need to know in order to insert code and display some ad:
-Enable and use at least one display option (Automatic Display, Widget, Shortcode, PHP function call).
-Enable display on at least one Wordpress page type (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages).
-Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.</p>
+    <p id="p5"><?php _e ('Few very important things you need to know in order to insert code and display some ad:
+Enable and use at least one insertion option (Automatic insertion, Widget, Shortcode, PHP function call).
+Enable insertion on at least one WordPress page type (Posts, Static pages, Homepage, Category pages, Search pages, Archive pages).
+Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.', 'ad-inserter'); ?></p>
 
 <?php } else { ?>
-    <p id="p1">This is a preview of the code for sticky ads. Here you can test various horizontal and vertical alignments, close button locations, visually edit margin values
-      or write CSS code directly and watch live preview. Highlight button highlights background, margin and code area, while Reset button restores all the values to those of the current block.</p>
+    <p id="p1"><?php _e ('This is a preview of the code for sticky ads. Here you can test various horizontal and vertical alignments, close button locations, visually edit margin values
+or write CSS code directly and watch live preview. Highlight button highlights background, margin and code area, while Reset button restores all the values to those of the current block.', 'ad-inserter'); ?></p>
 
-    <p id="p2">Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a code block.
-Free Ad Inserter supports 16 code blocks, Ad Inserter Pro supports up to 96 code blocks (depending on the license type).
-The settings page is divided into tabs - 16 code blocks and general plugin settings. Black number means inactive code block (code is not inserted anywhere),
-red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.</p>
+    <p id="p2"><?php _e ("Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a block.
+Free Ad Inserter supports 16 blocks, Ad Inserter Pro supports up to 96 blocks (depending on the license type).
+The settings page is divided into tabs - 16 blocks and general plugin settings. Black number means inactive block (code is not inserted anywhere),
+red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.", 'ad-inserter'); ?></p>
 
-    <p id="p3">Few very important things you need to know in order to insert code and display some ad:
-Enable and use at least one display option (Automatic Display, Widget, Shortcode, PHP function call).
-Enable display on at least one Wordpress page type (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages).
-Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.</p>
+    <p id="p3"><?php _e ('Few very important things you need to know in order to insert code and display some ad:
+Enable and use at least one insertion option (Automatic insertion, Widget, Shortcode, PHP function call).
+Enable insertion on at least one WordPress page type (Posts, Static pages, Homepage, Category pages, Search pages, Archive pages).
+Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.', 'ad-inserter'); ?></p>
 
-    <p id="p4">Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a code block.
-Free Ad Inserter supports 16 code blocks, Ad Inserter Pro supports up to 96 code blocks (depending on the license type).
-The settings page is divided into tabs - 16 code blocks and general plugin settings. Black number means inactive code block (code is not inserted anywhere),
-red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.</p>
+    <p id="p4"><?php _e ("Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a block.
+Free Ad Inserter supports 16 blocks, Ad Inserter Pro supports up to 96 blocks (depending on the license type).
+The settings page is divided into tabs - 16 blocks and general plugin settings. Black number means inactive block (code is not inserted anywhere),
+red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.", 'ad-inserter'); ?></p>
 
-    <p id="p5">Few very important things you need to know in order to insert code and display some ad:
-Enable and use at least one display option (Automatic Display, Widget, Shortcode, PHP function call).
-Enable display on at least one Wordpress page type (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages).
-Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.</p>
+    <p id="p5"><?php _e ('Few very important things you need to know in order to insert code and display some ad:
+Enable and use at least one insertion option (Automatic insertion, Widget, Shortcode, PHP function call).
+Enable insertion on at least one WordPress page type (Posts, Static pages, Homepage, Category pages, Search pages, Archive pages).
+Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.', 'ad-inserter'); ?></p>
 
-    <p id="p6">Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a code block.
-Free Ad Inserter supports 16 code blocks, Ad Inserter Pro supports up to 96 code blocks (depending on the license type).
-The settings page is divided into tabs - 16 code blocks and general plugin settings. Black number means inactive code block (code is not inserted anywhere),
-red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.</p>
+    <p id="p6"><?php _e ("Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a block.
+Free Ad Inserter supports 16 blocks, Ad Inserter Pro supports up to 96 blocks (depending on the license type).
+The settings page is divided into tabs - 16 blocks and general plugin settings. Black number means inactive block (code is not inserted anywhere),
+red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.", 'ad-inserter'); ?></p>
 
-    <p id="p7">Few very important things you need to know in order to insert code and display some ad:
-Enable and use at least one display option (Automatic Display, Widget, Shortcode, PHP function call).
-Enable display on at least one Wordpress page type (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages).
-Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.</p>
+    <p id="p7"><?php _e ('Few very important things you need to know in order to insert code and display some ad:
+Enable and use at least one insertion option (Automatic insertion, Widget, Shortcode, PHP function call).
+Enable insertion on at least one WordPress page type (Posts, Static pages, Homepage, Category pages, Search pages, Archive pages).
+Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.', 'ad-inserter'); ?></p>
 
-    <p id="p8">Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a code block.
-Free Ad Inserter supports 16 code blocks, Ad Inserter Pro supports up to 96 code blocks (depending on the license type).
-The settings page is divided into tabs - 16 code blocks and general plugin settings. Black number means inactive code block (code is not inserted anywhere),
-red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.</p>
+    <p id="p8"><?php _e ("Ad Inserter can be configured to insert any code anywhere on the page. Each code with it's settings is called a block.
+Free Ad Inserter supports 16 blocks, Ad Inserter Pro supports up to 96 blocks (depending on the license type).
+The settings page is divided into tabs - 16 blocks and general plugin settings. Black number means inactive block (code is not inserted anywhere),
+red number means block is using automatic insertion, blue number means block is using manual insertion while violet number means block is using automatic and manual insertion.", 'ad-inserter'); ?></p>
 
-    <p id="p9">Few very important things you need to know in order to insert code and display some ad:
-Enable and use at least one display option (Automatic Display, Widget, Shortcode, PHP function call).
-Enable display on at least one Wordpress page type (Posts, Static pages, Homepage, Category pages, Search Pages, Archive pages).
-Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.</p>
+    <p id="p9"><?php _e ('Few very important things you need to know in order to insert code and display some ad:
+Enable and use at least one insertion option (Automatic insertion, Widget, Shortcode, PHP function call).
+Enable insertion on at least one WordPress page type (Posts, Static pages, Homepage, Category pages, Search pages, Archive pages).
+Single pages (posts and static pages) have also additional setting for individual exceptions. Use default blank value unless you are using individual post/page exceptions.', 'ad-inserter'); ?></p>
 <?php }  ?>
 
     <span class="ai-content"></span>
@@ -2128,12 +2366,41 @@ Single pages (posts and static pages) have also additional setting for individua
 
 <?php ai_wp_footer_hook (); ?>
 <script>
-<?php if (function_exists ('ai_load_settings_2')) echo ai_get_js ('ai-close'); ?>
+<?php if (function_exists ('ai_extract_features_2')) echo ai_get_js ('ai-cookie'), ai_get_js ('ai-close'); ?>
 <?php
   if ($sticky) echo ai_get_js ('ai-sticky');
+  echo ai_get_js ('ai-rotate');
+  if (function_exists ('add_footer_inline_scripts_2')) {
+    echo ai_get_js ('ai-load');
+  }
   if ($sticky) echo "setTimeout (function() {AOS.init();}, 200);\n";
   if (defined ('AI_ADSENSE_OVERLAY')) {
     echo ai_get_js ('ai-ads');
+  }
+  if ($iframe_resize) {
+    echo 'function ai_resize_iframe (iframe) {
+  function getDocHeight (doc) {
+    doc = doc || document;
+    // from http://stackoverflow.com/questions/1145850/get-height-of-entire-document-with-javascript
+    var body = doc.body, html = doc.documentElement;
+    var height = Math.max (body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+    return height;
+  }
+
+  function resizeIframe (iframe) {
+    var doc = iframe.contentDocument ? iframe.contentDocument : iframe.contentWindow.document;
+    iframe.style.visibility = "hidden";
+    iframe.style.height = "10px"; // reset to minimal height ...
+    // IE opt. for bing/msn needs a bit added or scrollbar appears
+    iframe.style.height = getDocHeight (doc) + "px";
+    iframe.style.visibility = "visible";
+
+    update_wrapper_size ();
+  }
+
+  setTimeout (function(){resizeIframe (iframe);}, 200);
+}
+';
   }
 ?>
 </script>

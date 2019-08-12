@@ -1,4 +1,5 @@
-
+<?php // Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit; ?>
 <script type="text/x-template" id="module-data-template">
 		<?php $i=0;
     		foreach ($moduleTemplate as $key => $module) {
@@ -28,11 +29,20 @@
                           :data-module_id="cell.cell_id"
 					>
 
-		        		<span class="module_label">'.$module['label'].'</span>
+                        <span class="module_label">'.esc_html($module['label']).'
+                         <em v-if="cell.cell_identity_name"> {{cell.cell_identity_name}} </em>
+                        </span>
 		        		<span class="amppb-setting-right">
-			        		<label  @click="showModulePopUp($event)" class="link" title="'.$module['label'].'" data-popupContent=\''.json_encode($module).'\'
+                             <label  @click="duplicateModule($event)" class="link amppb-module-copy" title="'.esc_attr($module['label']).'" 
                                 :data-module_id="cell.cell_id"
                                 :data-container_id="cell.container_id"
+                            >
+                                <span class=" dashicons dashicons-admin-page"></span>
+                            </label>
+			        		<label  @click="showModulePopUp($event)" class="link" title="'.esc_attr($module['label']).'" data-popupContent=\''.json_encode($module).'\'
+                                :data-module_id="cell.cell_id"
+                                :data-container_id="cell.container_id"
+                                :data-cell_identity_name = cell.cell_identity_name
                             >
 			        			<span class="dashicons dashicons-admin-generic"></span>
 			        		</label>

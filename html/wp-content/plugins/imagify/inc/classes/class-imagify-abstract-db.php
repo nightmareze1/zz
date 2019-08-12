@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
+defined( 'ABSPATH' ) || die( 'Cheatin’ uh?' );
 
 /**
  * Imagify DB base class.
@@ -7,14 +7,14 @@ defined( 'ABSPATH' ) || die( 'Cheatin\' uh?' );
  * @since  1.5
  * @source https://gist.github.com/pippinsplugins/e220a7f0f0f2fbe64608
  */
-abstract class Imagify_Abstract_DB extends Imagify_Abstract_DB_Deprecated {
+abstract class Imagify_Abstract_DB extends Imagify_Abstract_DB_Deprecated implements \Imagify\DB\DBInterface {
 
 	/**
 	 * Class version.
 	 *
 	 * @var string
 	 */
-	const VERSION = '1.2.1';
+	const VERSION = '1.3';
 
 	/**
 	 * Suffix used in the name of the options that store the table versions.
@@ -171,7 +171,7 @@ abstract class Imagify_Abstract_DB extends Imagify_Abstract_DB_Deprecated {
 	/** ----------------------------------------------------------------------------------------- */
 
 	/**
-	 * Whitelist of columns.
+	 * Get the column placeholders.
 	 *
 	 * @since  1.5
 	 * @access public
@@ -256,7 +256,7 @@ abstract class Imagify_Abstract_DB extends Imagify_Abstract_DB_Deprecated {
 		$placeholder   = $this->get_placeholder( $column_where );
 		$column_where  = esc_sql( $column_where );
 
-		$result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $column_where = $placeholder LIMIT 1;", $column_value ), ARRAY_A ); // WPCS: unprepared SQL ok.
+		$result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $this->table_name WHERE $column_where = $placeholder LIMIT 1;", $column_value ), ARRAY_A ); // WPCS: unprepared SQL ok, PreparedSQLPlaceholders replacement count ok.
 
 		return (array) $this->cast_row( $result );
 	}
@@ -323,7 +323,7 @@ abstract class Imagify_Abstract_DB extends Imagify_Abstract_DB_Deprecated {
 		$column       = esc_sql( $column_select );
 		$column_where = esc_sql( $column_where );
 
-		$result = $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = $placeholder LIMIT 1;", $column_value ) ); // WPCS: unprepared SQL ok.
+		$result = $wpdb->get_var( $wpdb->prepare( "SELECT $column FROM $this->table_name WHERE $column_where = $placeholder LIMIT 1;", $column_value ) ); // WPCS: unprepared SQL ok, PreparedSQLPlaceholders replacement count ok.
 
 		return $this->cast( $result, $column_select );
 	}
@@ -499,7 +499,7 @@ abstract class Imagify_Abstract_DB extends Imagify_Abstract_DB_Deprecated {
 
 		$placeholder = $this->get_placeholder( $this->primary_key );
 
-		return (bool) $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $this->primary_key = $placeholder", $row_id ) ); // WPCS: unprepared SQL ok.
+		return (bool) $wpdb->query( $wpdb->prepare( "DELETE FROM $this->table_name WHERE $this->primary_key = $placeholder", $row_id ) ); // WPCS: unprepared SQL ok, PreparedSQLPlaceholders replacement count ok.
 	}
 
 
@@ -868,7 +868,15 @@ abstract class Imagify_Abstract_DB extends Imagify_Abstract_DB_Deprecated {
 		}
 
 		$serialized_data = array_intersect_key( $data, $this->to_serialize );
-		$serialized_data = array_map( 'maybe_serialize', $serialized_data );
+
+		if ( ! $serialized_data ) {
+			return $data;
+		}
+
+		$serialized_data = array_map( function( $array ) {
+			// Try not to store empty serialized arrays.
+			return [] === $array ? null : maybe_serialize( $array );
+		}, $serialized_data );
 
 		return array_merge( $data, $serialized_data );
 	}

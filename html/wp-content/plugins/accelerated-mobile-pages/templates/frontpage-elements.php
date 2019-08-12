@@ -1,4 +1,8 @@
 <?php
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 add_action('pre_amp_render_post', 'ampforwp_frontpage_file', 11);
 function ampforwp_frontpage_file() {
 	global $redux_builder_amp;
@@ -37,7 +41,7 @@ function ampforwp_design_1_frontpage_content( $template, $post_id ){
 
 		<?php if( $redux_builder_amp['ampforwp-title-on-front-page'] ) { ?>
 			<header class="amp-wp-article-header ampforwp-title">
-				<h1 class="amp-wp-title"><?php echo get_the_title( $post_id );?></h1>
+				<h2 class="amp-wp-title"><?php echo get_the_title( $post_id );?></h2>
 			</header>
 			
 		<?php }  
@@ -70,7 +74,7 @@ function ampforwp_design_1_frontpage_content( $template, $post_id ){
 				$ampforwp_the_content = $template->get('ampforwp_amp_content');
 			}
 			// Muffin Builder Compatibility #1455 #1893
-			if ( function_exists('mfn_builder_print') ) {
+			if ( function_exists('mfn_builder_print') && ! $amp_custom_content_enable ) {
 				ob_start();
 			  	mfn_builder_print( $post_id );
 				$content = ob_get_contents();
@@ -89,7 +93,15 @@ function ampforwp_design_1_frontpage_content( $template, $post_id ){
 										) 
 									) 
 								);
-			 	$ampforwp_the_content =  $sanitizer_obj->get_amp_content();		
+			 	if ( ! get_post_meta( $post_id, 'mfn-post-hide-content', true ) ) {
+	 				$ampforwp_custom_amp_editor_content = '';
+					$ampforwp_custom_amp_editor_content = $ampforwp_the_content;
+			 		$ampforwp_the_content =  $sanitizer_obj->get_amp_content();
+			 		$ampforwp_the_content .=  $ampforwp_custom_amp_editor_content;
+				}
+				else{
+					$ampforwp_the_content =  $sanitizer_obj->get_amp_content();
+				}		
 			}
 			$ampforwp_the_content = apply_filters('ampforwp_modify_the_content', $ampforwp_the_content);
 			echo $ampforwp_the_content;
@@ -146,7 +158,7 @@ function ampforwp_design_2_frontpage_content($template, $post_id){
 				$ampforwp_the_content = $template->get('ampforwp_amp_content');
 			}
 			// Muffin Builder Compatibility #1455 #1893
-			if ( function_exists('mfn_builder_print') ) {
+			if ( function_exists('mfn_builder_print') && ! $amp_custom_content_enable ) {
 				ob_start();
 			  	mfn_builder_print( $post_id );
 				$content = ob_get_contents();
@@ -165,7 +177,15 @@ function ampforwp_design_2_frontpage_content($template, $post_id){
 										) 
 									) 
 								);
-			 	$ampforwp_the_content =  $sanitizer_obj->get_amp_content();		
+				if ( ! get_post_meta( $post_id, 'mfn-post-hide-content', true ) ) {
+	 				$ampforwp_custom_amp_editor_content = '';
+					$ampforwp_custom_amp_editor_content = $ampforwp_the_content;
+			 		$ampforwp_the_content =  $sanitizer_obj->get_amp_content();
+			 		$ampforwp_the_content .=  $ampforwp_custom_amp_editor_content;
+				}
+				else{
+					$ampforwp_the_content =  $sanitizer_obj->get_amp_content();
+				}
 			}
 			$ampforwp_the_content = apply_filters('ampforwp_modify_the_content', $ampforwp_the_content);
 			echo $ampforwp_the_content;
@@ -195,6 +215,7 @@ function ampforwp_design_3_frontpage_content($template, $post_id){
 	$amp_custom_content_enable = get_post_meta( $post_id, 'ampforwp_custom_content_editor_checkbox', true);?>
 	<main>
 		<article class="amp-wp-article">
+			<div class="amp-wp-article-content">
 			<?php do_action( 'ampforwp_design_3_frontpage_title', $template ); ?>
 			<?php do_action('ampforwp_before_featured_image_hook', $template ); ?>
 			<?php 	$featured_image = $template->get( 'featured_image' );
@@ -224,7 +245,7 @@ function ampforwp_design_3_frontpage_content($template, $post_id){
 					$ampforwp_the_content = $template->get('ampforwp_amp_content');
 				}
 				// Muffin Builder Compatibility #1455 #1893
-				if ( function_exists('mfn_builder_print') ) {
+				if ( function_exists('mfn_builder_print') && ! $amp_custom_content_enable ) {
 					ob_start();
 				  	mfn_builder_print( $post_id );
 					$content = ob_get_contents();
@@ -243,7 +264,15 @@ function ampforwp_design_3_frontpage_content($template, $post_id){
 											) 
 										) 
 									);
-				 	$ampforwp_the_content =  $sanitizer_obj->get_amp_content();		
+					if ( ! get_post_meta( $post_id, 'mfn-post-hide-content', true ) ) {
+		 				$ampforwp_custom_amp_editor_content = '';
+						$ampforwp_custom_amp_editor_content = $ampforwp_the_content;
+				 		$ampforwp_the_content =  $sanitizer_obj->get_amp_content();
+				 		$ampforwp_the_content .=  $ampforwp_custom_amp_editor_content;
+					}
+					else{
+						$ampforwp_the_content =  $sanitizer_obj->get_amp_content();
+					}
 				}	
 				$ampforwp_the_content = apply_filters('ampforwp_modify_the_content', $ampforwp_the_content);
 				echo $ampforwp_the_content;
@@ -256,6 +285,7 @@ function ampforwp_design_3_frontpage_content($template, $post_id){
 			<div class="amp-wp-content post-pagination-meta">
 				<?php $template->load_parts( apply_filters( 'amp_post_template_meta_parts', array( 'meta-taxonomy' ) ) ); ?>
 			</div>
+		</div>	
 		</article>
 	</main>
 	<?php 
@@ -273,7 +303,7 @@ function ampforwp_design_2_frontpage_title() {
  	}
 	if( $redux_builder_amp['ampforwp-title-on-front-page'] ) { ?>
 		<header class="amp-wp-article-header ampforwp-title">
-			<h1 class="amp-wp-title"><?php if( is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' )){$ID = get_option('page_on_front');}else{$ID = ampforwp_get_frontpage_id();}echo get_the_title( $ID );?></h1>
+			<h2 class="amp-wp-title"><?php if( is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' )){$ID = get_option('page_on_front');}else{$ID = ampforwp_get_frontpage_id();}echo get_the_title( $ID );?></h2>
 		</header>	
 		
 	<?php } 
@@ -290,7 +320,7 @@ function ampforwp_design_3_frontpage_title() {
  }
 	if( $redux_builder_amp['ampforwp-title-on-front-page'] ) { ?>
 		<header class="amp-wp-article-header ampforwp-title amp-wp-content">
-			<h1 class="amp-wp-title"><?php 
+			<h2 class="amp-wp-title"><?php 
 			//WPML Static Front Page Support #1111
 			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 			if( is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' )){
@@ -300,7 +330,7 @@ function ampforwp_design_3_frontpage_title() {
  				else{
 				$ID = ampforwp_get_frontpage_id();
 			}
-				echo get_the_title( $ID );?></h1>
+				echo get_the_title( $ID );?></h2>
 		</header> <?php 
 		
 	}
