@@ -9,11 +9,11 @@ jQuery (function ($) {
     }
 
     if (typeof ajaxurl !== 'undefined') {
-      var nonce = $('.ai-notice[nonce]').attr ('nonce');
-
-//      console.log ('AI NOTICE nonce', nonce, typeof nonce);
+//      var nonce = $('.ai-notice[nonce]').attr ('nonce');
+      var nonce = $('.ai-notice[data-value]').attr ('data-value');
 
       if (typeof nonce !== 'undefined') {
+        nonce = atob (nonce);
         $.ajax (ajaxurl, {
           type: 'POST',
           data: {
@@ -36,7 +36,7 @@ jQuery (function ($) {
   $(document).on ('click', '.ai-notice .ai-notice-dismiss', function () {
     var ai_debug = parseInt ($('#ai-data').attr ('js_debugging'));
     var notice_div = $(this).closest ('.ai-notice');
-    var nonce = notice_div.attr ('nonce');
+    var nonce = atob (notice_div.attr ('data-value'));
     var notice = notice_div.data ('notice');
     var action = $(this).data ('notice');
 

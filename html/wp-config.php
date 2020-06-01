@@ -25,24 +25,28 @@ if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && 'https' == $_SERVER['HTTP_X_
        $_SERVER['HTTPS'] = 'on';
    }
 
+
+/*
+	*  * Force URLs in srcset attributes into HTTPS scheme.
+	*   * This is particularly useful when you're running a Flexible SSL frontend like Cloudflare
+	*    */
 // ** MySQL settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
 define('DB_NAME', 'itshelldb');
 
 /** MySQL database username */
-define('DB_USER', 'root');
+define('DB_USER', 'itshell');
 
 /** MySQL database password */
 define('DB_PASSWORD', '1');
 
 /** MySQL hostname */
-define('DB_HOST', 'mysql-itshellws1');
+define('DB_HOST', '172.16.250.161');
 
-#define('FORCE_SSL_LOGIN', true);
-#define('FORCE_SSL_ADMIN', true);
-
-define('WP_HOME','https://www.itshellws.org');
-define('WP_SITEURL','https://www.itshellws.org');
+define('FORCE_SSL_LOGIN', true);
+define('FORCE_SSL_ADMIN', true);
+define('WP_SITEURL', 'http://' . $_SERVER['HTTP_HOST']);
+define('WP_HOME', 'http://' . $_SERVER['HTTP_HOST']);
 
 /** Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
@@ -90,10 +94,13 @@ $table_prefix  = 'wp_8663apy1wg_';
  *
  * @link https://codex.wordpress.org/Debugging_in_WordPress
  */
-define('WP_DEBUG', false);
-//define( 'WP_CACHE', true );
+define ('WP_CACHE', true );
 
-define( 'WP_CACHE', true );
+define('WP_DEBUG', false);
+
+define('WP_MEMORY_LIMIT', '512M' );
+
+define('WP_MAX_MEMORY_LIMIT', '512M');
 
 require_once( dirname( __FILE__ ) . '/gd-config.php' );
 define( 'FS_METHOD', 'direct');

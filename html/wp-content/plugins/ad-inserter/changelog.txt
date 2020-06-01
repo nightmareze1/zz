@@ -2,6 +2,303 @@
 
 This is an archive of older changelog entries. Most recent entries are maintained in readme.txt
 
+= 2.4.23 =
+- Added support to define custom fields with shortocdes
+- Added support to delay showing ads for specified number of pageviews (Pro only)
+- Added support to remember closed ad for specified time period (Pro only)
+- Added support to automatically close ad after specified time period (Pro only)
+- Fix for false positive ad blocking detection (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.22 =
+- Fix for remote code execution vulnerability - credit to Wordfence
+
+= 2.4.21 =
+- Fix for possible error Class not found (Pro only)
+
+= 2.4.20 =
+- Fix for path traversal vulnerability - credit to Wilfried Becard of Synacktiv (https://synacktiv.com)
+- Fix for block rearrangement issues
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.19 =
+- Added support for taxonomy for Yoast primary category
+- Layout changes to accomodate longer translated texts
+- Fix for escape character not saved in header, footer and ad blocking message code
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.18 =
+- Added support for full width responsive AdSense code option
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.17 =
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.16 =
+- Fix for compatibility with AMP for WP - Accelerated Mobile Pages for WordPress
+- Few minor bug fixes
+
+= 2.4.15 =
+- Fix for improved compatibility with other plugins
+- Few minor bug fixes and cosmetic changes
+
+= 2.4.14 =
+- Fix for ROTATE shortcodes with option name identical to block name
+- Fix for possible conflict with output buffering in other plugins
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.13 =
+- Added shortcode to disable ad blocking detection code
+- Added options to disable ad blocking actions for administrators or logged in users
+- Added option to change PDF report footer (Pro only)
+- Added support for public ad impression and click reports (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.12 =
+- Added ads.txt editor
+- Added option to prevent disabling caching for logged in administrators
+- Improved compatibility with PHP 7.2
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.11 =
+- Fix for saving code with slashes
+- Fix for rotation editor code import
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.10 =
+- Added support for counter shortcodes
+- Added support for code separator selection for code preview
+- Added support for group rotations
+- Added support for CHECK separator (Pro only)
+- Added links to test pages for check for available positions
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.9 =
+- Added support for HEAD separator
+- Added support for DoubleClick for Publishers (DFP) ads
+- Added support to generate statistics reports in PDF format (Pro only)
+- Fix for ad label when using AMP separator
+- Fix for AdSense code fixed by viewport
+- Fix for error when checking for available positions
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.8 =
+- Added support for automatic insertion before/after image
+- Added support for theme checker for available positions for automatic insertion
+
+= 2.4.7 =
+- Fix for lazy loading in Ajax calls (Pro only)
+- Fix for country list editor (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.6 =
+- Improved ad blocking detection (detects Firefox content blocking)
+- Added support for wildcards for referrers (domains)
+- Added debugging notice when JavaScript errors are detected
+- Added support to load blocks in iframes (Pro only)
+- Added geolocation support for country subdivisions and cities (Pro only)
+- Added option to hide license key on client websites (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.5 =
+- Added support for AMP WP - Google AMP For WordPress
+- Added support to individually disable insertions for debugging purposes
+- Improved HTML element selection tool
+- Fix for Call to undefined function wp_get_current_user()
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.4 =
+- Fix for Fatal error: Call to undefined function mb_strtoupper()
+
+= 2.4.3 =
+- Added support for insertion before/after every N paragraphs (%N)
+- Added support for i18n
+- Fix for insertion on admin pages
+- Fix for client-side cookie check
+- Fix for loaded styles from other plugins/themes on the settings page
+- Fix for client-side insertion near HTML elements using :eq selector
+- Fix for deactivation feedback form not closing
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.2 =
+- Added support for visual HTML element selection
+- Fix for client-side insertion inside HTML elements
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.1 =
+- Added option to insert into HTML element (prepend, append, replace content)
+- Added option to remove HTML element
+- Added option to not show deactivation feedback form
+- Added support for negative relative positions for paragraph counting
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.4.0 =
+- Improved code for client-side insertion
+- Added support for usage tracking
+- Fix for compatibility with older PHP versions (below 5.4)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.21 =
+- Added option to force showing admin toolbar when viewing site
+- Added additional debugging info for blocks in Ajax requests
+- Fix for viewport visibility detection
+- Fix for rotation with non-ASCII characters
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.20 =
+- Improved loading of settings
+- Fix for content processing in some ajax calls
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.19 =
+- Improved code for client-side insertion
+- Fix for rotation with shortcodes
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.18 =
+- Added support to schedule insertion for N days after publishing
+- Added support to schedule insertion only for posts published inside/outside time period (Pro only)
+- Added support to prevent activation of free Ad Inserter while Pro is active
+- Added url parameter to show block code
+- Improved Header/Footer code debugging
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.17 =
+- Added shortcode for ad blocking detection action
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.16 =
+- Added option to insert block only when WP loop is currently active
+- Added support for Better AMP plugin
+- Code generator for placeholders on https sites now generates https urls
+- Optimized loading of plugin settings
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.15 =
+- Fix for insertion on AMP pages
+
+= 2.3.14 =
+- Simplified AdSense integration
+- Added setting to define maximum number of blocks (ads) per page
+- Optimized the_content filter processing
+- Added setting for lazy loading offset (Pro only)
+- Fix for url parameter list when using client-side dynamic blocks
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.13 =
+- Added support for lazy loading (Pro only)
+- Fix for unwanted insertions with some paragraph settings
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.12 =
+- Fix for urlencode error
+- Few other minor bug fixes
+
+= 2.3.11 =
+- Added support for W3TC/client-side check for cookies (in url parameter list) to support showing ads based on visitor's cookie consent
+- Added support for W3TC/client-side check for referers
+- Improved paragraph processing
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.10 =
+- Added support for timed rotation
+- Added support for client-side insertion of dynamic blocks
+- Improved word count function
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.9 =
+- Added option to easily disable insertion of individual code block
+- Changes for compatibility with PHP 7.2
+- Added non-interaction parameter to external tracking (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.8 =
+- Added support for rotation option shares
+- Added support for sticky ad settings and animations (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.7 =
+- Added support for ad labels
+- Blocked search indexing while debugging
+- Close button setting moved to tab Display (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.6 =
+- Added widget for debugging tools
+- Fix for AdSense ad overlays not displayed with some themes
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.3.5 =
+- Added display of header and footer code in Label blocks debugging function
+- Added AdSense ad overlays in Label blocks debugging function (experimental)
+- Fixed bug for removed square brackets in HTML element selectors
+- Fixed preview of AdSense ad units
+- Few minor bug fixes
+
+= 2.3.4 =
+- Added support for author:author-username items in taxonomy list
+- Fixed errors when downgrading from Pro
+- Few minor bug fixes
+
+= 2.3.3 =
+- Added list editors
+- Added Label blocks debugging function for AdSense Auto ads
+
+= 2.3.2 =
+- Added AdSense code generator for ad sizes using CSS media queries
+- Fix for slow updates caused by changed user agent (Pro only, credits Olivier Langlois)
+- Fix for client-side insertion of non-English characters before/after HTML element
+
+= 2.3.1 =
+- Added support for server-side insertion before/after any HTML element
+- Few minor bug fixes
+
+= 2.3.0 =
+- Added support for client-side insertion before/after any HTML element
+- Inplemented AdSense integration
+- Added option to define close button position
+- Fix for code generator import and code preview error with non ASCII characters
+- Fix for post/page exceptions and page types not processed in the header
+- Fix for close button in preview window
+- Fix for errors when rearranging blocks
+- Fix for errors when importing code
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.2.16 =
+- Fix for error when saving settings on multisite installation
+
+= 2.2.15 =
+- Fix for responsive AMP ads using center alignment
+
+= 2.2.14 =
+- Added code generator for placeholders
+- Added option to disable caching (works with WP Super Cache, W3 Total Cache and WP Rocket)
+- Added options to configure classes for wrapping div
+- Added support for external tracking via Google Analytics and Piwik (Pro only)
+- Added support for MaxMind geolocation databases (Pro only)
+- Added option for close button on sticky ads (Pro only)
+- Fix for no paragraph counting inside nested elements
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.2.13 =
+- Added option to disable inline alignment styles for code blocks (using alignment classes)
+- Fix for custom CSS codes with single quotation marks
+
+= 2.2.12 =
+- Fix for code block styles when block class name was not set
+
+= 2.2.11 =
+- Code block styles moved to classes
+- Code block list moved to the sidebar
+- Added preview buttons in code block list
+- Fix for ad blocking detection when using https (Pro only)
+- Few minor bug fixes, cosmetic changes and code improvements
+
+= 2.2.10 =
+- Fix for rotation editor code import/export
+- Fix for errors when using old |rotate| separator
+- Few minor bug fixes, cosmetic changes and code improvements
+
 = 2.2.9 =
 - Output buffering is now disabled by default (for position Above header you need to enable it)
 - Fix for min. paragraph number not processed

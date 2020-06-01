@@ -1,0 +1,23 @@
+{
+    "name": "ITSHELLWS",
+    "short_name": "ITSHELLWS",
+    "description": "TECNOLOGIA A TU ALCANCE",
+    "icons": [
+        {
+            "src": "https:\/\/itshellws.apps.itshellws-k8s.com\/wp-content\/plugins\/pwa-for-wp\/images\/logo.png",
+            "sizes": "192x192",
+            "type": "image\/png"
+        },
+        {
+            "src": "https:\/\/itshellws.apps.itshellws-k8s.com\/wp-content\/plugins\/pwa-for-wp\/images\/logo-512x512.png",
+            "sizes": "512x512",
+            "type": "image\/png"
+        }
+    ],
+    "background_color": "#D5E0EB",
+    "theme_color": "#D5E0EB",
+    "display": "standalone",
+    "orientation": "portrait",
+    "start_url": "https:\/\/itshellws.apps.itshellws-k8s.com\/amp\/",
+    "scope": "https:\/\/itshellws.apps.itshellws-k8s.com\/amp\/"
+}

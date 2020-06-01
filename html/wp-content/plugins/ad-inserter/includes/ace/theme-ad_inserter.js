@@ -133,6 +133,9 @@ color: #80ff80;\
 //border: 1px solid #FFBBBB;\
 //border-radius: 3px;\
 }\
+.ace-ad-inserter .ace_data {\
+color: #e0b6ff\
+}\
 .ace-ad-inserter .ace_indent-guide {\
 background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWPQ09NrYAgMjP4PAAtGAwchHMyAAAAAAElFTkSuQmCC) right repeat-y\
 }";

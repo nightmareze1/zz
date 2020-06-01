@@ -3,7 +3,16 @@
 //ini_set ('display_errors', 1);
 //error_reporting (E_ALL);
 
-if (($adsense_client_ids = get_option (AI_ADSENSE_CLIENT_IDS)) !== false) {
+//    GPT
+//  define ('AI_ADSENSE_CLIENT_ID',     '607114800573.apps.googleusercontent.com');
+//  define ('AI_ADSENSE_CLIENT_SECRET', '2muX2P9FHRNtm6BURa49t1z6');
+//  define ('AI_ADSENSE_DEVELOPER_KEY', 'AIzaSyCDZtqhLeAp1XM-xS52nzQ7NwnrOH0UE2U');
+
+if (defined ('AI_CI_STRING') && get_option (AI_ADSENSE_OWN_IDS) === false) {
+  define ('AI_ADSENSE_CLIENT_ID',     base64_decode (AI_CI_STRING));
+  define ('AI_ADSENSE_CLIENT_SECRET', base64_decode (AI_CS_STRING));
+}
+elseif (($adsense_client_ids = get_option (AI_ADSENSE_CLIENT_IDS)) !== false) {
   define ('AI_ADSENSE_CLIENT_ID',     $adsense_client_ids ['ID']);
   define ('AI_ADSENSE_CLIENT_SECRET', $adsense_client_ids ['SECRET']);
 }
@@ -106,7 +115,6 @@ class adsense_api {
       $this->authenticate();
 
       if ($this->isTokenValid ()) {
-
         $adsense_service = $this->getAdSenseService();
 
         $adsense_adsense_accounts   = $adsense_service->accounts;

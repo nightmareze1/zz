@@ -14,7 +14,7 @@ if ( ! class_exists( 'CZR_resources_fonts' ) ) :
         function __construct () {
 
               self::$instance =& $this;
-              add_action( 'wp_enqueue_scripts'            , array( $this , 'czr_fn_enqueue_gfonts' ), 0 );
+              add_action( 'wp_enqueue_scripts'            , array( $this , 'czr_fn_maybe_enqueue_gfonts' ), 0 );
 
               //Font awesome before other theme styles
               add_action( 'wp_enqueue_scripts'            , array( $this , 'czr_fn_maybe_enqueue_fa_icons'), 9 );
@@ -34,8 +34,10 @@ if ( ! class_exists( 'CZR_resources_fonts' ) ) :
         * @since Customizr 3.2.3
         */
         function czr_fn_maybe_enqueue_fa_icons() {
+              if ( czr_fn_is_full_nimble_tmpl() )
+                return;
               //Enqueue FontAwesome CSS
-              if ( true == czr_fn_opt( 'tc_font_awesome_icons' ) ) {
+              if ( true == czr_fn_opt( 'tc_font_awesome_icons' ) && !czr_fn_is_checked( 'tc_defer_font_awesome' ) ) {
                     $_path = apply_filters( 'czr_fa_css_path' , CZR_BASE_URL . CZR_ASSETS_PREFIX . 'shared/fonts/fa/css/' );
                     wp_enqueue_style( 'customizr-fa',
                           $_path . 'fontawesome-all.min.css',
@@ -54,30 +56,41 @@ if ( ! class_exists( 'CZR_resources_fonts' ) ) :
     * @package Customizr
     * @since Customizr 3.2.9
     */
-    function czr_fn_enqueue_gfonts() {
-      $_font_pair         = esc_attr( czr_fn_opt( 'tc_fonts' ) );
-
-      if ( ! $this -> czr_fn_is_gfont( $_font_pair , '_g_') )
+    function czr_fn_maybe_enqueue_gfonts() {
+      // March 2020 : gfonts can be preloaded since https://github.com/presscustomizr/customizr/issues/1816
+      if ( czr_fn_is_checked( 'tc_preload_gfonts' ) )
         return;
-
-      $font               = explode( '|', czr_fn_get_font( 'single' , $_font_pair ) );
-
-      if ( ! $font )
+      $gfonts = self::czr_fn_get_gfont_candidates();
+      if ( !$gfonts || empty( $gfonts ) )
         return;
-
-      if ( is_array( $font ) )//case is a pair
-        $font             = implode( '%7C', array_unique( $font ) );
-
 
       wp_enqueue_style(
         'czr-gfonts',
-        sprintf( '//fonts.googleapis.com/css?family=%s', $font ),
+        sprintf( '//fonts.googleapis.com/css?family=%1$s&display=swap', $gfonts ),
         array(),
         null,
         'all'
       );
     }
 
+
+    static function czr_fn_get_gfont_candidates() {
+      $_font_pair = esc_attr( czr_fn_opt( 'tc_fonts' ) );
+
+      if ( !czr_fn_is_gfont( $_font_pair , '_g_') )
+        return;
+
+      $font = explode( '|', czr_fn_get_font( 'single' , $_font_pair ) );
+
+      if ( ! $font )
+        return;
+
+      if ( !is_array( $font ) )//case is a pair
+        return;
+
+      return implode( '%7C', array_unique( $font ) );
+
+    }
 
 
     /**
@@ -116,7 +129,7 @@ if ( ! class_exists( 'CZR_resources_fonts' ) ) :
 
         foreach ($_selector_fonts as $_key => $_raw_font) {
           //create the $_family and $_weight vars
-          extract( $this -> czr_fn_get_font_css_prop( $_raw_font , $this -> czr_fn_is_gfont( $_font_pair ) ) );
+          extract( $this -> czr_fn_get_font_css_prop( $_raw_font , czr_fn_is_gfont( $_font_pair ) ) );
 
           $selector = '';
 
@@ -146,8 +159,12 @@ if ( ! class_exists( 'CZR_resources_fonts' ) ) :
 
       /*
       * TODO: implement modular scale
+      * oct 2019 => we don't change the editor font-size anymore based on user options
+      * invoked in CZR_admin_init::czr_fn_user_defined_tinymce_css
+      * @see https://github.com/presscustomizr/customizr/issues/1781
       */
-      if ( 15 != $_body_font_size ) {
+
+      if ( 15 != $_body_font_size && is_null( $_context ) ) {
 
           $_line_height = apply_filters('czr_body_line_height_ratio', 1.5 );
           if ( ! czr_fn_is_checked( 'tc_ms_respond_css' ) ) {
@@ -160,7 +177,9 @@ if ( ! class_exists( 'CZR_resources_fonts' ) ) :
                 line-height : {$_line_height}em;
               }\n";
           } else {
-            $emsize_medium = $_body_font_size * 0.833 / 16;//@see assets/css/front/stye-modular-scale.css
+            // June 2019 => increase the ratio from 0.833 to 0.9 to limit problems when deactivating modular scale.
+            // @see https://github.com/presscustomizr/customizr/issues/1755
+            $emsize_medium = $_body_font_size * 0.900 / 16;//@see assets/css/front/stye-modular-scale.css
             $emsize_medium = number_format( (float)$emsize_medium, 2, '.', '');
             $emsize_large = $_body_font_size * 0.9375 / 16;
             $emsize_large = number_format( (float)$emsize_large, 2, '.', '');
@@ -185,18 +204,6 @@ if ( ! class_exists( 'CZR_resources_fonts' ) ) :
       return $_css;
     }//end of fn
 
-
-    /**
-    * Helper to check if the requested font code includes the Google font identifier : _g_
-    * @return bool
-    *
-    * @package Customizr
-    * @since Customizr 3.3.2
-    */
-    private function czr_fn_is_gfont($_font , $_gfont_id = null ) {
-      $_gfont_id = $_gfont_id ? $_gfont_id : '_g_';
-      return false !== strpos( $_font , $_gfont_id );
-    }
 
 
     /**

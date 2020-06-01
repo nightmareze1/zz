@@ -1,55 +1,68 @@
 var adsense_ad_names = [];
 var ai_preview_window = typeof ai_preview !== 'undefined';
 
-function ai_process_adsense_ads ($) {
-  var ai_debug = typeof ai_debugging !== 'undefined';
-  $('ins ins iframe').each (function () {
-    var adsense_iframe = $(this);
-    var adsense_width = adsense_iframe.attr ('width');
-    var adsense_height = adsense_iframe.attr ('height');
-    var adsense_iframe2 = adsense_iframe.contents().find ('iframe[allowtransparency]');
-    var url_parameters = getAllUrlParams (adsense_iframe2.attr ('src'))
+function ai_process_adsense_ad (element) {
+  var ai_debug = typeof ai_debugging !== 'undefined'; // 1
+//  var ai_debug = false;
 
-    if (typeof url_parameters ['client'] !== 'undefined') {
-      var adsense_ad_client = url_parameters ['client'];
-      var adsense_publisher_id = adsense_ad_client.replace ('ca-', '');
-      var adsense_ad_slot = url_parameters ['slotname'];
-      var adsense_index = url_parameters ['ifi'];
+  var adsense_container = jQuery(element);
+  var adsense_width = adsense_container.attr ('width');
+  var adsense_height = adsense_container.attr ('height');
 
-      if (ai_debug) console.log ('AI ADSENSE', adsense_index, adsense_ad_client, adsense_ad_slot, url_parameters ['format'], url_parameters ['w'], url_parameters ['h']);
+//  var adsense_iframe2 = adsense_container.contents().find ('iframe[allowtransparency]');
+//  var url_parameters = getAllUrlParams (adsense_iframe2.attr ('src'))
+  var url_parameters = getAllUrlParams (adsense_container.attr ('src'))
 
-      var adsense_overlay = $('<div class="ai-debug-ad-overlay"></div>');
+  if (typeof url_parameters ['client'] !== 'undefined') {
+    var adsense_ad_client = url_parameters ['client'];
+    var adsense_publisher_id = adsense_ad_client.replace ('ca-', '');
+    var adsense_ad_slot = url_parameters ['slotname'];
+    var adsense_index = url_parameters ['ifi'];
 
-      var adsense_ad_info = '';
-      if (typeof adsense_ad_slot !== 'undefined') {
-        var adsense_ad_name = '';
-        if (typeof adsense_ad_names ['publisher_id'] !== 'undefined' &&
-            adsense_ad_names ['publisher_id'] == adsense_publisher_id &&
-            typeof adsense_ad_names [adsense_ad_slot] !== 'undefined') {
-          adsense_ad_name = '<div class="ai-info ai-info-2">' + adsense_ad_names [adsense_ad_slot] + '</div>';
-        }
-        adsense_ad_info = '<div class="ai-info ai-info-1">' + adsense_ad_slot + '</div>' + adsense_ad_name;
-      } else {
-          var adsense_auto_ads = adsense_iframe.closest ('div.google-auto-placed').length != 0;
-          if (adsense_auto_ads) {
-            adsense_overlay.addClass ('ai-auto-ads');
-            adsense_ad_info = '<div class="ai-info ai-info-1">Auto ads</div>';
-          } else adsense_overlay.addClass ('ai-no-slot');
-        }
+    if (ai_debug) console.log ('AI ADSENSE', adsense_index, adsense_ad_client, adsense_ad_slot, url_parameters ['format'], url_parameters ['w'], url_parameters ['h']);
 
-      var adsense_info = $('<div class="ai-debug-ad-info"><div class="ai-info ai-info-1">AdSense #' + adsense_index + '</div><div class="ai-info ai-info-2">' + adsense_width + 'x' + adsense_height + '</div>' + adsense_ad_info + '</div>');
+    var adsense_overlay = jQuery('<div class="ai-debug-ad-overlay"></div>');
 
-      adsense_iframe.after (adsense_info);
-
-      if (!ai_preview_window) {
-        adsense_iframe.after (adsense_overlay);
+    var adsense_ad_info = '';
+    if (typeof adsense_ad_slot !== 'undefined') {
+      var adsense_ad_name = '';
+      if (typeof adsense_ad_names ['publisher_id'] !== 'undefined' &&
+          adsense_ad_names ['publisher_id'] == adsense_publisher_id &&
+          typeof adsense_ad_names [adsense_ad_slot] !== 'undefined') {
+        adsense_ad_name = '<div class="ai-info ai-info-2">' + adsense_ad_names [adsense_ad_slot] + '</div>';
       }
+      adsense_ad_info = '<div class="ai-info ai-info-1">' + adsense_ad_slot + '</div>' + adsense_ad_name;
+    } else {
+        var adsense_auto_ads = adsense_container.closest ('div.google-auto-placed').length != 0;
+        if (adsense_auto_ads) {
+          adsense_overlay.addClass ('ai-auto-ads');
+          adsense_ad_info = '<div class="ai-info ai-info-1">Auto ads</div>';
+        } else adsense_overlay.addClass ('ai-no-slot');
+      }
+
+    var adsense_info = jQuery('<div class="ai-debug-ad-info"><div class="ai-info ai-info-1">AdSense #' + adsense_index + '</div><div class="ai-info ai-info-2">' + adsense_width + 'x' + adsense_height + '</div>' + adsense_ad_info + '</div>');
+
+    adsense_container.after (adsense_info);
+
+    if (!ai_preview_window) {
+      adsense_container.after (adsense_overlay);
     }
+  }
+}
+
+function ai_process_adsense_ads () {
+//  jQuery('ins ins iframe').each (function () {
+  jQuery('ins > ins > iframe[src*="google"]:visible').each (function () {
+    var dummy_container = jQuery (this).closest ('.ai-dummy-ad');
+//    if (!dummy_container.length) ai_process_adsense_ad (this);
+    if (!dummy_container.length) ai_process_adsense_ad (this);
   });
 }
 
 jQuery(document).ready(function($) {
-  var ai_debug = typeof ai_debugging !== 'undefined';
+  var ai_debug = typeof ai_debugging !== 'undefined'; // 2
+//  var ai_debug = false;
+
   var ajaxurl = 'AI_AJAXURL';
   var nonce = 'AI_NONCE';
   var adsense_data = {'ai': 1}; // dummy
@@ -60,6 +73,7 @@ jQuery(document).ready(function($) {
         try {
           adsense_ad_names = JSON.parse (data);
 
+          if (ai_debug) console.log ('');
           if (ai_debug) console.log ("AI ADSENSE DATA:", Object.keys (adsense_ad_names).length - 1, 'ad units');
 
         } catch (error) {
@@ -72,7 +86,10 @@ jQuery(document).ready(function($) {
       if (ai_debug) console.log ('AI ADSENSE DATA', 'END');
   });
 
-  if (!ai_preview_window) setTimeout (function() {ai_process_adsense_ads (jQuery);}, 2000);
+  $(window).on ('load', function () {
+    if (!ai_preview_window) setTimeout (function() {ai_process_adsense_ads (jQuery);}, 50);
+  });
+
 });
 
 function getAllUrlParams (url) {
@@ -104,7 +121,8 @@ function getAllUrlParams (url) {
       });
 
       // set parameter value (use 'true' if empty)
-      var paramValue = typeof(a[1])==='undefined' ? true : a[1];
+//      var paramValue = typeof(a[1])==='undefined' ? true : a[1];
+      var paramValue = typeof(a[1])==='undefined' ? '' : a[1];
 
       // (optional) keep case consistent
       paramName = paramName.toLowerCase();
